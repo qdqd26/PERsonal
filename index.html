@@ -1,13 +1,1865 @@
-{
-  "name": "pair-aura-web",
-  "version": "1.1.0",
-  "private": true,
-  "description": "Deployment-ready static H5/web MVP for Pair Aura relationship report sharing.",
-  "scripts": {
-    "start": "npx serve .",
-    "check:js": "node scripts/check-js.mjs",
-    "deploy:vercel": "vercel --prod"
-  },
-  "keywords": ["pair-aura", "mbti", "sbti", "h5", "static-site"],
-  "license": "UNLICENSED"
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#120B2E" />
+  <meta name="description" content="输入两个人的 MBTI / SBTI 类型，生成短、准、好分享的关系气场报告。" />
+  <meta name="application-name" content="Pair Aura" />
+  <meta name="apple-mobile-web-app-title" content="Pair Aura" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pair Aura 关系气场报告" />
+  <meta property="og:description" content="测测你和 TA 是哪种关系：合拍指数、关系类型、相处建议和分享海报。" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Pair Aura 关系气场报告" />
+  <meta name="twitter:description" content="测测你和 TA 是哪种关系：合拍指数、关系类型、相处建议和分享海报。" />
+  <title>Pair Aura 关系气场报告</title>
+  <style>
+:root {
+  --bg: #120b2e;
+  --card: rgba(255, 255, 255, 0.12);
+  --card-strong: rgba(255, 255, 255, 0.18);
+  --stroke: rgba(255, 255, 255, 0.20);
+  --text: #ffffff;
+  --muted: #cfc7ff;
+  --muted-2: #9f94d6;
+  --pink: #ff5ca8;
+  --purple: #7b61ff;
+  --blue: #46d9ff;
+  --green: #78f2c2;
+  --yellow: #ffe66d;
+  --shadow: 0 22px 80px rgba(0, 0, 0, 0.35);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
+
+* { box-sizing: border-box; }
+html { min-height: 100%; background: var(--bg); }
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 92, 168, 0.32), transparent 30%),
+    radial-gradient(circle at 78% 24%, rgba(70, 217, 255, 0.26), transparent 32%),
+    linear-gradient(160deg, #120b2e 0%, #1b0f42 45%, #090719 100%);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255,255,255,.14) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.45), transparent 75%);
+}
+
+.ambient {
+  position: fixed;
+  width: 360px;
+  height: 360px;
+  border-radius: 999px;
+  filter: blur(70px);
+  opacity: .55;
+  pointer-events: none;
+  z-index: 0;
+}
+.ambient-a { background: var(--pink); left: -160px; top: 8vh; }
+.ambient-b { background: var(--blue); right: -150px; top: 24vh; }
+.ambient-c { background: var(--purple); left: 26vw; bottom: -190px; }
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) 16px 30px;
+}
+
+.view { display: none; animation: fadeIn .28s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  margin-bottom: 12px;
+}
+.sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 8px 0;
+  backdrop-filter: blur(20px);
+}
+.brand-mark {
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: rgba(255,255,255,.92);
+}
+
+button, input, select { font: inherit; }
+button { cursor: pointer; border: 0; }
+.primary-btn, .secondary-btn, .ghost-btn {
+  border-radius: 999px;
+  padding: 14px 20px;
+  transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+}
+.primary-btn {
+  color: #160b32;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--yellow), var(--green) 35%, var(--blue) 70%, var(--pink));
+  box-shadow: 0 16px 44px rgba(70, 217, 255, .25);
+}
+.secondary-btn {
+  color: var(--text);
+  background: rgba(255,255,255,.12);
+  border: 1px solid var(--stroke);
+}
+.ghost-btn {
+  color: var(--text);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+}
+.small { padding: 9px 13px; font-size: 13px; }
+.wide { width: 100%; margin-top: 22px; }
+button:hover { transform: translateY(-1px); }
+button:active { transform: translateY(1px) scale(.99); }
+
+.home-view {
+  min-height: calc(100vh - 50px);
+  display: none;
+  align-content: start;
+}
+.home-view.active { display: grid; }
+.hero-orbit {
+  position: relative;
+  height: 260px;
+  margin-top: 12px;
+}
+.aura {
+  position: absolute;
+  top: 48px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 44px;
+  color: white;
+  box-shadow: inset 0 0 34px rgba(255,255,255,.28), 0 0 70px rgba(255,255,255,.18);
+  animation: float 4s ease-in-out infinite;
+}
+.aura-left {
+  left: calc(50% - 175px);
+  background: radial-gradient(circle at 35% 35%, #fff, #ff8bc4 18%, #7b61ff 58%, rgba(123,97,255,.16));
+}
+.aura-right {
+  right: calc(50% - 175px);
+  animation-delay: -1.5s;
+  background: radial-gradient(circle at 35% 35%, #fff, #80f2ff 18%, #46d9ff 46%, rgba(255,92,168,.28));
+}
+.aura-core {
+  position: absolute;
+  inset: 88px 0 auto;
+  margin: auto;
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.9), rgba(255,230,109,.62), transparent 66%);
+  filter: blur(1px);
+  opacity: .72;
+}
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+
+.hero-copy { text-align: center; }
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(42px, 9vw, 82px);
+  line-height: 1.02;
+  letter-spacing: -.05em;
+}
+.subtitle {
+  width: min(560px, 100%);
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 26px 0 16px;
+}
+.sample-tags {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  color: rgba(255,255,255,.86);
+}
+.sample-tags span {
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+}
+
+.form-card, .report-card, .poster-panel {
+  background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+  border: 1px solid var(--stroke);
+  border-radius: 30px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(24px);
+}
+.form-card { padding: 20px; }
+.section-title {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.section-title > span {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.15);
+  color: var(--yellow);
+  font-weight: 900;
+}
+.section-title h2 { margin: 0; font-size: 22px; }
+.section-title p { margin: 5px 0 0; color: var(--muted); line-height: 1.5; }
+.gap-top { margin-top: 28px; }
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.choice-grid.compact { grid-template-columns: repeat(2, 1fr); }
+.choice-card {
+  min-height: 118px;
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  text-align: left;
+}
+.choice-card strong { display: block; margin: 8px 0 5px; }
+.choice-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.choice-card.active {
+  background: linear-gradient(135deg, rgba(255,92,168,.24), rgba(70,217,255,.18));
+  border-color: rgba(255,255,255,.42);
+  box-shadow: 0 14px 32px rgba(70,217,255,.16);
+}
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.person-card {
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
+}
+.person-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.person-badge {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  font-weight: 900;
+}
+.person-badge.alt { background: linear-gradient(135deg, var(--blue), var(--green)); }
+label {
+  display: block;
+  margin: 12px 0 7px;
+  color: var(--muted);
+  font-size: 13px;
+}
+input, select {
+  width: 100%;
+  color: white;
+  background: rgba(18, 11, 46, .52);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 15px;
+  padding: 12px 13px;
+  outline: none;
+}
+select option { color: #111; }
+.fine-print { color: var(--muted-2); font-size: 12px; line-height: 1.6; text-align: center; }
+
+.loading-view.active {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.loader-orbit {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  margin: 0 auto 24px;
+}
+.loader-orbit div {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--pink);
+  animation: spin 1.8s linear infinite;
+}
+.loader-orbit div:nth-child(2) { inset: 18px; border-top-color: var(--blue); animation-duration: 1.4s; animation-direction: reverse; }
+.loader-orbit div:nth-child(3) { inset: 38px; border-top-color: var(--green); animation-duration: 1.1s; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.report-hero {
+  padding: 26px;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 26% 16%, rgba(255,92,168,.35), transparent 35%),
+    radial-gradient(circle at 78% 36%, rgba(70,217,255,.28), transparent 35%),
+    linear-gradient(160deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow);
+}
+.report-hero h2 { margin: 6px 0 8px; font-size: clamp(38px, 8vw, 70px); line-height: 1; letter-spacing: -.05em; }
+.report-hero .score { font-size: 76px; line-height: 1; font-weight: 900; margin: 16px 0 8px; }
+.report-hero .score span { font-size: 28px; color: var(--muted); }
+.keyword-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.keyword-row span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+  color: var(--yellow);
+  font-weight: 700;
+}
+.summary { color: var(--muted); line-height: 1.7; font-size: 16px; }
+.quick-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+.comparison-grid, .content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+.report-card { padding: 18px; }
+.report-card h3 { margin: 0 0 8px; font-size: 18px; }
+.report-card p { margin: 0; color: var(--muted); line-height: 1.65; }
+.type-pill { display: inline-flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.10); margin-bottom: 10px; }
+.dim-card { margin-top: 14px; }
+.dim-item { margin: 15px 0; }
+.dim-head { display: flex; justify-content: space-between; color: rgba(255,255,255,.9); font-weight: 700; margin-bottom: 8px; }
+.dim-track { height: 12px; border-radius: 999px; background: rgba(255,255,255,.12); overflow: hidden; }
+.dim-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pink), var(--blue), var(--green)); }
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+.stat-strip div {
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.12);
+  text-align: center;
+}
+.stat-strip strong { display: block; font-size: 28px; }
+.stat-strip span { color: var(--muted); font-size: 12px; }
+
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 12px 0 4px;
+}
+.link-card {
+  display: block;
+  padding: 15px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.14);
+  color: var(--text);
+  text-decoration: none;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+.link-card:hover { transform: translateY(-2px); background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.28); }
+.link-card strong { display: block; font-size: 15px; margin-bottom: 5px; }
+.link-card span { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.metric-panel { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.12); }
+.metric-panel h4, .facet-section h4 { margin: 0 0 10px; font-size: 14px; color: rgba(255,255,255,.92); }
+.mini-metric { margin: 10px 0; }
+.mini-metric-head { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: rgba(255,255,255,.86); margin-bottom: 5px; }
+.mini-track { height: 8px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.12); }
+.mini-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pink), var(--blue), var(--green)); }
+.facet-section { margin-top: 16px; }
+.facet-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.facet-chip {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.88);
+  font-size: 12px;
+  line-height: 1.1;
+}
+.facet-chip.hot { background: rgba(255,230,109,.12); border-color: rgba(255,230,109,.34); color: #fff6b0; }
+.facet-compare-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+.facet-compare-card { padding: 12px; border-radius: 18px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+.facet-compare-card strong { display: block; margin-bottom: 4px; font-size: 13px; }
+.facet-compare-card span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.roast-card { border-color: rgba(255,230,109,.35); background: linear-gradient(180deg, rgba(255,230,109,.16), rgba(255,92,168,.10)); }
+.source-note { margin-top: 10px; color: rgba(255,255,255,.54); font-size: 12px; line-height: 1.55; }
+
+.poster-panel { padding: 16px; }
+#posterCanvas {
+  display: block;
+  width: min(100%, 430px);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  background: #120b2e;
+}
+.poster-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+
+.share-tools {
+  width: min(100%, 720px);
+  margin: 18px auto 0;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 18px 48px rgba(0,0,0,.18);
+}
+.share-tools h3 { margin: 0 0 8px; font-size: 17px; }
+.share-tools p { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.share-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin: 10px 0; }
+.share-row input, .share-row textarea {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(5,3,18,.42);
+  color: #fff;
+  border-radius: 16px;
+  padding: 12px 14px;
+  outline: none;
+  font-size: 13px;
+  line-height: 1.5;
+  min-width: 0;
+}
+.share-row textarea { min-height: 78px; resize: vertical; }
+.share-row input:focus, .share-row textarea:focus { border-color: rgba(120,242,194,.48); box-shadow: 0 0 0 3px rgba(120,242,194,.12); }
+.share-status { margin-top: 8px; color: #fff6b0; font-size: 12px; line-height: 1.55; }
+.share-status.ok { color: #baffdf; }
+.share-status.warn { color: #fff6b0; }
+.qr-status { text-align: center; margin-top: 10px; color: rgba(255,255,255,.62); font-size: 12px; }
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(20px);
+  opacity: 0;
+  z-index: 20;
+  max-width: min(480px, calc(100% - 28px));
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.72);
+  color: white;
+  pointer-events: none;
+  transition: .22s ease;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 760px) {
+  .choice-grid, .choice-grid.compact, .people-grid, .comparison-grid, .content-grid, .resource-grid, .facet-compare-grid, .share-row { grid-template-columns: 1fr; }
+  .form-card { padding: 16px; border-radius: 24px; }
+  .aura { width: 142px; height: 142px; }
+  .aura-left { left: calc(50% - 145px); }
+  .aura-right { right: calc(50% - 145px); }
+  .hero-orbit { height: 232px; }
+  .hero-actions .primary-btn, .hero-actions .secondary-btn { width: 100%; }
+  .stat-strip { grid-template-columns: 1fr; }
+  .top-nav { margin-bottom: 8px; }
+}
+
+  
+.official-only { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.variant-select { margin-bottom: 6px; }
+.compact-note { color: var(--muted); font-size: 13px; line-height: 1.65; }
+.compact-chips { margin-top: 10px; }
+.hero-stats { margin: 20px 0 0; }
+.highlight-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.highlight-chip { padding: 12px; border-radius: 18px; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.16); }
+.highlight-chip strong { display: block; color: #fff; font-size: 15px; }
+.highlight-chip span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.compact-content { grid-template-columns: repeat(3, 1fr); }
+.compact-algo-card { margin-top: 14px; }
+.compact-facet-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 760px) { .official-only, .highlight-row, .compact-content, .compact-facet-grid { grid-template-columns: 1fr; } }
+
+.scene-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 14px; }
+.scene-card { position: relative; overflow: hidden; }
+.scene-card::after { content: ""; position: absolute; width: 120px; height: 120px; right: -42px; top: -48px; border-radius: 50%; background: radial-gradient(circle, rgba(255,230,109,.22), transparent 70%); }
+.algo-focus { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.algo-focus .focus-item { padding: 15px; border-radius: 22px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.13); text-align: center; }
+.algo-focus strong { display: block; font-size: 30px; line-height: 1; }
+.algo-focus span { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; }
+.punchline { color: #fff; font-size: 18px; line-height: 1.7; margin: 18px 0 0; }
+@media (max-width: 760px) { .scene-grid, .algo-focus { grid-template-columns: 1fr; } }
+
+</style>
+  <!-- QRCode is loaded lazily by ensureQrLib(); no blocking external script in the critical path. -->
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="ambient ambient-c"></div>
+
+  <main class="app-shell">
+    <section id="homeView" class="view active home-view">
+      <nav class="top-nav">
+        <div class="brand-mark">Pair Aura</div>
+        <button class="ghost-btn small" id="jumpToInputBtn">直接生成</button>
+      </nav>
+
+      <div class="hero-orbit" aria-hidden="true">
+        <div class="aura aura-left"><span>A</span></div>
+        <div class="aura aura-right"><span>B</span></div>
+        <div class="aura-core"></div>
+      </div>
+
+      <div class="hero-copy">
+        <p class="eyebrow">RELATIONSHIP AURA REPORT</p>
+        <h1>测测你和 TA<br />是哪种关系气场</h1>
+        <p class="subtitle">输入两个人的 MBTI / SBTI 类型，生成合拍指数、冲突点、相处建议和可转发海报。</p>
+      </div>
+
+      <div class="hero-actions">
+        <button class="primary-btn" id="startBtn">开始合成关系</button>
+        <button class="secondary-btn" id="loadDemoBtn">看一个示例</button>
+      </div>
+
+      <div class="sample-tags">
+        <span>高吸引高摩擦型</span>
+        <span>互补成长型</span>
+        <span>稳定同频型</span>
+        <span>需要翻译型</span>
+      </div>
+    </section>
+
+    <section id="inputView" class="view input-view">
+      <nav class="top-nav">
+        <button class="ghost-btn small" data-back-home>返回</button>
+        <div class="brand-mark">生成设置</div>
+      </nav>
+
+      <form id="reportForm" class="form-card">
+        <div class="section-title">
+          <span>01</span>
+          <div>
+            <h2>选择关系组</h2>
+            <p>先选大方向，报告里会自动展开朋友/情侣或学习/项目两种用法。</p>
+          </div>
+        </div>
+
+        <div class="choice-grid" id="contextChoices"></div>
+
+        <div class="section-title gap-top">
+          <span>02</span>
+          <div>
+            <h2>选择报告语气</h2>
+            <p>只保留两种高差异风格：温情吐槽，或现实清醒。</p>
+          </div>
+        </div>
+        <div class="choice-grid compact" id="styleChoices"></div>
+
+        <div class="section-title gap-top">
+          <span>03</span>
+          <div>
+            <h2>先去测 / 核对结果</h2>
+            <p>我们不复制第三方报告，只提供入口方便你确认自己的类型。</p>
+          </div>
+        </div>
+        <div class="resource-grid official-only">
+          <a class="link-card" href="https://www.mbtionline.com/" target="_blank" rel="noopener noreferrer"><strong>MBTI 官方测评</strong><span>The Myers-Briggs Company 的官方在线入口；用于确认你的 MBTI 类型。</span></a>
+          <a class="link-card" href="https://www.sbti.ai/en" target="_blank" rel="noopener noreferrer"><strong>SBTI 官方测评</strong><span>SBTI 官方入口；可测出 27 种娱乐人格标签并核对结果。</span></a>
+        </div>
+
+        <div class="section-title gap-top">
+          <span>04</span>
+          <div>
+            <h2>输入两个人的类型</h2>
+            <p>先用手动输入跑通传播闭环，后续再加截图识别。</p>
+          </div>
+        </div>
+
+        <div class="people-grid">
+          <article class="person-card">
+            <div class="person-head">
+              <span class="person-badge">A</span>
+              <strong>你 / A</strong>
+            </div>
+            <label>昵称</label>
+            <input id="nameA" type="text" placeholder="例如：我" maxlength="12" />
+            <label>测评体系</label>
+            <select id="systemA"></select>
+            <label>类型</label>
+            <select id="typeA"></select>
+            <label class="variant-label" id="variantLabelA">MBTI 细分指标</label>
+            <select id="variantA" class="variant-select"></select>
+          </article>
+
+          <article class="person-card">
+            <div class="person-head">
+              <span class="person-badge alt">B</span>
+              <strong>TA / B</strong>
+            </div>
+            <label>昵称</label>
+            <input id="nameB" type="text" placeholder="例如：TA" maxlength="12" />
+            <label>测评体系</label>
+            <select id="systemB"></select>
+            <label>类型</label>
+            <select id="typeB"></select>
+            <label class="variant-label" id="variantLabelB">MBTI 细分指标</label>
+            <select id="variantB" class="variant-select"></select>
+          </article>
+        </div>
+
+        <button type="submit" class="primary-btn wide">生成关系气场报告</button>
+        <p class="fine-print">仅供娱乐、社交破冰和自我理解，不构成心理诊断、职业筛选或严肃关系决策建议。</p>
+      </form>
+    </section>
+
+    <section id="loadingView" class="view loading-view">
+      <div class="loader-orbit">
+        <div></div><div></div><div></div>
+      </div>
+      <h2 id="loadingText">正在合成你们的关系气场...</h2>
+      <p>检测互补频率、心动摩擦值和沟通翻译难度。</p>
+    </section>
+
+    <section id="reportView" class="view report-view">
+      <nav class="top-nav sticky-nav">
+        <button class="ghost-btn small" data-edit>重新输入</button>
+        <div class="brand-mark">报告结果</div>
+        <button class="ghost-btn small" data-share-link>分享</button>
+      </nav>
+      <div id="reportMount"></div>
+    </section>
+
+    <section id="posterView" class="view poster-view">
+      <nav class="top-nav sticky-nav">
+        <button class="ghost-btn small" data-back-report>返回报告</button>
+        <div class="brand-mark">分享海报</div>
+      </nav>
+      <div class="poster-panel">
+        <canvas id="posterCanvas" width="900" height="1280" aria-label="关系气场分享海报"></canvas>
+        <p id="qrStatus" class="qr-status">二维码会指向当前报告链接。</p>
+        <div class="poster-actions">
+          <button class="primary-btn" id="downloadPosterBtn">下载海报</button>
+          <button class="secondary-btn" id="copyLinkBtn">复制链接</button>
+          <button class="secondary-btn" id="copyShareTextBtn">复制文案</button>
+          <button class="secondary-btn" id="nativeShareBtn">系统分享</button>
+        </div>
+        <div class="share-tools">
+          <h3>分享链接设置</h3>
+          <p>本地预览时生成的是本地链接，不能直接发给别人。部署后可在这里填写你的线上首页地址，二维码和复制链接会自动改成公开链接。</p>
+          <div class="share-row">
+            <input id="publicBaseUrlInput" type="url" placeholder="例如：https://your-domain.com/ 或 https://xxx.vercel.app/" />
+            <button class="secondary-btn" id="applyBaseUrlBtn">应用域名</button>
+          </div>
+          <div class="share-row">
+            <input id="shareUrlInput" type="text" readonly aria-label="当前报告分享链接" />
+            <button class="secondary-btn" id="openShareUrlBtn">打开链接</button>
+          </div>
+          <div class="share-row">
+            <textarea id="shareTextInput" readonly aria-label="推荐分享文案"></textarea>
+            <button class="secondary-btn" id="copyShareTextBtn2">复制文案</button>
+          </div>
+          <div id="shareStatus" class="share-status warn">等待生成公开分享链接。</div>
+        </div>
+        <p class="fine-print">微信内可长按保存图片，或复制链接发给 TA。二维码、海报和系统分享会使用同一个报告链接。</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+// Pair Aura Web MVP
+// No backend, no login. The report is generated from transparent rule-based scoring.
+
+const MBTI_TYPES = [
+  'INTJ', 'INTP', 'ENTJ', 'ENTP',
+  'INFJ', 'INFP', 'ENFJ', 'ENFP',
+  'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
+  'ISTP', 'ISFP', 'ESTP', 'ESFP'
+];
+
+const MBTI_TITLES = {
+  INTJ: '战略规划者', INTP: '逻辑探索者', ENTJ: '强势推进者', ENTP: '灵感辩手',
+  INFJ: '深度共情者', INFP: '理想主义者', ENFJ: '关系组织者', ENFP: '热情探索者',
+  ISTJ: '稳定执行者', ISFJ: '温柔守护者', ESTJ: '秩序管理者', ESFJ: '氛围照顾者',
+  ISTP: '冷静实干者', ISFP: '感性体验者', ESTP: '现场行动派', ESFP: '快乐感染者'
+};
+
+const MBTI_VARIANTS = {
+  standard: { label: '标准估算', desc: '只按四字母类型估算', adjust: {} },
+  assertive: { label: '-A 稳定版', desc: '更稳定、更少内耗', adjust: { stress_sensitivity: -18, stability_need: 8, conflict_directness: 4 } },
+  turbulent: { label: '-T 敏感版', desc: '更敏感、更在意反馈', adjust: { stress_sensitivity: 20, emotional_expression: 10, intimacy_need: 8, stability_need: 8 } },
+  expressive: { label: '表达外放版', desc: '更主动表达，更容易把情绪说出来', adjust: { emotional_expression: 16, social_energy: 8, conflict_directness: 6 } },
+  contained: { label: '克制内收版', desc: '表达更慢热，更需要空间', adjust: { emotional_expression: -14, social_energy: -8, independence_need: 10 } },
+  planful: { label: '计划强化版', desc: '更重视安排、确定性和提前量', adjust: { planning: 16, stability_need: 12, novelty: -6 } },
+  flexible: { label: '随性灵活版', desc: '更即兴，更容易边走边看', adjust: { planning: -16, novelty: 10, change_readiness: 12 } },
+  logical: { label: '理性决策版', desc: '更重证据链和问题解决', adjust: { logic_orientation: 14, emotional_expression: -6, conflict_directness: 8 } },
+  empathic: { label: '共情回应版', desc: '更在意感受、氛围和关系温度', adjust: { logic_orientation: -12, emotional_expression: 12, cooperation: 12, intimacy_need: 8 } }
+};
+
+function applyMbtiVariant(vector, variantId) {
+  const variant = MBTI_VARIANTS[variantId] || MBTI_VARIANTS.standard;
+  const next = { ...vector };
+  Object.entries(variant.adjust || {}).forEach(([key, delta]) => {
+    next[key] = clamp((next[key] || 0) + delta, 0, 100);
+  });
+  return next;
+}
+
+const SBTI_TYPES = {
+  'CTRL': { title: '操盘控制型', vector: { social_energy: 64, emotional_expression: 42, logic_orientation: 78, planning: 86, novelty: 56, conflict_directness: 78, intimacy_need: 42, independence_need: 74, cooperation: 54, stability_need: 78 }, keywords: ['掌控', '会安排', '别催我'] },
+  'ATM-er': { title: '人形提款机型', vector: { social_energy: 66, emotional_expression: 76, logic_orientation: 44, planning: 52, novelty: 58, conflict_directness: 48, intimacy_need: 86, independence_need: 36, cooperation: 88, stability_need: 62 }, keywords: ['付出型', '好说话', '容易透支'] },
+  'Dior-s': { title: '逆袭智者型', vector: { social_energy: 42, emotional_expression: 52, logic_orientation: 74, planning: 70, novelty: 70, conflict_directness: 56, intimacy_need: 50, independence_need: 78, cooperation: 58, stability_need: 66 }, keywords: ['蛰伏', '自尊', '等我逆袭'] },
+  'BOSS': { title: '大哥开路型', vector: { social_energy: 78, emotional_expression: 54, logic_orientation: 76, planning: 84, novelty: 62, conflict_directness: 86, intimacy_need: 48, independence_need: 70, cooperation: 58, stability_need: 74 }, keywords: ['带队', '强势', '我来'] },
+  'THAN-K': { title: '感恩大师型', vector: { social_energy: 70, emotional_expression: 82, logic_orientation: 40, planning: 58, novelty: 56, conflict_directness: 46, intimacy_need: 78, independence_need: 42, cooperation: 88, stability_need: 64 }, keywords: ['感恩', '会哄', '情绪价值'] },
+  'OH-NO': { title: '惊慌预警型', vector: { social_energy: 48, emotional_expression: 78, logic_orientation: 44, planning: 62, novelty: 42, conflict_directness: 42, intimacy_need: 74, independence_need: 48, cooperation: 66, stability_need: 88 }, keywords: ['焦虑', '预警', '先别慌'] },
+  'GOGO': { title: '冲冲冲行动型', vector: { social_energy: 86, emotional_expression: 72, logic_orientation: 54, planning: 48, novelty: 84, conflict_directness: 76, intimacy_need: 62, independence_need: 56, cooperation: 70, stability_need: 42 }, keywords: ['行动派', '高能', '别磨叽'] },
+  'SEXY': { title: '魅力发光型', vector: { social_energy: 84, emotional_expression: 78, logic_orientation: 46, planning: 46, novelty: 78, conflict_directness: 62, intimacy_need: 76, independence_need: 54, cooperation: 68, stability_need: 48 }, keywords: ['吸引力', '会撩', '存在感'] },
+  'LOVE-R': { title: '恋爱脑发电型', vector: { social_energy: 62, emotional_expression: 88, logic_orientation: 35, planning: 45, novelty: 82, conflict_directness: 62, intimacy_need: 92, independence_need: 34, cooperation: 70, stability_need: 65 }, keywords: ['浪漫', '投入', '需要回应'] },
+  'MUM': { title: '妈系照顾型', vector: { social_energy: 64, emotional_expression: 74, logic_orientation: 42, planning: 76, novelty: 42, conflict_directness: 46, intimacy_need: 82, independence_need: 34, cooperation: 90, stability_need: 84 }, keywords: ['照顾', '操心', '温柔管家'] },
+  'FAKE': { title: '变脸适应型', vector: { social_energy: 74, emotional_expression: 58, logic_orientation: 60, planning: 54, novelty: 78, conflict_directness: 54, intimacy_need: 56, independence_need: 64, cooperation: 74, stability_need: 48 }, keywords: ['适应', '会演', '社交皮肤'] },
+  'OJBK': { title: '都行随缘型', vector: { social_energy: 54, emotional_expression: 56, logic_orientation: 50, planning: 32, novelty: 68, conflict_directness: 38, intimacy_need: 52, independence_need: 66, cooperation: 70, stability_need: 36 }, keywords: ['都行', '随缘', '别问我'] },
+  'MALO': { title: '猴脑闯关型', vector: { social_energy: 82, emotional_expression: 76, logic_orientation: 46, planning: 34, novelty: 90, conflict_directness: 70, intimacy_need: 64, independence_need: 58, cooperation: 66, stability_need: 32 }, keywords: ['发散', '好奇', '坐不住'] },
+  'JOKE-R': { title: '小丑整活型', vector: { social_energy: 88, emotional_expression: 84, logic_orientation: 48, planning: 36, novelty: 86, conflict_directness: 64, intimacy_need: 70, independence_need: 50, cooperation: 72, stability_need: 34 }, keywords: ['整活', '搞笑', '用梗自救'] },
+  'WOC!': { title: '震惊吐槽型', vector: { social_energy: 72, emotional_expression: 86, logic_orientation: 52, planning: 44, novelty: 76, conflict_directness: 78, intimacy_need: 62, independence_need: 56, cooperation: 60, stability_need: 46 }, keywords: ['震惊', '吐槽', '情绪外放'] },
+  'THIN-K': { title: '深度脑补型', vector: { social_energy: 32, emotional_expression: 50, logic_orientation: 86, planning: 66, novelty: 78, conflict_directness: 40, intimacy_need: 56, independence_need: 82, cooperation: 56, stability_need: 70 }, keywords: ['想太多', '分析', '内耗哲学'] },
+  'SHIT': { title: '暴躁现实型', vector: { social_energy: 54, emotional_expression: 62, logic_orientation: 78, planning: 62, novelty: 46, conflict_directness: 88, intimacy_need: 42, independence_need: 78, cooperation: 42, stability_need: 72 }, keywords: ['现实', '暴躁', '不装了'] },
+  'ZZZZ': { title: '装死省电型', vector: { social_energy: 24, emotional_expression: 32, logic_orientation: 58, planning: 42, novelty: 38, conflict_directness: 26, intimacy_need: 38, independence_need: 88, cooperation: 46, stability_need: 80 }, keywords: ['装死', '低电量', '别吵'] },
+  'POOR': { title: '贫穷专注型', vector: { social_energy: 36, emotional_expression: 42, logic_orientation: 72, planning: 82, novelty: 40, conflict_directness: 52, intimacy_need: 40, independence_need: 80, cooperation: 58, stability_need: 86 }, keywords: ['专注', '省钱', '目标感'] },
+  'MONK': { title: '无欲修行型', vector: { social_energy: 24, emotional_expression: 36, logic_orientation: 65, planning: 66, novelty: 52, conflict_directness: 34, intimacy_need: 38, independence_need: 90, cooperation: 58, stability_need: 74 }, keywords: ['独处', '边界', '慢热'] },
+  'IMSB': { title: '嘴硬自疑型', vector: { social_energy: 46, emotional_expression: 58, logic_orientation: 55, planning: 54, novelty: 62, conflict_directness: 45, intimacy_need: 72, independence_need: 68, cooperation: 60, stability_need: 70 }, keywords: ['嘴硬', '敏感', '需要安全感'] },
+  'SOLO': { title: '孤狼掉线型', vector: { social_energy: 22, emotional_expression: 34, logic_orientation: 66, planning: 58, novelty: 58, conflict_directness: 34, intimacy_need: 36, independence_need: 92, cooperation: 42, stability_need: 72 }, keywords: ['孤狼', '独立', '别拉我'] },
+  'FUCK': { title: '野生爆发型', vector: { social_energy: 76, emotional_expression: 82, logic_orientation: 54, planning: 30, novelty: 88, conflict_directness: 86, intimacy_need: 60, independence_need: 72, cooperation: 46, stability_need: 28 }, keywords: ['野', '爆发', '不受控'] },
+  'DEAD': { title: '灵魂离线型', vector: { social_energy: 18, emotional_expression: 24, logic_orientation: 54, planning: 40, novelty: 32, conflict_directness: 24, intimacy_need: 28, independence_need: 86, cooperation: 38, stability_need: 78 }, keywords: ['离线', '空白', '低耗能'] },
+  'IMFW': { title: '娇弱小花型', vector: { social_energy: 38, emotional_expression: 82, logic_orientation: 38, planning: 48, novelty: 56, conflict_directness: 36, intimacy_need: 88, independence_need: 36, cooperation: 72, stability_need: 82 }, keywords: ['易碎', '需要哄', '敏感'] },
+  'HHHH': { title: '哈哈哈扩散型', vector: { social_energy: 88, emotional_expression: 82, logic_orientation: 45, planning: 38, novelty: 86, conflict_directness: 70, intimacy_need: 76, independence_need: 48, cooperation: 76, stability_need: 40 }, keywords: ['搞笑', '外放', '高能量'] },
+  'DRUNK': { title: '醉酒摆烂型', vector: { social_energy: 58, emotional_expression: 76, logic_orientation: 36, planning: 28, novelty: 74, conflict_directness: 58, intimacy_need: 66, independence_need: 62, cooperation: 50, stability_need: 30 }, keywords: ['上头', '摆烂', '情绪酒精'] }
+};
+
+const CONTEXTS = {
+  close: { id: 'close', name: '友谊 / 情侣', icon: '💗', subtitle: '适合朋友、闺蜜、暧昧、情侣；少选项，报告里分开讲。', theme: '关系亲密向' },
+  collab: { id: 'collab', name: '搭子 / 学习 / 项目', icon: '⚡', subtitle: '适合学习搭子、项目队友、社团搭档、旅行搭子。', theme: '合作搭档向' }
+};
+
+const LEGACY_CONTEXT_MAP = { romantic: 'close', friend: 'close', roommate: 'close', teamwork: 'collab', close_relationship: 'close', collaboration: 'collab', close: 'close', collab: 'collab' };
+
+const STYLES = {
+  warm_roast: { id: 'warm_roast', name: '温情吐槽', emoji: '🌙', desc: '有梗、有心软，适合发给 TA 看' },
+  reality: { id: 'reality', name: '现实版', emoji: '🧊', desc: '更清醒，直接看风险和建议' }
+};
+
+const LEGACY_STYLE_MAP = { warm: 'warm_roast', meme: 'warm_roast', sharp: 'reality', warm_roast: 'warm_roast', reality: 'reality' };
+
+const DIMENSION_META = [
+  { key: 'emotional_sync', label: '情绪同步', icon: '🌙' },
+  { key: 'communication', label: '沟通顺畅', icon: '💬' },
+  { key: 'lifestyle', label: '生活节奏', icon: '🧩' },
+  { key: 'goal_fit', label: '目标/分工', icon: '🎯' },
+  { key: 'complementarity', label: '互补吸引', icon: '⚡' },
+  { key: 'conflict_repair', label: '冲突修复', icon: '🛠' },
+  { key: 'long_term_comfort', label: '长期舒适', icon: '🌱' }
+];
+
+
+const MBTI_STEP2_GROUPS = [
+  { pair: 'E/I', facets: [['Initiating', '主动开场', 'Receiving', '接收回应'], ['Expressive', '外露表达', 'Contained', '克制保留'], ['Gregarious', '群体社交', 'Intimate', '小圈深聊'], ['Active', '行动外放', 'Reflective', '反思内收'], ['Enthusiastic', '热情外显', 'Quiet', '安静蓄能']] },
+  { pair: 'S/N', facets: [['Concrete', '具体事实', 'Abstract', '抽象概念'], ['Realistic', '现实落地', 'Imaginative', '想象发散'], ['Practical', '实用导向', 'Conceptual', '概念导向'], ['Experiential', '经验学习', 'Theoretical', '理论推演'], ['Traditional', '传统路径', 'Original', '原创路径']] },
+  { pair: 'T/F', facets: [['Logical', '逻辑优先', 'Empathetic', '共情优先'], ['Reasonable', '讲道理', 'Compassionate', '讲体谅'], ['Questioning', '追问验证', 'Accommodating', '配合协调'], ['Critical', '指出问题', 'Accepting', '先接纳'], ['Tough', '硬核直接', 'Tender', '柔软照顾']] },
+  { pair: 'J/P', facets: [['Systematic', '系统安排', 'Casual', '随性处理'], ['Planful', '提前规划', 'Open-Ended', '开放结尾'], ['Early Starting', '早早开工', 'Pressure-Prompted', '压力启动'], ['Scheduled', '日程明确', 'Spontaneous', '即兴行动'], ['Methodical', '按步推进', 'Emergent', '边走边看']] }
+];
+
+const CONTEXT_WEIGHTS = {
+  close: { emotional_sync: 0.24, communication: 0.20, lifestyle: 0.10, goal_fit: 0.06, complementarity: 0.15, conflict_repair: 0.17, long_term_comfort: 0.08 },
+  collab: { emotional_sync: 0.08, communication: 0.22, lifestyle: 0.08, goal_fit: 0.26, complementarity: 0.18, conflict_repair: 0.12, long_term_comfort: 0.06 }
+};
+
+const state = {
+  selectedContext: 'close',
+  selectedStyle: 'warm_roast',
+  currentInput: null,
+  currentReport: null,
+  currentReportUrl: window.location.href,
+  shareBaseUrl: ''
+};
+
+function $(selector) { return document.querySelector(selector); }
+function $all(selector) { return Array.from(document.querySelectorAll(selector)); }
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+function avg(nums) { return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0; }
+function gap(a, b, key) { return Math.abs((a[key] || 0) - (b[key] || 0)); }
+function roundObject(obj) {
+  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, Math.round(v)]));
+}
+function idealGapScore(actualGap, idealGap) { return clamp(100 - Math.abs(actualGap - idealGap) * 1.45, 35, 100); }
+
+function mbtiVector(type) {
+  const t = (type || '').toUpperCase();
+  if (!MBTI_TYPES.includes(t)) return null;
+  const isE = t[0] === 'E';
+  const isN = t[1] === 'N';
+  const isT = t[2] === 'T';
+  const isJ = t[3] === 'J';
+  const base = {
+    social_energy: isE ? 78 : 32,
+    emotional_expression: isT ? 42 : 72,
+    logic_orientation: isT ? 75 : 38,
+    planning: isJ ? 78 : 42,
+    novelty: isN ? 82 : 48,
+    conflict_directness: isT ? 64 : 52,
+    intimacy_need: isE ? 68 : 52,
+    independence_need: isE ? 46 : 76,
+    cooperation: isT ? 58 : 76,
+    stability_need: isJ ? 75 : 45,
+    stress_sensitivity: isT ? 48 : 64,
+    detail_focus: isN ? 46 : 78,
+    decision_speed: isJ ? 68 : 54,
+    change_readiness: isN ? 74 : 48,
+    boundary_strength: isE ? 50 : 76
+  };
+  const tuning = {
+    INTJ: { novelty: 88, planning: 84, independence_need: 88, emotional_expression: 38 },
+    INTP: { novelty: 90, planning: 36, independence_need: 86, conflict_directness: 48 },
+    ENTJ: { planning: 88, conflict_directness: 82, social_energy: 74 },
+    ENTP: { novelty: 92, planning: 34, conflict_directness: 74 },
+    INFJ: { emotional_expression: 68, planning: 80, cooperation: 82, stability_need: 80 },
+    INFP: { emotional_expression: 78, planning: 36, intimacy_need: 70, novelty: 86 },
+    ENFJ: { social_energy: 82, cooperation: 88, intimacy_need: 78, planning: 72 },
+    ENFP: { social_energy: 84, novelty: 92, planning: 32, intimacy_need: 76 },
+    ISTJ: { novelty: 38, planning: 88, stability_need: 90, emotional_expression: 36 },
+    ISFJ: { social_energy: 38, cooperation: 86, stability_need: 86, intimacy_need: 66 },
+    ESTJ: { planning: 86, conflict_directness: 78, stability_need: 78 },
+    ESFJ: { social_energy: 82, cooperation: 88, emotional_expression: 76 },
+    ISTP: { novelty: 56, planning: 42, independence_need: 86, conflict_directness: 44 },
+    ISFP: { novelty: 70, emotional_expression: 66, independence_need: 72, planning: 34 },
+    ESTP: { social_energy: 86, novelty: 78, planning: 34, conflict_directness: 76 },
+    ESFP: { social_energy: 88, novelty: 82, emotional_expression: 78, planning: 32 }
+  }[t] || {};
+  return { ...base, ...tuning };
+}
+
+function getTypeOptions(system) {
+  return system === 'sbti' ? Object.keys(SBTI_TYPES) : MBTI_TYPES;
+}
+
+
+function makeAxis(name, left, right, value, leftCode, rightCode) {
+  const isRight = value >= 50;
+  return {
+    name,
+    code: isRight ? rightCode : leftCode,
+    label: isRight ? right : left,
+    score: Math.round(value),
+    display: `${isRight ? right : left} ${Math.round(isRight ? value : 100 - value)}%`
+  };
+}
+
+function buildStep2Facets(type, vector) {
+  const letterValues = {
+    'E/I': type[0] === 'E' ? vector.social_energy : 100 - vector.social_energy,
+    'S/N': type[1] === 'S' ? vector.detail_focus : vector.novelty,
+    'T/F': type[2] === 'T' ? vector.logic_orientation : 100 - vector.logic_orientation,
+    'J/P': type[3] === 'J' ? vector.planning : 100 - vector.planning
+  };
+  const nuance = {
+    'E/I': [vector.decision_speed, vector.emotional_expression, vector.social_energy, vector.change_readiness, vector.emotional_expression],
+    'S/N': [vector.detail_focus, 100 - vector.change_readiness, vector.detail_focus, 100 - vector.novelty + 40, vector.stability_need],
+    'T/F': [vector.logic_orientation, 100 - vector.emotional_expression + 30, vector.conflict_directness, vector.conflict_directness, vector.logic_orientation],
+    'J/P': [vector.planning, vector.planning, vector.decision_speed, vector.planning, vector.detail_focus]
+  };
+  const facets = [];
+  MBTI_STEP2_GROUPS.forEach(group => {
+    group.facets.forEach((f, i) => {
+      const leftPreferred = type.includes(group.pair[0]);
+      const seed = clamp(avg([letterValues[group.pair], nuance[group.pair][i]]), 0, 100);
+      const leftScore = leftPreferred ? seed : 100 - seed;
+      const side = leftScore >= 50 ? 'left' : 'right';
+      facets.push({
+        pair: group.pair,
+        leftEnglish: f[0], leftLabel: f[1], rightEnglish: f[2], rightLabel: f[3],
+        label: side === 'left' ? f[1] : f[3],
+        english: side === 'left' ? f[0] : f[2],
+        opposite: side === 'left' ? f[3] : f[1],
+        score: Math.round(leftScore),
+        strength: Math.round(clamp(Math.max(leftScore, 100 - leftScore), 45, 95))
+      });
+    });
+  });
+  return facets;
+}
+
+function mbtiAspectProfile(type, vector) {
+  if (!MBTI_TYPES.includes(type)) return null;
+  const axes = [
+    makeAxis('Mind / 能量方向', 'Introverted 内向', 'Extraverted 外向', vector.social_energy, 'I', 'E'),
+    makeAxis('Energy / 信息处理', 'Observant 现实', 'Intuitive 直觉', vector.novelty, 'S', 'N'),
+    makeAxis('Nature / 决策方式', 'Feeling 感受', 'Thinking 理性', vector.logic_orientation, 'F', 'T'),
+    makeAxis('Tactics / 生活策略', 'Prospecting 灵活', 'Judging 计划', vector.planning, 'P', 'J'),
+    makeAxis('Identity* / 压力姿态', 'Assertive 稳定', 'Turbulent 敏感', vector.stress_sensitivity, 'A*', 'T*')
+  ];
+  const facets = buildStep2Facets(type, vector);
+  return { axes, facets, highlights: facets.filter(f => f.strength >= 60).sort((a, b) => b.strength - a.strength).slice(0, 8) };
+}
+
+function getProfile(system, type, variantId = 'standard') {
+  if (system === 'sbti') {
+    const item = SBTI_TYPES[type];
+    if (!item) return null;
+    return {
+      system: 'SBTI', type, title: item.title, keywords: item.keywords,
+      vector: { ...item.vector }, aspects: null, variantId: null, variantLabel: 'SBTI 官方 27 类型之一', variantDesc: '按 SBTI 娱乐标签向量参与匹配'
+    };
+  }
+  const t = (type || '').toUpperCase();
+  let vector = mbtiVector(t);
+  if (!vector) return null;
+  const variant = MBTI_VARIANTS[variantId] || MBTI_VARIANTS.standard;
+  vector = applyMbtiVariant(vector, variantId);
+  return {
+    system: 'MBTI',
+    type: t,
+    title: MBTI_TITLES[t],
+    keywords: [MBTI_TITLES[t], variant.label, t[0] === 'E' ? '外向能量' : '内向能量', t[3] === 'J' ? '计划感' : '灵活感'],
+    vector,
+    aspects: mbtiAspectProfile(t, vector),
+    variantId,
+    variantLabel: variant.label,
+    variantDesc: variant.desc
+  };
+}
+
+
+function scoreDimensions(vecA, vecB) {
+  const emotionalGap = gap(vecA, vecB, 'emotional_expression');
+  const intimacyGap = gap(vecA, vecB, 'intimacy_need');
+  const independenceGap = gap(vecA, vecB, 'independence_need');
+  const conflictGap = gap(vecA, vecB, 'conflict_directness');
+  const planningGap = gap(vecA, vecB, 'planning');
+  const socialGap = gap(vecA, vecB, 'social_energy');
+  const stabilityGap = gap(vecA, vecB, 'stability_need');
+  const logicGap = gap(vecA, vecB, 'logic_orientation');
+  const noveltyGap = gap(vecA, vecB, 'novelty');
+  const cooperationAvg = avg([vecA.cooperation, vecB.cooperation]);
+
+  const similarity = clamp(100 - avg([socialGap, emotionalGap, planningGap, noveltyGap, intimacyGap, stabilityGap]) * 0.86, 0, 100);
+  const complementarity = clamp(avg([
+    idealGapScore(socialGap, 28),
+    idealGapScore(logicGap, 34),
+    idealGapScore(planningGap, 30),
+    idealGapScore(noveltyGap, 24),
+    idealGapScore(emotionalGap, 28)
+  ]), 0, 100);
+  const conflictRisk = clamp(0.20 * emotionalGap + 0.18 * intimacyGap + 0.14 * independenceGap + 0.19 * conflictGap + 0.18 * planningGap + 0.11 * stabilityGap, 0, 100);
+
+  const dimensions = {
+    emotional_sync: clamp(100 - 0.52 * emotionalGap - 0.24 * intimacyGap + 0.10 * cooperationAvg, 0, 100),
+    communication: clamp(100 - 0.42 * conflictGap - 0.18 * logicGap + 0.18 * cooperationAvg, 0, 100),
+    lifestyle: clamp(100 - 0.46 * planningGap - 0.26 * stabilityGap - 0.18 * socialGap, 0, 100),
+    goal_fit: clamp(100 - 0.34 * planningGap - 0.22 * noveltyGap - 0.10 * logicGap + 0.18 * cooperationAvg, 0, 100),
+    complementarity,
+    conflict_repair: clamp(100 - 0.68 * conflictRisk + 0.18 * cooperationAvg, 0, 100)
+  };
+  dimensions.long_term_comfort = clamp(0.20 * dimensions.emotional_sync + 0.18 * dimensions.communication + 0.22 * dimensions.lifestyle + 0.16 * dimensions.conflict_repair + 0.14 * dimensions.goal_fit + 0.10 * dimensions.complementarity, 0, 100);
+
+  return {
+    dimensions: roundObject(dimensions),
+    similarity: Math.round(similarity),
+    complementarity: Math.round(complementarity),
+    conflictRisk: Math.round(conflictRisk),
+    gaps: {
+      socialGap: Math.round(socialGap), emotionalGap: Math.round(emotionalGap), intimacyGap: Math.round(intimacyGap),
+      independenceGap: Math.round(independenceGap), conflictGap: Math.round(conflictGap), planningGap: Math.round(planningGap),
+      stabilityGap: Math.round(stabilityGap), logicGap: Math.round(logicGap), noveltyGap: Math.round(noveltyGap)
+    }
+  };
+}
+
+function normalizeContextId(context) { return LEGACY_CONTEXT_MAP[context] || context || 'close'; }
+function normalizeStyleId(style) { return LEGACY_STYLE_MAP[style] || style || 'warm_roast'; }
+function normalizeInput(input) {
+  const next = JSON.parse(JSON.stringify(input || {}));
+  next.context = normalizeContextId(next.context);
+  next.style = normalizeStyleId(next.style);
+  next.personA = next.personA || { name: 'A', system: 'mbti', type: 'ENFP', variant: 'expressive' };
+  next.personB = next.personB || { name: 'B', system: 'mbti', type: 'ISTJ', variant: 'planful' };
+  return next;
+}
+function weightedTotal(dimensions, context) {
+  const ctx = normalizeContextId(context);
+  const weights = CONTEXT_WEIGHTS[ctx] || CONTEXT_WEIGHTS.close;
+  const total = Object.keys(weights).reduce((sum, key) => sum + (dimensions[key] || 0) * weights[key], 0);
+  return Math.round(clamp(total, 35, 96));
+}
+
+function relationshipType(stats, context) {
+  const d = stats.dimensions;
+  const s = stats.similarity;
+  const c = stats.complementarity;
+  const risk = stats.conflictRisk;
+  if (normalizeContextId(context) === 'collab' && d.communication >= 74 && d.goal_fit >= 74) return { id: 'efficient_team', title: '高效搭档型', keywords: ['分工清晰', '互相补位', '推进感强'], visual: '两团光球像齿轮一样咬合，适合一起推进任务。' };
+  if (c >= 78 && risk >= 52) return { id: 'high_attraction_high_friction', title: '高吸引高摩擦型', keywords: ['互补', '拉扯', '容易上头'], visual: '两团光球边缘有火花，吸引力和摩擦感同时存在。' };
+  if (s >= 78 && risk <= 34) return { id: 'stable_same_frequency', title: '稳定同频型', keywords: ['同频', '舒服', '低消耗'], visual: '两团光球高度重叠，关系能量平稳柔和。' };
+  if (c >= 74 && risk < 54) return { id: 'complementary_growth', title: '互补成长型', keywords: ['互补', '成长', '补位'], visual: '两团光球互相环绕，差异更多变成补充。' };
+  if (d.emotional_sync >= 74 && d.lifestyle < 62) return { id: 'sweet_but_misaligned', title: '上头但节奏拉扯型', keywords: ['心动', '错频', '需要磨合'], visual: '情绪颜色很接近，但行动轨道还没有完全同步。' };
+  if (s < 55 && risk >= 62) return { id: 'friction_learning', title: '拉扯磨合型', keywords: ['差异明显', '边界重要', '慢慢翻译'], visual: '两团光球距离较远，需要建立清晰沟通桥梁。' };
+  return { id: 'needs_translation', title: '需要翻译型', keywords: ['有潜力', '要沟通', '别脑补'], visual: '两团光球可以融合，但需要先学会读懂彼此的信号。' };
+}
+
+function strongestGap(gaps) {
+  const map = [
+    ['socialGap', '社交能量'], ['emotionalGap', '情绪表达'], ['intimacyGap', '亲密需求'], ['independenceGap', '独立空间'],
+    ['conflictGap', '冲突处理'], ['planningGap', '行动计划'], ['stabilityGap', '稳定需求'], ['logicGap', '理性/感性决策'], ['noveltyGap', '新鲜感需求']
+  ];
+  const sorted = map.sort((a, b) => (gaps[b[0]] || 0) - (gaps[a[0]] || 0));
+  return { key: sorted[0][0], label: sorted[0][1], value: gaps[sorted[0][0]] || 0 };
+}
+
+function topGaps(gaps, count = 3) {
+  const labels = {
+    socialGap: '社交能量', emotionalGap: '情绪表达', intimacyGap: '亲密需求', independenceGap: '独立空间',
+    conflictGap: '冲突处理', planningGap: '行动计划', stabilityGap: '稳定需求', logicGap: '理性/感性决策', noveltyGap: '新鲜感需求'
+  };
+  return Object.entries(labels)
+    .map(([key, label]) => ({ key, label, value: gaps[key] || 0 }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, count);
+}
+
+const GAP_COPY = {
+  socialGap: {
+    warm_roast: '一个像群聊发动机，一个像勿扰模式常驻。别急着说对方冷，也别急着说对方吵，你们只是充电方式不一样。',
+    reality: '社交能量差异大。互动频率、独处时间和回应速度需要提前说清楚，否则容易把正常休息误读成冷淡。'
+  },
+  emotionalGap: {
+    warm_roast: '一个情绪上头像开弹幕，一个表面冷静像在写故障报告。最离谱的是：你们可能都在乎，只是表达方式完全不在一个频道。',
+    reality: '情绪表达速度不同。一个需要先被理解，一个习惯先解决问题；冲突时要先确认需求，再讨论方案。'
+  },
+  intimacyGap: {
+    warm_roast: '一个想贴贴，一个想留白；一个觉得“你不找我就是不爱”，一个觉得“我没打扰你就是尊重”。这就是经典关系错译。',
+    reality: '亲密需求差异明显。陪伴、报备、分享频率必须明确，否则一方会焦虑，一方会窒息。'
+  },
+  independenceGap: {
+    warm_roast: '一个把分享当安全感，一个把空间当氧气。别用“你变了”开大招，很多时候对方只是想安静回血。',
+    reality: '独立空间需求不同。关系边界需要说在前面，不要等到一方觉得被控制、另一方觉得被忽视时才补救。'
+  },
+  conflictGap: {
+    warm_roast: '一个想立刻开会复盘，一个已经精神下线。你们吵架最怕不是吵，是一个追着问、一个越问越想逃。',
+    reality: '冲突处理方式不同。建议约定冷静时长和复盘时间，避免“我想解决问题”变成二次伤害。'
+  },
+  planningGap: {
+    warm_roast: '一个日历排到下周，一个主打人生抽卡。旅行、作业、项目最怕这组合：一个急到冒烟，一个还在说“应该来得及”。',
+    reality: '计划性差异会直接影响生活和合作。需要明确负责人、截止时间和最低交付标准。'
+  },
+  stabilityGap: {
+    warm_roast: '一个要稳定剧本，一个爱即兴发挥。最容易崩的瞬间：对方认真问安排，你回一句“都行”。',
+    reality: '稳定需求不同。重大安排要给确定性，小事可以保留弹性；不要把所有事情都交给临场发挥。'
+  },
+  logicGap: {
+    warm_roast: '一个要答案，一个要态度；一个在讲证据链，一个在讲感受链。你们不是没法沟通，是一个在写论文，一个在写日记。',
+    reality: '决策逻辑差异明显。讨论问题前先确认：现在需要情绪支持，还是需要解决方案。'
+  },
+  noveltyGap: {
+    warm_roast: '一个想开新地图，一个想在熟悉路线里回血。新鲜感和安全感都没错，错的是让对方硬跟你的节奏跑。',
+    reality: '新鲜感需求不同。安排活动或合作方式时，需要平衡探索和稳定，避免一方无聊、一方疲惫。'
+  }
+};
+
+function lineForGap(gapInfo, style) {
+  const tone = normalizeStyleId(style);
+  return (GAP_COPY[gapInfo.key] && GAP_COPY[gapInfo.key][tone]) || GAP_COPY.emotionalGap[tone];
+}
+
+function sceneExpansionCards(context, style, stats) {
+  const tone = normalizeStyleId(style);
+  const ctx = normalizeContextId(context);
+  if (ctx === 'collab') {
+    return [
+      { title: '如果你们是学习搭子', content: tone === 'reality' ? '先约学习节奏，再谈互相督促。一个负责启动，一个负责收尾可以很强；但如果没人定计划，热血会很快变成已读不回。' : '你们像一台灵感发动机配一个收尾系统。最怕的是开局“今晚狠狠学”，十分钟后一个刷手机，一个开始焦虑。' },
+      { title: '如果你们是项目搭档', content: tone === 'reality' ? '适合互补，但必须提前分工。明确负责人、交付物和 deadline，比相信默契更可靠。' : '别靠默契做项目，默契在 deadline 面前经常装死。该谁写、谁查、谁催，提前说清楚才是真的体面。' }
+    ];
+  }
+  return [
+    { title: '如果你们是朋友', content: tone === 'reality' ? '这段关系适合轻松但要有边界。别把不常聊天误读成疏远，也别把玩笑开到对方的雷区。' : '你们像那种一边嫌对方烦，一边默认对方必须在场的关系。真正的默契不是天天聊，是冷一阵也知道还在。' },
+    { title: '如果你们是情侣', content: tone === 'reality' ? '核心不是够不够喜欢，而是能不能把需求说清楚。回应频率、独处空间、吵架复盘，都要有规则。' : '一个等回应，一个等冷静，很容易把“我在乎你”演成“我怎么又惹你了”。喜欢是真的，错频也是真的。' }
+  ];
+}
+
+function cardsForReport(profileA, profileB, stats, context, style) {
+  const tone = normalizeStyleId(style);
+  const gapInfo = strongestGap(stats.gaps);
+  const sameLine = stats.similarity >= 72
+    ? '你们底色挺像，不需要时时刻刻解释自己。舒服是真的，但别因为“你懂我”就省略沟通。'
+    : '你们不是复制粘贴型关系。一个带来新鲜感，一个带来盲区提醒；好玩是真的，容易错频也是真的。';
+  const advice = tone === 'reality'
+    ? (normalizeContextId(context) === 'collab'
+      ? '别靠感觉合作。把目标、分工和截止时间写下来，谁负责什么越清楚，关系越不容易被任务拖垮。'
+      : '别让对方猜你的需求。想被陪、想独处、想马上聊、想晚点聊，都要直接说。')
+    : (normalizeContextId(context) === 'collab'
+      ? '一个负责点火，一个负责落地。别互相嫌弃，先把对方当外挂用。'
+      : '先接住情绪，再讨论方案。不要急着证明谁对，先让对方知道“我懂你为什么会这样”。');
+  return [
+    { title: '最像的地方', content: sameLine },
+    { title: `最容易卡住：${gapInfo.label}`, content: lineForGap(gapInfo, tone), roast: true },
+    { title: '一句真正有用的建议', content: advice }
+  ];
+}
+
+function punchlineForReport(relationship, stats, style) {
+  const tone = normalizeStyleId(style);
+  if (tone === 'reality') {
+    if (stats.conflictRisk >= 60) return '你们的问题不是没有吸引力，而是默认对方会自动理解自己。别靠脑补维系关系。';
+    if (stats.complementarity >= 78) return '这段关系有互补价值，但要把差异变成分工，而不是变成互相嫌弃。';
+    return '你们不是不能合拍，只是需要把相处规则说得更具体。';
+  }
+  if (relationship.id === 'high_attraction_high_friction') return '有点上头，也有点费电。像两块磁铁，吸得很快，撞得也响。';
+  if (relationship.id === 'stable_same_frequency') return '舒服得像不用解释的老歌，但别把默契用成懒得表达。';
+  if (relationship.id === 'efficient_team') return '这组合适合一起冲，但请先把 deadline 写墙上，不然热血会蒸发。';
+  return '你们不是天生同频，是很适合互相翻译。翻译好了叫默契，翻译不好叫拉扯。';
+}
+
+function makeSummary(type, stats) {
+  if (type.id === 'high_attraction_high_friction') return '吸引力和摩擦感同时在线：差异让你们靠近，也会让你们互相触发。';
+  if (type.id === 'stable_same_frequency') return '底色舒服，消耗不高；这类关系最怕的不是冲突，是太熟以后忘了表达。';
+  if (type.id === 'efficient_team') return '协作潜力很强，适合分工推进；把规则定清楚，你们会比单打独斗更快。';
+  if (type.id === 'complementary_growth') return '差异像拼图，不完全一样，但刚好能补上彼此短板。';
+  if (type.id === 'sweet_but_misaligned') return '情绪容易靠近，节奏还要校准；先同步频率，再谈默契。';
+  if (stats.conflictRisk >= 62) return '不是没可能，是需要把边界和需求说清楚，别让脑补替你们做决定。';
+  return '这段关系有发展空间，关键是学会把自己的表达方式翻译给对方听。';
+}
+
+function compareFacetHighlights(profileA, profileB) {
+  if (!profileA.aspects || !profileB.aspects) return [];
+  const mapB = new Map(profileB.aspects.facets.map(f => [`${f.pair}-${f.leftEnglish}`, f]));
+  return profileA.aspects.facets.map(fa => {
+    const fb = mapB.get(`${fa.pair}-${fa.leftEnglish}`);
+    const diff = fb ? Math.abs(fa.score - fb.score) : 0;
+    return { pair: fa.pair, name: `${fa.leftLabel} ↔ ${fa.rightLabel}`, a: fa.label, b: fb ? fb.label : '', diff };
+  }).sort((x, y) => y.diff - x.diff).slice(0, 6);
+}
+
+function createReport(input) {
+  input = normalizeInput(input);
+  const profileA = getProfile(input.personA.system, input.personA.type, input.personA.variant || 'standard');
+  const profileB = getProfile(input.personB.system, input.personB.type, input.personB.variant || 'standard');
+  if (!profileA || !profileB) throw new Error('无法识别输入的人格类型，请检查 A/B 的类型选择。');
+  const stats = scoreDimensions(profileA.vector, profileB.vector);
+  const score = weightedTotal(stats.dimensions, input.context);
+  const relationship = relationshipType(stats, input.context);
+  const report = {
+    id: `report_${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    context: CONTEXTS[input.context] || CONTEXTS.close,
+    style: STYLES[input.style] || STYLES.warm_roast,
+    personA: { name: input.personA.name || 'A', ...profileA },
+    personB: { name: input.personB.name || 'B', ...profileB },
+    score,
+    relationship,
+    summary: makeSummary(relationship, stats),
+    dimensions: stats.dimensions,
+    dimensionMeta: DIMENSION_META,
+    similarity: stats.similarity,
+    complementarity: stats.complementarity,
+    conflictRisk: stats.conflictRisk,
+    scoreBreakdown: { similarity: stats.similarity, complementarity: stats.complementarity, friction: stats.conflictRisk },
+    algorithmHighlights: topGaps(stats.gaps, 3),
+    punchline: punchlineForReport(relationship, stats, input.style),
+    sceneCards: sceneExpansionCards(input.context, input.style, stats),
+    facetComparison: compareFacetHighlights(profileA, profileB),
+    cards: cardsForReport(profileA, profileB, stats, input.context, input.style),
+    disclaimer: '仅供娱乐、社交破冰和自我理解；不构成心理诊断、职业筛选或严肃关系决策建议。MBTI 细分指标为娱乐化近似。'
+  };
+  report.shareText = input.style === 'reality' ? `我测了我们的关系气场：${report.relationship.title}，合拍 ${report.score}%，摩擦 ${report.conflictRisk}%。这版挺现实。` : `系统说我们是「${report.relationship.title}」：合拍 ${report.score}%，有点准也有点好笑。你看看像不像？`;
+  return report;
+}
+
+function encodeInput(input) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(input))))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeInput(payload) {
+  const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
+  return JSON.parse(decodeURIComponent(escape(atob(padded))));
+}
+function sanitizeBaseUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    const url = new URL(raw);
+    if (!/^https?:$/.test(url.protocol)) return '';
+    url.search = '';
+    url.hash = '';
+    return url.toString();
+  } catch {
+    return '';
+  }
+}
+function getStoredShareBase() {
+  try { return sanitizeBaseUrl(localStorage.getItem('pairAuraShareBaseUrl') || ''); }
+  catch { return ''; }
+}
+function setStoredShareBase(value) {
+  const cleaned = sanitizeBaseUrl(value);
+  try {
+    if (cleaned) localStorage.setItem('pairAuraShareBaseUrl', cleaned);
+    else localStorage.removeItem('pairAuraShareBaseUrl');
+  } catch {}
+  state.shareBaseUrl = cleaned;
+  return cleaned;
+}
+function getCurrentPageBase() {
+  try {
+    const url = new URL(window.location.href);
+    url.search = '';
+    url.hash = '';
+    return url;
+  } catch {
+    return null;
+  }
+}
+function buildLocalReportUrl(input) {
+  const url = getCurrentPageBase();
+  if (!url) return window.location.href;
+  url.searchParams.set('r', encodeInput(input));
+  return url.toString();
+}
+function buildReportUrl(input) {
+  const payload = encodeInput(input);
+  const base = state.shareBaseUrl || getStoredShareBase();
+  let url;
+  if (base) {
+    url = new URL(base);
+  } else {
+    url = getCurrentPageBase() || new URL('https://example.com/');
+  }
+  url.searchParams.set('r', payload);
+  return url.toString();
+}
+function canReplaceWith(urlString) {
+  try {
+    const next = new URL(urlString, window.location.href);
+    return next.origin === window.location.origin || window.location.protocol === 'file:';
+  } catch { return false; }
+}
+function safeReplaceState(urlString) {
+  try {
+    if (canReplaceWith(urlString)) history.replaceState(null, '', urlString);
+  } catch {}
+}
+function isLikelyPublicUrl(urlString) {
+  try {
+    const url = new URL(urlString);
+    return /^https?:$/.test(url.protocol) && !['localhost', '127.0.0.1', '0.0.0.0'].includes(url.hostname);
+  } catch { return false; }
+}
+function isLocalPreviewUrl(urlString) {
+  try {
+    const url = new URL(urlString);
+    return url.protocol === 'file:' || ['localhost', '127.0.0.1', '0.0.0.0'].includes(url.hostname);
+  } catch { return true; }
+}
+function shareMessage(report, url) {
+  if (!report) return '';
+  return `${report.shareText}
+
+打开报告：${url}`;
+}
+function updateSharePanel() {
+  const report = state.currentReport;
+  if (!report) return;
+  const url = state.currentReportUrl || buildReportUrl(state.currentInput);
+  const urlInput = $('#shareUrlInput');
+  const textInput = $('#shareTextInput');
+  const baseInput = $('#publicBaseUrlInput');
+  const status = $('#shareStatus');
+  if (baseInput) baseInput.value = state.shareBaseUrl || getStoredShareBase() || '';
+  if (urlInput) urlInput.value = url;
+  if (textInput) textInput.value = shareMessage(report, url);
+  if (status) {
+    if (isLikelyPublicUrl(url)) {
+      status.textContent = '当前是公开链接，可以复制或生成二维码海报直接分享。';
+      status.className = 'share-status ok';
+    } else if (isLocalPreviewUrl(url)) {
+      status.textContent = '当前仍是本地预览链接：可测试流程，但发给别人无法打开。部署后填写线上域名再分享。';
+      status.className = 'share-status warn';
+    } else {
+      status.textContent = '已生成报告链接，请确认该地址能被对方访问。';
+      status.className = 'share-status warn';
+    }
+  }
+}
+function refreshShareUrl() {
+  if (!state.currentInput) return;
+  state.currentReportUrl = buildReportUrl(state.currentInput);
+  updateSharePanel();
+}
+
+function showView(id) {
+  $all('.view').forEach(v => v.classList.remove('active'));
+  $(`#${id}`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function toast(text) {
+  const el = $('#toast');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => el.classList.remove('show'), 2300);
+}
+
+function renderChoices() {
+  const contextRoot = $('#contextChoices');
+  contextRoot.innerHTML = Object.values(CONTEXTS).map(item => `
+    <button type="button" class="choice-card ${item.id === state.selectedContext ? 'active' : ''}" data-context="${item.id}">
+      <span>${item.icon}</span><strong>${item.name}</strong><p>${item.subtitle}</p>
+    </button>`).join('');
+  const styleRoot = $('#styleChoices');
+  styleRoot.innerHTML = Object.values(STYLES).map(item => `
+    <button type="button" class="choice-card ${item.id === state.selectedStyle ? 'active' : ''}" data-style="${item.id}">
+      <span>${item.emoji}</span><strong>${item.name}</strong><p>${item.desc}</p>
+    </button>`).join('');
+}
+
+function initSelects() {
+  ['A', 'B'].forEach(suffix => {
+    const system = $(`#system${suffix}`);
+    system.innerHTML = `
+      <option value="mbti">MBTI / 16型人格</option>
+      <option value="sbti">SBTI 27种娱乐人格</option>`;
+    system.addEventListener('change', () => updateTypeSelect(suffix));
+    updateVariantSelect(suffix);
+    updateTypeSelect(suffix);
+  });
+  $('#nameA').value = '我';
+  $('#nameB').value = 'TA';
+  $('#typeA').value = 'ENFP';
+  $('#variantA').value = 'expressive';
+  $('#typeB').value = 'ISTJ';
+  $('#variantB').value = 'planful';
+}
+
+function updateVariantSelect(suffix) {
+  const select = $(`#variant${suffix}`);
+  if (!select) return;
+  select.innerHTML = Object.entries(MBTI_VARIANTS)
+    .map(([id, item]) => `<option value="${id}">${item.label}｜${item.desc}</option>`).join('');
+}
+
+function updateTypeSelect(suffix) {
+  const system = $(`#system${suffix}`).value;
+  const type = $(`#type${suffix}`);
+  type.innerHTML = getTypeOptions(system).map(item => `<option value="${item}">${item}${system === 'mbti' ? ` · ${MBTI_TITLES[item]}` : ` · ${SBTI_TYPES[item].title}`}</option>`).join('');
+  const variant = $(`#variant${suffix}`);
+  const variantLabel = $(`#variantLabel${suffix}`);
+  if (variant && variantLabel) {
+    const isMbti = system === 'mbti';
+    variant.style.display = isMbti ? 'block' : 'none';
+    variantLabel.style.display = isMbti ? 'block' : 'none';
+  }
+}
+
+function currentInputFromForm() {
+  return {
+    context: state.selectedContext,
+    style: state.selectedStyle,
+    personA: { name: $('#nameA').value.trim() || 'A', system: $('#systemA').value, type: $('#typeA').value, variant: $('#variantA') ? $('#variantA').value : 'standard' },
+    personB: { name: $('#nameB').value.trim() || 'B', system: $('#systemB').value, type: $('#typeB').value, variant: $('#variantB') ? $('#variantB').value : 'standard' }
+  };
+}
+
+function renderProfileDetails(profile) {
+  if (!profile.aspects) {
+    return `<div class="compact-note">SBTI 官方 27 类型之一 · ${profile.keywords.map(escapeHtml).join(' / ')}</div>`;
+  }
+  const top = profile.aspects.highlights.slice(0, 2).map(f => `<span class="facet-chip hot">${escapeHtml(f.label)}</span>`).join('');
+  return `<div class="compact-note">${escapeHtml(profile.variantLabel)} · ${escapeHtml(profile.variantDesc)}</div><div class="facet-chips compact-chips">${top}</div>`;
+}
+
+function renderReport(report) {
+  const mount = $('#reportMount');
+  const focusKeys = normalizeContextId(report.context.id) === 'collab'
+    ? ['communication', 'goal_fit', 'complementarity', 'conflict_repair']
+    : ['emotional_sync', 'communication', 'complementarity', 'conflict_repair'];
+  const dimHtml = report.dimensionMeta
+    .filter(meta => focusKeys.includes(meta.key))
+    .map(meta => {
+      const value = report.dimensions[meta.key] || 0;
+      return `<div class="dim-item"><div class="dim-head"><span>${meta.icon} ${meta.label}</span><span>${value}</span></div><div class="dim-track"><div class="dim-fill" style="width:${value}%"></div></div></div>`;
+    }).join('');
+  const cardHtml = report.cards.map(card => `<article class="report-card ${card.roast ? 'roast-card' : ''}"><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.content)}</p></article>`).join('');
+  const sceneHtml = report.sceneCards.map(card => `<article class="report-card scene-card"><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.content)}</p></article>`).join('');
+  const highlightsHtml = (report.algorithmHighlights || []).map(item => `
+    <div class="highlight-chip"><strong>${escapeHtml(item.label)}</strong><span>差异 ${item.value}</span></div>`).join('');
+  mount.innerHTML = `
+    <section class="report-hero">
+      <p class="eyebrow">${report.context.icon} ${report.context.name} · ${report.style.emoji} ${report.style.name}</p>
+      <h2>${escapeHtml(report.relationship.title)}</h2>
+      <div class="score">${report.score}<span>%</span></div>
+      <div class="keyword-row">${report.relationship.keywords.map(k => `<span>${escapeHtml(k)}</span>`).join('')}</div>
+      <p class="summary">${escapeHtml(report.summary)}</p>
+      <p class="punchline">${escapeHtml(report.punchline)}</p>
+      <section class="algo-focus">
+        <div class="focus-item"><strong>${report.similarity}</strong><span>相似度</span></div>
+        <div class="focus-item"><strong>${report.complementarity}</strong><span>互补度</span></div>
+        <div class="focus-item"><strong>${report.conflictRisk}</strong><span>摩擦值</span></div>
+      </section>
+      <div class="quick-actions">
+        <button class="primary-btn" data-open-poster>生成二维码海报</button>
+        <button class="secondary-btn" data-copy-report-link>复制报告链接</button>
+      </div>
+    </section>
+
+    <section class="comparison-grid compact-profile-grid">
+      <article class="report-card">
+        <span class="type-pill">A · ${escapeHtml(report.personA.name)}</span>
+        <h3>${escapeHtml(report.personA.type)}｜${escapeHtml(report.personA.title)}</h3>
+        ${renderProfileDetails(report.personA)}
+      </article>
+      <article class="report-card">
+        <span class="type-pill">B · ${escapeHtml(report.personB.name)}</span>
+        <h3>${escapeHtml(report.personB.type)}｜${escapeHtml(report.personB.title)}</h3>
+        ${renderProfileDetails(report.personB)}
+      </article>
+    </section>
+
+    <section class="report-card dim-card">
+      <h3>算法重点</h3>
+      <div class="highlight-row">${highlightsHtml}</div>
+      ${dimHtml}
+    </section>
+
+    <section class="scene-grid">
+      ${sceneHtml}
+    </section>
+
+    <section class="content-grid compact-content">
+      ${cardHtml}
+    </section>
+    <p class="fine-print">${escapeHtml(report.disclaimer)}</p>`;
+
+  $('[data-open-poster]').addEventListener('click', () => openPoster());
+  $('[data-copy-report-link]').addEventListener('click', copyCurrentLink);
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+}
+
+function generate(input) {
+  state.currentInput = input;
+  showView('loadingView');
+  const steps = ['正在合成你们的关系气场...', '正在检测互补频率...', '正在计算心动摩擦值...', '正在压缩成最抓人的几句话...'];
+  let i = 0;
+  const timer = setInterval(() => {
+    $('#loadingText').textContent = steps[i % steps.length];
+    i += 1;
+  }, 360);
+  setTimeout(() => {
+    clearInterval(timer);
+    try {
+      const report = createReport(input);
+      state.currentReport = report;
+      state.currentReportUrl = buildReportUrl(input);
+      safeReplaceState(buildLocalReportUrl(input));
+      renderReport(report);
+      showView('reportView');
+    } catch (err) {
+      toast(err.message || '生成失败，请检查输入');
+      showView('inputView');
+    }
+  }, 980);
+}
+
+function openPoster() {
+  if (!state.currentReport) return;
+  refreshShareUrl();
+  showView('posterView');
+  updateSharePanel();
+  drawPoster(state.currentReport, state.currentReportUrl);
+}
+
+async function drawPoster(report, url) {
+  const canvas = $('#posterCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const gradient = ctx.createLinearGradient(0, 0, w, h);
+  gradient.addColorStop(0, '#120B2E');
+  gradient.addColorStop(0.48, '#25115F');
+  gradient.addColorStop(1, '#090719');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, w, h);
+
+  drawGlow(ctx, 170, 180, 230, 'rgba(255,92,168,.55)');
+  drawGlow(ctx, 730, 300, 230, 'rgba(70,217,255,.50)');
+  drawGlow(ctx, 450, 1020, 260, 'rgba(123,97,255,.45)');
+  drawPosterStars(ctx, w, h);
+
+  ctx.fillStyle = 'rgba(255,255,255,.12)';
+  roundRect(ctx, 70, 70, 760, 1080, 42, true);
+  ctx.strokeStyle = 'rgba(255,255,255,.24)';
+  ctx.lineWidth = 2;
+  roundRect(ctx, 70, 70, 760, 1080, 42, false, true);
+
+  ctx.fillStyle = '#78F2C2';
+  ctx.font = '700 30px system-ui, sans-serif';
+  ctx.fillText('PAIR AURA REPORT', 112, 140);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '900 70px system-ui, sans-serif';
+  drawWrappedText(ctx, report.relationship.title, 112, 245, 680, 78, 2);
+
+  ctx.font = '900 132px system-ui, sans-serif';
+  ctx.fillText(String(report.score), 112, 455);
+  ctx.font = '700 45px system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.78)';
+  ctx.fillText('% 合拍指数', 320, 440);
+
+  ctx.fillStyle = '#FFE66D';
+  ctx.font = '700 34px system-ui, sans-serif';
+  ctx.fillText(report.relationship.keywords.join(' / '), 112, 525);
+
+  ctx.fillStyle = 'rgba(255,255,255,.88)';
+  ctx.font = '400 31px system-ui, sans-serif';
+  drawWrappedText(ctx, report.summary, 112, 610, 676, 48, 4);
+
+  drawMiniAuras(ctx, report);
+  drawDimensionBars(ctx, report, 112, 820);
+
+  ctx.fillStyle = 'rgba(255,255,255,.16)';
+  roundRect(ctx, 112, 1010, 676, 100, 26, true);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '700 26px system-ui, sans-serif';
+  drawWrappedText(ctx, '扫码测测你和 TA 是哪种关系', 140, 1060, 410, 34, 2);
+
+  await drawQr(ctx, url, 650, 1032, 118);
+
+  ctx.fillStyle = 'rgba(255,255,255,.58)';
+  ctx.font = '400 22px system-ui, sans-serif';
+  ctx.fillText('仅供娱乐和关系沟通参考', 112, 1210);
+}
+
+function drawGlow(ctx, x, y, r, color) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, color);
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+function drawPosterStars(ctx, w, h) {
+  ctx.fillStyle = 'rgba(255,255,255,.22)';
+  for (let i = 0; i < 90; i++) {
+    const x = (i * 97) % w;
+    const y = (i * 193) % h;
+    ctx.beginPath();
+    ctx.arc(x, y, i % 3 === 0 ? 2 : 1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+function drawMiniAuras(ctx, report) {
+  drawGlow(ctx, 312, 720, 110, 'rgba(255,92,168,.62)');
+  drawGlow(ctx, 462, 720, 110, 'rgba(70,217,255,.62)');
+  ctx.fillStyle = 'rgba(255,255,255,.92)';
+  ctx.font = '800 26px system-ui, sans-serif';
+  ctx.fillText(`${report.personA.name} · ${report.personA.type}`, 160, 760);
+  ctx.fillText(`${report.personB.name} · ${report.personB.type}`, 492, 760);
+}
+function drawDimensionBars(ctx, report, x, y) {
+  const items = ['emotional_sync', 'communication', 'complementarity'];
+  const labels = { emotional_sync: '情绪同步', communication: '沟通顺畅', complementarity: '互补吸引' };
+  ctx.font = '500 24px system-ui, sans-serif';
+  items.forEach((key, idx) => {
+    const value = report.dimensions[key];
+    const yy = y + idx * 48;
+    ctx.fillStyle = 'rgba(255,255,255,.82)';
+    ctx.fillText(labels[key], x, yy);
+    ctx.fillStyle = 'rgba(255,255,255,.14)';
+    roundRect(ctx, x + 132, yy - 20, 420, 16, 8, true);
+    const grad = ctx.createLinearGradient(x + 132, 0, x + 552, 0);
+    grad.addColorStop(0, '#FF5CA8'); grad.addColorStop(.5, '#46D9FF'); grad.addColorStop(1, '#78F2C2');
+    ctx.fillStyle = grad;
+    roundRect(ctx, x + 132, yy - 20, 420 * value / 100, 16, 8, true);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(String(value), x + 575, yy);
+  });
+}
+async function ensureQrLib() {
+  if (window.QRCode && window.QRCode.toCanvas) return true;
+  const moduleSources = [
+    'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm',
+    'https://esm.sh/qrcode@1.5.4'
+  ];
+  for (const src of moduleSources) {
+    try {
+      const mod = await import(src);
+      const qr = mod.default || mod;
+      if (qr && typeof qr.toCanvas === 'function') {
+        window.QRCode = qr;
+        return true;
+      }
+    } catch {}
+  }
+  return false;
+}
+async function drawQr(ctx, url, x, y, size) {
+  const status = $('#qrStatus');
+  if (status) status.textContent = '正在生成二维码...';
+  ctx.fillStyle = '#FFFFFF';
+  roundRect(ctx, x - 8, y - 8, size + 16, size + 16, 18, true);
+  const ready = await ensureQrLib();
+  if (ready) {
+    const qrCanvas = document.createElement('canvas');
+    await window.QRCode.toCanvas(qrCanvas, url, { width: size, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#120B2E', light: '#FFFFFF' } });
+    ctx.drawImage(qrCanvas, x, y, size, size);
+    if (status) status.textContent = isLikelyPublicUrl(url) ? '二维码已生成，扫码可打开当前报告。' : '二维码已生成，但当前链接可能只是本地预览地址。';
+  } else {
+    ctx.fillStyle = '#120B2E';
+    ctx.font = '700 16px system-ui, sans-serif';
+    drawWrappedText(ctx, '二维码库未加载，请复制链接分享', x + 12, y + 45, size - 24, 22, 3);
+    if (status) status.textContent = '二维码库加载失败：可先使用复制链接/复制文案分享。';
+  }
+}
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + width, y, x + width, y + height, r);
+  ctx.arcTo(x + width, y + height, x, y + height, r);
+  ctx.arcTo(x, y + height, x, y, r);
+  ctx.arcTo(x, y, x + width, y, r);
+  if (fill) ctx.fill();
+  if (stroke) ctx.stroke();
+}
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 99) {
+  const chars = Array.from(text);
+  let line = '';
+  let lineCount = 0;
+  for (const char of chars) {
+    const testLine = line + char;
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      ctx.fillText(line, x, y);
+      line = char;
+      y += lineHeight;
+      lineCount += 1;
+      if (lineCount >= maxLines - 1) break;
+    } else {
+      line = testLine;
+    }
+  }
+  if (line && lineCount < maxLines) ctx.fillText(line, x, y);
+}
+
+function downloadPoster() {
+  const canvas = $('#posterCanvas');
+  try {
+    const link = document.createElement('a');
+    link.download = `pair-aura-${state.currentReport ? state.currentReport.relationship.title : 'report'}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('海报已生成下载');
+  } catch {
+    toast('下载失败：可长按海报保存，或截图分享');
+  }
+}
+async function copyText(text, successMessage = '已复制') {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(successMessage);
+  } catch {
+    const input = document.createElement('textarea');
+    input.value = text;
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    document.body.appendChild(input);
+    input.select();
+    try {
+      document.execCommand('copy');
+      toast(successMessage);
+    } catch {
+      window.prompt('手动复制：', text);
+    } finally {
+      input.remove();
+    }
+  }
+}
+async function copyCurrentLink() {
+  refreshShareUrl();
+  const link = state.currentReportUrl || window.location.href;
+  return copyText(link, isLikelyPublicUrl(link) ? '公开报告链接已复制' : '链接已复制。本地预览链接发给别人可能打不开');
+}
+async function copyShareText() {
+  refreshShareUrl();
+  const text = shareMessage(state.currentReport, state.currentReportUrl || window.location.href);
+  return copyText(text, '分享文案已复制');
+}
+async function nativeShare() {
+  const report = state.currentReport;
+  if (!report) return;
+  refreshShareUrl();
+  const url = state.currentReportUrl;
+  const text = report.shareText;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Pair Aura 关系气场报告', text, url });
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+    }
+  }
+  copyShareText();
+}
+function applyPublicBaseUrl() {
+  const input = $('#publicBaseUrlInput');
+  const raw = input ? input.value : '';
+  const cleaned = setStoredShareBase(raw);
+  if (input) input.value = cleaned;
+  if (!cleaned && raw.trim()) {
+    toast('请输入以 https:// 或 http:// 开头的公开首页地址');
+    return;
+  }
+  refreshShareUrl();
+  if (state.currentReport) drawPoster(state.currentReport, state.currentReportUrl);
+  toast(cleaned ? '公开域名已应用，二维码和链接已更新' : '已清除公开域名，恢复当前页面链接');
+}
+function openShareUrl() {
+  refreshShareUrl();
+  if (!state.currentReportUrl) return;
+  window.open(state.currentReportUrl, '_blank', 'noopener,noreferrer');
+}
+
+function loadFromUrl() {
+  const payload = new URLSearchParams(window.location.search).get('r');
+  if (!payload) return false;
+  try {
+    const input = decodeInput(payload);
+    const normalized = normalizeInput(input);
+    state.selectedContext = normalized.context;
+    state.selectedStyle = normalized.style;
+    state.currentInput = normalized;
+    state.currentReport = createReport(normalized);
+    state.currentReportUrl = buildReportUrl(normalized);
+    renderReport(state.currentReport);
+    showView('reportView');
+    return true;
+  } catch (err) {
+    console.warn('Invalid report payload', err);
+    return false;
+  }
+}
+
+function hydrateForm(input) {
+  if (!input) return;
+  input = normalizeInput(input);
+  state.selectedContext = input.context || state.selectedContext;
+  state.selectedStyle = input.style || state.selectedStyle;
+  renderChoices();
+  $('#nameA').value = input.personA.name || '我';
+  $('#nameB').value = input.personB.name || 'TA';
+  $('#systemA').value = input.personA.system || 'mbti';
+  updateTypeSelect('A');
+  $('#typeA').value = input.personA.type || 'ENFP';
+  if ($('#variantA')) $('#variantA').value = input.personA.variant || 'standard';
+  $('#systemB').value = input.personB.system || 'mbti';
+  updateTypeSelect('B');
+  $('#typeB').value = input.personB.type || 'ISTJ';
+  if ($('#variantB')) $('#variantB').value = input.personB.variant || 'standard';
+}
+
+function initEvents() {
+  $('#startBtn').addEventListener('click', () => showView('inputView'));
+  $('#jumpToInputBtn').addEventListener('click', () => showView('inputView'));
+  $('#loadDemoBtn').addEventListener('click', () => generate({ context: 'close', style: 'warm_roast', personA: { name: '我', system: 'mbti', type: 'ENFP', variant: 'expressive' }, personB: { name: 'TA', system: 'mbti', type: 'ISTJ', variant: 'planful' } }));
+  $all('[data-back-home]').forEach(btn => btn.addEventListener('click', () => showView('homeView')));
+  $all('[data-edit]').forEach(btn => btn.addEventListener('click', () => { hydrateForm(state.currentInput); showView('inputView'); }));
+  $all('[data-share-link]').forEach(btn => btn.addEventListener('click', nativeShare));
+  $all('[data-back-report]').forEach(btn => btn.addEventListener('click', () => showView('reportView')));
+  $('#downloadPosterBtn').addEventListener('click', downloadPoster);
+  $('#copyLinkBtn').addEventListener('click', copyCurrentLink);
+  $('#copyShareTextBtn').addEventListener('click', copyShareText);
+  $('#copyShareTextBtn2').addEventListener('click', copyShareText);
+  $('#nativeShareBtn').addEventListener('click', nativeShare);
+  $('#applyBaseUrlBtn').addEventListener('click', applyPublicBaseUrl);
+  $('#openShareUrlBtn').addEventListener('click', openShareUrl);
+
+  $('#contextChoices').addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-context]');
+    if (!btn) return;
+    state.selectedContext = btn.dataset.context;
+    renderChoices();
+  });
+  $('#styleChoices').addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-style]');
+    if (!btn) return;
+    state.selectedStyle = btn.dataset.style;
+    renderChoices();
+  });
+  $('#reportForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    generate(currentInputFromForm());
+  });
+}
+
+function main() {
+  state.shareBaseUrl = getStoredShareBase();
+  renderChoices();
+  initSelects();
+  initEvents();
+  if (!loadFromUrl()) showView('homeView');
+}
+
+document.addEventListener('DOMContentLoaded', main);
+
+  </script>
+</body>
+</html>
