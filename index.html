@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pair Aura｜关系气场报告</title>
+  <title>Pair Aura｜人格匹配度报告</title>
   <meta name="description" content="输入两个人的 MBTI / SBTI / 九型人格，生成一份双人关系说明书：看哪里同频、哪里互补、哪里容易互相触发。" />
   <style>
 :root {
@@ -866,7 +866,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
       <div class="brand-mark"><span>PA</span></div>
       <div>
         <strong>Pair Aura</strong>
-        <p>关系气场报告</p>
+        <p>人格匹配度报告</p>
       </div>
       <button class="topbar-link" id="topStartBtn" type="button">开始合成</button>
     </nav>
@@ -1108,33 +1108,33 @@ const IDENTITY_OPTIONS = [
 
 const SBTI_TYPES = [
   { code: '', label: '不填写 SBTI' },
+  { code: 'IMSB', label: 'IMSB｜自我攻击者' },
+  { code: 'BOSS', label: 'BOSS｜领导者' },
+  { code: 'MUM', label: 'MUM｜妈妈' },
+  { code: 'FAKE', label: 'FAKE｜伪人' },
+  { code: 'DEAD', label: 'DEAD｜死者' },
+  { code: 'ZZZZ', label: 'ZZZZ｜装死者' },
+  { code: 'GOGO', label: 'GOGO｜行者' },
+  { code: 'FUCK', label: 'FUCK｜草者' },
   { code: 'CTRL', label: 'CTRL｜拿捏者' },
-  { code: 'LOVE-R', label: 'LOVE-R｜恋爱脑诗人' },
-  { code: 'MONK', label: 'MONK｜清修型独立人' },
-  { code: 'SOLO', label: 'SOLO｜独行玩家' },
-  { code: 'HHHH', label: 'HHHH｜快乐发电机' },
-  { code: 'DEAD', label: 'DEAD｜情绪省电模式' },
-  { code: 'ZZZZ', label: 'ZZZZ｜装睡型高手' },
-  { code: 'OJBK', label: 'OJBK｜随缘通过型' },
-  { code: 'IMSB', label: 'IMSB｜敏感脑补机' },
-  { code: 'ATM-ER', label: 'ATM-er｜付出型老好人' },
-  { code: 'SHIT', label: '冷眼吐槽家' },
-  { code: 'FIRE', label: 'FIRE｜高燃行动派' },
-  { code: 'ICE', label: 'ICE｜冷静观察者' },
-  { code: 'MOON', label: 'MOON｜夜间情绪家' },
-  { code: 'SUN', label: 'SUN｜太阳能社交人' },
-  { code: 'CUBE', label: 'CUBE｜秩序方块' },
-  { code: 'FLOW', label: 'FLOW｜顺流随性派' },
-  { code: 'CAT', label: 'CAT｜边界感猫猫' },
-  { code: 'DOG', label: 'DOG｜热情陪伴型' },
-  { code: 'NPC', label: 'NPC｜低调配合型' },
-  { code: 'BOSS', label: 'BOSS｜掌控推进型' },
-  { code: 'CLOWN', label: 'CLOWN｜气氛喜剧人' },
-  { code: 'DIVA', label: 'DIVA｜戏剧高光型' },
-  { code: 'TANK', label: 'TANK｜抗压坦克' },
-  { code: 'BUBBLE', label: 'BUBBLE｜泡泡幻想家' },
-  { code: 'STONE', label: 'STONE｜沉默稳定石' },
-  { code: 'WAVE', label: 'WAVE｜情绪浪潮型' }
+  { code: 'HHHH', label: 'HHHH｜傻乐者' },
+  { code: 'SEXY', label: 'SEXY｜尤物' },
+  { code: 'OJBK', label: 'OJBK｜无所谓人' },
+  { code: 'POOR', label: 'POOR｜贫穷者' },
+  { code: 'OH-NO', label: 'OH-NO｜哦不人' },
+  { code: 'MONK', label: 'MONK｜僧人' },
+  { code: 'SHIT', label: 'SHIT｜狗屎人' },
+  { code: 'THAN-K', label: 'THAN-K｜感恩者' },
+  { code: 'MALO', label: 'MALO｜吗喽' },
+  { code: 'ATM-er', label: 'ATM-er｜送钱者' },
+  { code: 'THIN-K', label: 'THIN-K｜思考者' },
+  { code: 'SOLO', label: 'SOLO｜孤儿' },
+  { code: 'LOVE-R', label: 'LOVE-R｜多情者' },
+  { code: 'WOC!', label: 'WOC!｜握草人' },
+  { code: 'DRUN-K', label: 'DRUN-K｜酒鬼' },
+  { code: 'IMFW', label: 'IMFW｜废物' },
+  { code: 'JOKE-R', label: 'JOKE-R｜小丑' },
+  { code: 'Dior-s', label: 'Dior-s｜屌丝' }
 ];
 
 const ENNEAGRAM_TYPES = [
@@ -1625,34 +1625,66 @@ function buildMbtiVector(type, identity = 'unknown') {
 }
 
 const SBTI_VECTOR_PATCHES = {
-  'CTRL': { controlNeed: 24, planningNeed: 18, decisionSpeed: 12, conflictDirectness: 18, agreeableness: -8, securityNeed: 10 },
-  'LOVE-R': { intimacyNeed: 32, emotionalExpression: 24, neuroticism: 18, logicEmotion: 22, securityNeed: 20, independenceNeed: -16 },
-  'MONK': { independenceNeed: 30, intimacyNeed: -16, emotionalExpression: -18, selfStability: 16, extraversion: -18, conflictDirectness: -10 },
-  'SOLO': { independenceNeed: 28, extraversion: -14, intimacyNeed: -12, noveltyNeed: 8, selfStability: 6 },
-  'HHHH': { extraversion: 28, noveltyNeed: 18, emotionalExpression: 18, decisionSpeed: 12, conscientiousness: -8 },
-  'DEAD': { emotionalExpression: -22, neuroticism: 8, decisionSpeed: -18, extraversion: -18, selfStability: -6 },
-  'ZZZZ': { decisionSpeed: -22, planningNeed: -12, conflictDirectness: -16, independenceNeed: 10, emotionalExpression: -12 },
-  'OJBK': { planningNeed: -18, controlNeed: -16, agreeableness: 10, selfStability: 12, noveltyNeed: 10 },
-  'IMSB': { neuroticism: 26, securityNeed: 22, authenticityNeed: 14, emotionalExpression: 12, conflictDirectness: -8 },
-  'ATM-ER': { agreeableness: 26, intimacyNeed: 18, securityNeed: 8, independenceNeed: -18, selfStability: -8 },
-  'SHIT': { agreeableness: -22, conflictDirectness: 22, authenticityNeed: 18, controlNeed: 10, emotionalExpression: 6 },
-  'FIRE': { extraversion: 18, decisionSpeed: 24, conflictDirectness: 18, noveltyNeed: 14, neuroticism: 6 },
-  'ICE': { emotionalExpression: -24, logicEmotion: -18, selfStability: 22, conflictDirectness: -6, agreeableness: -6 },
-  'MOON': { neuroticism: 22, emotionalExpression: 20, openness: 18, intimacyNeed: 18, decisionSpeed: -8 },
-  'SUN': { extraversion: 30, agreeableness: 14, emotionalExpression: 20, selfStability: 10, intimacyNeed: 8 },
-  'CUBE': { planningNeed: 26, conscientiousness: 24, controlNeed: 14, noveltyNeed: -18, selfStability: 12 },
-  'FLOW': { planningNeed: -24, noveltyNeed: 20, controlNeed: -20, decisionSpeed: -4, openness: 14 },
-  'CAT': { independenceNeed: 28, intimacyNeed: -4, conflictDirectness: -8, authenticityNeed: 12, extraversion: -10 },
-  'DOG': { intimacyNeed: 26, agreeableness: 22, extraversion: 12, securityNeed: 10, independenceNeed: -18 },
-  'NPC': { agreeableness: 12, conflictDirectness: -16, extraversion: -10, selfStability: 8, controlNeed: -8 },
-  'BOSS': { controlNeed: 26, decisionSpeed: 24, conflictDirectness: 20, conscientiousness: 14, agreeableness: -8 },
-  'CLOWN': { extraversion: 24, emotionalExpression: 22, noveltyNeed: 18, neuroticism: -4, planningNeed: -12 },
-  'DIVA': { emotionalExpression: 28, authenticityNeed: 22, intimacyNeed: 18, conflictDirectness: 12, neuroticism: 14 },
-  'TANK': { selfStability: 24, conflictDirectness: 12, neuroticism: -16, planningNeed: 8, emotionalExpression: -6 },
-  'BUBBLE': { openness: 24, noveltyNeed: 20, intimacyNeed: 14, planningNeed: -18, selfStability: -8 },
-  'STONE': { selfStability: 26, emotionalExpression: -22, planningNeed: 10, extraversion: -12, conflictDirectness: -12 },
-  'WAVE': { neuroticism: 26, emotionalExpression: 24, logicEmotion: 18, intimacyNeed: 16, selfStability: -12 }
+  'IMSB': { neuroticism: 30, securityNeed: 24, authenticityNeed: 18, emotionalExpression: 12, conflictDirectness: -10, selfStability: -18, decisionSpeed: -8 },
+  'BOSS': { controlNeed: 30, decisionSpeed: 26, conflictDirectness: 22, conscientiousness: 18, planningNeed: 16, agreeableness: -10, securityNeed: -6 },
+  'MUM': { agreeableness: 28, intimacyNeed: 22, emotionalExpression: 16, securityNeed: 12, independenceNeed: -12, conflictDirectness: -8, selfStability: 6 },
+  'FAKE': { extraversion: 18, agreeableness: 14, emotionalExpression: 6, authenticityNeed: -22, controlNeed: 10, selfStability: -8, securityNeed: 8 },
+  'DEAD': { emotionalExpression: -28, noveltyNeed: -22, decisionSpeed: -24, extraversion: -22, intimacyNeed: -16, selfStability: -12, neuroticism: 8 },
+  'ZZZZ': { decisionSpeed: -28, planningNeed: -18, conflictDirectness: -18, emotionalExpression: -16, independenceNeed: 14, conscientiousness: -12, selfStability: 4 },
+  'GOGO': { decisionSpeed: 30, extraversion: 20, noveltyNeed: 20, conflictDirectness: 14, planningNeed: -10, controlNeed: -6, emotionalExpression: 10 },
+  'FUCK': { noveltyNeed: 28, conflictDirectness: 26, emotionalExpression: 22, extraversion: 18, controlNeed: -14, agreeableness: -10, selfStability: -6 },
+  'CTRL': { controlNeed: 30, planningNeed: 26, conscientiousness: 22, decisionSpeed: 16, conflictDirectness: 16, noveltyNeed: -14, securityNeed: 10 },
+  'HHHH': { extraversion: 28, emotionalExpression: 26, noveltyNeed: 18, agreeableness: 12, planningNeed: -12, logicEmotion: 14, selfStability: -8 },
+  'SEXY': { extraversion: 28, emotionalExpression: 18, authenticityNeed: 18, intimacyNeed: 14, selfStability: 12, noveltyNeed: 10, securityNeed: -8 },
+  'OJBK': { planningNeed: -24, controlNeed: -22, agreeableness: 12, selfStability: 14, noveltyNeed: 10, conflictDirectness: -12, securityNeed: -8 },
+  'POOR': { conscientiousness: 20, planningNeed: 14, noveltyNeed: -18, extraversion: -18, independenceNeed: 16, controlNeed: 8, authenticityNeed: 10 },
+  'OH-NO': { neuroticism: 24, securityNeed: 28, planningNeed: 18, conflictDirectness: -10, noveltyNeed: -14, selfStability: -10, agreeableness: 8 },
+  'MONK': { independenceNeed: 32, intimacyNeed: -20, emotionalExpression: -20, extraversion: -22, conflictDirectness: -12, selfStability: 16, controlNeed: -6 },
+  'SHIT': { agreeableness: -24, conflictDirectness: 24, authenticityNeed: 20, conscientiousness: 12, controlNeed: 12, emotionalExpression: 8, neuroticism: 4 },
+  'THAN-K': { agreeableness: 28, emotionalExpression: 18, securityNeed: -8, intimacyNeed: 18, conflictDirectness: -10, selfStability: 12, controlNeed: -8 },
+  'MALO': { openness: 26, noveltyNeed: 30, planningNeed: -22, decisionSpeed: 16, extraversion: 18, controlNeed: -18, conscientiousness: -16 },
+  'ATM-er': { agreeableness: 30, intimacyNeed: 20, securityNeed: 12, independenceNeed: -22, selfStability: -12, conscientiousness: 12, emotionalExpression: 10 },
+  'THIN-K': { openness: 18, independenceNeed: 24, logicEmotion: -26, emotionalExpression: -12, decisionSpeed: -12, controlNeed: 8, conflictDirectness: -4 },
+  'SOLO': { independenceNeed: 30, extraversion: -20, intimacyNeed: -14, securityNeed: 14, selfStability: -12, emotionalExpression: -8, conflictDirectness: -8 },
+  'LOVE-R': { intimacyNeed: 32, emotionalExpression: 26, logicEmotion: 24, neuroticism: 18, securityNeed: 20, independenceNeed: -18, authenticityNeed: 16 },
+  'WOC!': { emotionalExpression: 26, noveltyNeed: 14, conflictDirectness: 8, openness: 12, decisionSpeed: 10, agreeableness: -4, selfStability: 4 },
+  'DRUN-K': { emotionalExpression: 24, extraversion: 18, noveltyNeed: 18, planningNeed: -24, decisionSpeed: -10, controlNeed: -18, selfStability: -18, neuroticism: 12 },
+  'IMFW': { securityNeed: 28, intimacyNeed: 24, selfStability: -24, independenceNeed: -20, agreeableness: 16, decisionSpeed: -12, emotionalExpression: 10 },
+  'JOKE-R': { extraversion: 26, emotionalExpression: 22, noveltyNeed: 20, agreeableness: 10, authenticityNeed: -10, neuroticism: 8, planningNeed: -12 },
+  'Dior-s': { authenticityNeed: 22, openness: 14, noveltyNeed: -12, extraversion: -12, agreeableness: -8, selfStability: 10, conflictDirectness: 6 }
 };
+
+const SBTI_CODE_ALIASES = {
+  'ATM-ER': 'ATM-er',
+  'ATMER': 'ATM-er',
+  'OH-NO!': 'OH-NO',
+  'OHNO': 'OH-NO',
+  'WOC': 'WOC!',
+  'DRUNK': 'DRUN-K',
+  'DRUN-K': 'DRUN-K',
+  'DIOR-S': 'Dior-s',
+  'CLOWN': 'JOKE-R',
+  'FIRE': 'GOGO',
+  'ICE': 'THIN-K',
+  'MOON': 'LOVE-R',
+  'SUN': 'SEXY',
+  'CUBE': 'CTRL',
+  'FLOW': 'OJBK',
+  'CAT': 'MONK',
+  'DOG': 'MUM',
+  'NPC': 'FAKE',
+  'DIVA': 'SEXY',
+  'TANK': 'BOSS',
+  'BUBBLE': 'MALO',
+  'STONE': 'ZZZZ',
+  'WAVE': 'IMSB'
+};
+
+function normalizeSbtiCode(code) {
+  const raw = String(code || '').trim();
+  if (!raw) return '';
+  return SBTI_VECTOR_PATCHES[raw] ? raw : (SBTI_CODE_ALIASES[raw] || SBTI_CODE_ALIASES[raw.toUpperCase()] || raw);
+}
 
 const ENNEAGRAM_VECTOR_PATCHES = {
   '1': { conscientiousness: 22, planningNeed: 20, controlNeed: 12, selfStability: 8, conflictDirectness: 6, noveltyNeed: -10 },
@@ -1675,7 +1707,8 @@ function buildEnneagramVector(code) {
 
 function buildSbtiVector(code) {
   const v = getBaseVector();
-  const patch = SBTI_VECTOR_PATCHES[code] || {};
+  const normalized = normalizeSbtiCode(code);
+  const patch = SBTI_VECTOR_PATCHES[normalized] || {};
   addToVector(v, patch);
   return v;
 }
@@ -2146,8 +2179,8 @@ function restoreFromUrl() {
     document.getElementById('mbtiB').value = inputs.mbtiB || 'ISTJ';
     document.getElementById('identityA').value = inputs.identityA || 'unknown';
     document.getElementById('identityB').value = inputs.identityB || 'unknown';
-    document.getElementById('sbtiA').value = inputs.sbtiA || '';
-    document.getElementById('sbtiB').value = inputs.sbtiB || '';
+    document.getElementById('sbtiA').value = normalizeSbtiCode(inputs.sbtiA) || '';
+    document.getElementById('sbtiB').value = normalizeSbtiCode(inputs.sbtiB) || '';
     if (document.getElementById('enneaA')) document.getElementById('enneaA').value = inputs.enneaA || '';
     if (document.getElementById('enneaB')) document.getElementById('enneaB').value = inputs.enneaB || '';
     state.context = normalizeContext(inputs.context || 'close');
@@ -2163,8 +2196,8 @@ function restoreFromUrl() {
 }
 
 function reportShareText(report) {
-  if (!report) return '我生成了一份 Pair Aura 关系气场报告，想发给你看看。';
-  const title = report.classification?.title || '关系气场报告';
+  if (!report) return '我生成了一份 Pair Aura 人格匹配度报告，想发给你看看。';
+  const title = report.classification?.title || '人格匹配度报告';
   const score = round(report.metrics?.total || 0);
   const keywords = (report.classification?.keywords || []).slice(0, 3).join(' / ');
   const sign = report.poetry ? `\n关系签：${report.poetry.quote}｜${report.poetry.source}` : '';
@@ -2374,7 +2407,7 @@ async function nativeShareReport() {
   const text = reportShareText(state.lastReport);
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'Pair Aura 关系气场报告', text, url });
+      await navigator.share({ title: 'Pair Aura 人格匹配度报告', text, url });
       recordUsageEvent('native_share_success');
       return;
     } catch (err) {
@@ -2403,8 +2436,8 @@ function runQualitySelfCheck() {
   const pairs = [
     { a: 'ENFP', b: 'ISTJ', sA: 'LOVE-R', sB: 'CTRL', context: 'close' },
     { a: 'INTJ', b: 'ENFP', sA: 'MONK', sB: 'HHHH', context: 'close' },
-    { a: 'ISFJ', b: 'ESTP', sA: 'STONE', sB: 'FIRE', context: 'collab' },
-    { a: 'ENTJ', b: 'INFP', sA: 'BOSS', sB: 'MOON', context: 'collab' },
+    { a: 'ISFJ', b: 'ESTP', sA: 'ZZZZ', sB: 'GOGO', context: 'collab' },
+    { a: 'ENTJ', b: 'INFP', sA: 'BOSS', sB: 'LOVE-R', context: 'collab' },
     { a: 'ENFP', b: 'ENFP', sA: 'LOVE-R', sB: 'LOVE-R', context: 'close' }
   ];
   pairs.forEach(pair => {
