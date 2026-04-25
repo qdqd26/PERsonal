@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pair Aura V10｜关系气场报告</title>
+  <title>Pair Aura V13｜关系气场报告</title>
   <meta name="description" content="不是给你贴标签，是看你和 TA 会发生什么。输入两个人的 MBTI / SBTI，生成一份能发给 TA 的关系说明书。" />
   <style>
 :root {
@@ -451,6 +451,44 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
 .primary-button:hover { transform: translateY(-2px); filter: saturate(1.15); }
 
 .hidden { display: none !important; }
+.screen { animation: screenIn .55s cubic-bezier(.2,.8,.2,1) both; }
+.screen:not(.active) { display: none !important; }
+@keyframes screenIn { from { opacity: 0; transform: translateY(24px) scale(.985); filter: blur(10px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+.synth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 45%, rgba(255,92,168,.18), transparent 34%), rgba(4,6,18,.72);
+  backdrop-filter: blur(22px);
+}
+.synth-card {
+  width: min(420px, calc(100vw - 38px));
+  min-height: 260px;
+  padding: 26px;
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  text-align: center;
+}
+.synth-orbits { position: relative; width: 190px; height: 128px; }
+.synth-orbits span { position: absolute; top: 26px; width: 96px; height: 96px; border-radius: 50%; mix-blend-mode: screen; animation: synthPulse 1.4s ease-in-out infinite alternate; }
+.synth-orbits span:first-child { left: 18px; background: radial-gradient(circle at 32% 28%, #fff, #ff9ad0 14%, #ff5ca8 58%, transparent 78%); }
+.synth-orbits span:nth-child(2) { right: 18px; background: radial-gradient(circle at 32% 28%, #fff, #a7f0ff 14%, #55d7ff 58%, transparent 78%); animation-delay: -.35s; }
+.synth-orbits i { position: absolute; left: 88px; top: 18px; width: 14px; height: 112px; border-radius: 999px; background: linear-gradient(transparent, var(--yellow), transparent); filter: drop-shadow(0 0 22px var(--yellow)); animation: sparkMove 1.4s ease-in-out infinite; }
+.synth-card p { margin: 0; color: #fff; font-weight: 900; letter-spacing: -.02em; }
+@keyframes synthPulse { from { transform: translateX(-5px) scale(.95); opacity: .72; } to { transform: translateX(5px) scale(1.06); opacity: 1; } }
+.poetry-sign { margin-top: 20px; padding: 16px 18px; border-radius: 22px; border: 1px solid rgba(255,230,109,.22); background: linear-gradient(135deg, rgba(255,230,109,.12), rgba(255,92,168,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
+.poetry-sign strong { display: block; color: var(--yellow); margin-bottom: 7px; letter-spacing: .03em; }
+.poetry-sign q { display: block; color: #fff; font-size: clamp(1.02rem, 2vw, 1.24rem); font-weight: 900; line-height: 1.55; }
+.poetry-sign small { display: block; margin-top: 6px; color: var(--muted); }
+.final-remark { margin-top: 16px; color: #fff; font-size: clamp(1.05rem, 2vw, 1.26rem); line-height: 1.7; font-weight: 850; }
+.mobile-progress { position: sticky; top: 10px; z-index: 5; display: none; margin-bottom: 14px; padding: 9px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(16px); }
+.mobile-progress span { flex: 1; text-align: center; padding: 8px 10px; border-radius: 999px; color: var(--muted); font-size: .78rem; font-weight: 900; }
+.mobile-progress span.active { color: #160a2a; background: linear-gradient(135deg, var(--yellow), var(--green)); }
+.story-card.poem-card { border-color: rgba(255,230,109,.24); background: linear-gradient(135deg, rgba(255,230,109,.10), rgba(85,215,255,.07)); }
+
 .result-section { margin-top: 22px; display: grid; gap: 18px; }
 .result-hero {
   min-height: 460px;
@@ -614,6 +652,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
 .algorithm-card p, .share-panel p { color: var(--muted); line-height: 1.72; margin-bottom: 0; }
 .share-panel { display: grid; gap: 18px; }
 .share-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.share-hint { margin: 0; color: var(--muted); line-height: 1.7; font-size: .94rem; }
 .secondary-button {
   min-height: 46px;
   padding: 0 18px;
@@ -653,6 +692,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
   .official-strip a { width: 100%; }
   .aura-console { min-height: 310px; }
   .console-card { font-size: .82rem; }
+  .mobile-progress { display: flex; }
   .orb { width: 190px; }
   .orb-a { left: 6%; }
   .orb-b { right: 6%; }
@@ -666,23 +706,30 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
   <div class="ambient ambient-pink"></div>
   <div class="ambient ambient-blue"></div>
   <div class="ambient ambient-green"></div>
+  <div id="synthOverlay" class="synth-overlay hidden" aria-live="polite">
+    <div class="synth-card glass-card">
+      <div class="synth-orbits"><span></span><span></span><i></i></div>
+      <p id="synthText">正在合成你们的关系气场...</p>
+    </div>
+  </div>
+
   <main class="app-shell">
     <nav class="topbar glass-card soft-border">
       <div class="brand-mark"><span>PA</span></div>
       <div>
-        <strong>Pair Aura V10</strong>
+        <strong>Pair Aura V13</strong>
         <p>关系气场报告</p>
       </div>
-      <a class="topbar-link" href="#matchForm">开始合成</a>
+      <button class="topbar-link" id="topStartBtn" type="button">开始合成</button>
     </nav>
 
-    <section class="hero premium-card">
+    <section id="homeScreen" class="hero premium-card screen active">
       <div class="hero-copy">
         <p class="eyebrow">Pair Aura</p>
         <h1>你和 TA，<br /><span>是哪种关系气场？</span></h1>
         <p class="hero-subtitle"><span class="value-line">不是给你贴标签，是看你和 TA 会发生什么。</span>输入两个人的 MBTI / SBTI，生成一份能发给 TA 的关系说明书。</p>
         <div class="hero-actions">
-          <a class="hero-primary" href="#matchForm">开始生成报告</a>
+          <button class="hero-primary" id="heroStartBtn" type="button">开始生成报告</button>
           <button class="hero-secondary" id="heroDemoBtn" type="button">看一个示例</button>
         </div>
         <div class="hero-proof" aria-label="使用提示">
@@ -706,7 +753,8 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
       </div>
     </section>
 
-    <form id="matchForm" class="form-grid" autocomplete="off">
+    <form id="matchForm" class="form-grid screen" autocomplete="off">
+      <div class="mobile-progress" aria-hidden="true"><span class="active">1 输入</span><span>2 关系</span><span>3 语气</span></div>
       <section class="glass-card section-card step-card featured-step">
         <div class="step-heading">
           <span class="step-index">01</span>
@@ -794,7 +842,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
       <button class="primary-button" type="submit">开始合成关系气场</button>
     </form>
 
-    <section id="resultSection" class="result-section hidden" aria-live="polite">
+    <section id="resultSection" class="result-section hidden screen" aria-live="polite">
       <article class="result-hero premium-card result-premium">
         <div class="result-text">
           <p class="eyebrow" id="resultContext">RELATION AURA</p>
@@ -804,6 +852,8 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
           </div>
           <div id="keywordList" class="keyword-list"></div>
           <p id="summaryText" class="summary-text"></p>
+          <div id="poetrySign" class="poetry-sign"></div>
+          <p id="finalRemarkText" class="final-remark"></p>
         </div>
         <div class="score-orbit" aria-hidden="true">
           <div class="mini-orb mini-a"></div>
@@ -835,7 +885,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
 
       <article class="glass-card algorithm-card">
         <h3>算法说明</h3>
-        <p>V10 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数是关系讨论入口，不是心理诊断或关系判决。</p>
+        <p>V13 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数是关系讨论入口，不是心理诊断或关系判决。</p>
       </article>
 
       <section class="share-panel glass-card">
@@ -845,8 +895,11 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
         </div>
         <div class="share-actions">
           <button id="copyLinkBtn" class="secondary-button" type="button">复制报告链接</button>
-          <button id="downloadPosterBtn" class="secondary-button" type="button">下载海报</button>
+          <button id="copyShareTextBtn" class="secondary-button" type="button">复制分享文案</button>
+          <button id="nativeShareBtn" class="secondary-button" type="button">发给 TA</button>
+          <button id="downloadPosterBtn" class="secondary-button" type="button">下载可扫码海报</button>
         </div>
+        <p id="shareHint" class="share-hint">报告链接会写进二维码。微信里可直接发链接，也可以保存海报扫码打开。</p>
         <canvas id="posterCanvas" width="900" height="1350" aria-label="分享海报预览"></canvas>
       </section>
     </section>
@@ -950,106 +1003,106 @@ const TRAIT_META = {
 
 const TRAIT_COPY = {
   extraversion: {
-    micro: '你们的社交电量差得不大，只是一个更容易先开口，另一个更习惯看准气氛再加入。这个差距不吵人，但会决定谁先破冰。',
-    visible: '一个更靠交流回血，一个更靠安静回血。最容易误会的时刻，是外放的一方以为沉默等于冷淡，安静的一方以为热闹等于压力。',
-    strong: '你们在社交能量上几乎像白天和夜晚：一个想继续聊，一个需要退回自己的小房间。吸引很明显，消耗也很容易。',
-    bridge: '提前说清“我不是不想理你，只是在充电”，比事后解释一百句更有效。'
+    micro: '你们的社交电量只是轻微错拍：一个先靠近，一个先观察。刚刚好，不吵也不冷。',
+    visible: '一个靠互动充电，一个靠安静回血。别把沉默当冷淡，也别把热闹当打扰。',
+    strong: '一个像把灯打开，一个像把门轻轻带上。靠近会有火花，也需要给彼此留电量。',
+    bridge: '热闹的人少追问，安静的人多给一句回应。'
   },
   openness: {
-    micro: '你们对新鲜感的需求只是轻微错位，一个更爱想象，一个更看现实可行性。这个差异像滤镜不同，不一定是方向不同。',
-    visible: '一个更容易被可能性点燃，另一个更想先确认能不能落地。吸引点在这里，争论点也在这里。',
-    strong: '一个在脑内开宇宙分店，一个在现实里检查地基稳不稳。别急着否定对方，那可能正是你们互补的入口。',
-    bridge: '先让灵感被听见，再让现实来筛选，顺序反了就容易变成泼冷水。'
+    micro: '一个多一点想象，一个多一点现实。不是路线相反，是看世界的镜头不一样。',
+    visible: '一个先看可能性，一个先看能不能落地。最好的状态是：别急着否定对方。',
+    strong: '一个在脑海里放烟花，一个在现实里搭地基。差异很大，但也很能互补。',
+    bridge: '先让灵感落座，再请现实把门。'
   },
   agreeableness: {
-    micro: '你们的温和程度接近，但表达礼貌的方式不完全一样。一个更顾及感受，另一个更看重把事情说清。',
-    visible: '一个更会先照顾气氛，另一个更容易直接指出问题。冲突不一定来自恶意，而是“在乎关系”和“在乎事实”的排序不同。',
-    strong: '一个怕话说重了伤人，一个怕话说轻了没用。你们如果不翻译彼此，很容易一个觉得被刺，一个觉得对方绕。',
-    bridge: '先讲立场，再讲感受；先说“我不是攻击你”，再说“这个点我确实在意”。'
+    micro: '一个更顾及气氛，一个更习惯说清。你们都不是难相处，只是温柔的方式不同。',
+    visible: '一个先照顾感受，一个先指出问题。被误会时，别急着证明自己没错。',
+    strong: '一个怕伤人，一个怕没用。话说出来之前，最好先给对方一点安全感。',
+    bridge: '先表达善意，再表达不同。'
   },
   conscientiousness: {
-    micro: '你们的责任感差距不大，只是一个更愿意提前排队，一个更能现场调整。小差异会体现在出门、ddl 和临时变化上。',
-    visible: '一个想把事情提前固定，另一个更相信到时候能处理。合作时容易一个嫌对方散，一个嫌对方紧。',
-    strong: '一个脑子里有甘特图，一个活在“到时候再说”的宇宙。好处是一个能兜底，一个能救场；坏处是容易互相看不顺眼。',
-    bridge: '把不可变的 deadline 写死，把可变的过程留一点弹性。'
+    micro: '一个更想提前准备，一个更能临场发挥。小差异会出现在约定、出门和 deadline 里。',
+    visible: '一个靠计划安心，一个靠弹性自在。谁都没错，只是安全感来源不同。',
+    strong: '一个心里有时间表，一个相信船到桥头自然直。能互补，也很容易互相着急。',
+    bridge: '把关键节点定住，把过程留给呼吸。'
   },
   neuroticism: {
-    micro: '你们的敏感度差距轻微，更多是触发点不同。一个可能对语气敏感，另一个可能对不确定敏感。',
-    visible: '一个更容易捕捉细节情绪，另一个更能把事情放过去。前者不是作，后者也不是冷，只是警报系统灵敏度不同。',
-    strong: '一个心里会自动放大信号，另一个觉得没发生什么。这里最容易出现“你怎么这么敏感”和“你怎么这么不在乎”。',
-    bridge: '不要争论“该不该难过”，先确认“你确实被触发了”。'
+    micro: '你们的敏感点不一样：一个在意语气，一个在意不确定。小心别让小事变成心事。',
+    visible: '一个会多想一点，一个更容易放过。不是矫情，也不是冷漠。',
+    strong: '一个心里警报响得很快，一个还没意识到发生了什么。最需要的是解释，不是反驳。',
+    bridge: '先承认对方被触发了，再讨论事情本身。'
   },
   logicEmotion: {
-    micro: '你们处理问题时一个稍偏感受，一个稍偏逻辑，但差距不算大。关键是别在对方需要安慰时提前开方案。',
-    visible: '一个想先被理解，一个想先把问题解决。看似都在帮忙，其实接收方式完全不同。',
-    strong: '你们像一个开情绪频道，一个开解决方案频道。频道不切换，再真诚也会听成“不懂我”。',
-    bridge: '先问一句：你现在想要我安慰你，还是一起分析？'
+    micro: '一个更想要答案，一个更想要态度。差距不大，但安慰方式会不一样。',
+    visible: '一个在找解决方案，一个在等一句“我懂你”。两种在乎，别翻译错。',
+    strong: '一个打开理性频道，一个打开情绪频道。都在努力，但容易像没听见对方。',
+    bridge: '先问：你现在需要被抱住，还是一起想办法？'
   },
   emotionalExpression: {
-    micro: '你们表达情绪的差距不大，只是一个更明显，一个更克制。小心不要把克制误读成没感觉。',
-    visible: '一个情绪会写在脸上，一个会先放进心里处理。前者需要回应，后者需要空间。',
-    strong: '一个像弹幕实时滚动，一个像后台静默运行。不是谁更真诚，而是表达接口完全不同。',
-    bridge: '给情绪外放的人一个回应，给情绪内收的人一个缓冲时间。'
+    micro: '一个表情更快，一个反应更慢。不是没感觉，是情绪抵达时间不同。',
+    visible: '一个把情绪写在脸上，一个先放进心里处理。最怕一个等回应，一个在沉默。',
+    strong: '一个像实时弹幕，一个像夜里才亮的灯。表达差异大，但不代表谁不在乎。',
+    bridge: '快的人别逼问，慢的人别消失。'
   },
   planningNeed: {
-    micro: '你们对计划的需求只是轻微不同，一个更喜欢有大方向，另一个更能临场变通。',
-    visible: '一个提前安排才安心，另一个看情况才舒服。旅行、约会、项目推进都容易在这里卡一下。',
-    strong: '一个需要日程表，一个需要呼吸感。计划太满会窒息，完全不计划又会焦虑。',
-    bridge: '只固定关键节点，不规定每一分钟怎么过。'
+    micro: '一个更想要方向，一个更愿意随机。差异轻，但会影响出行和约定。',
+    visible: '一个提前安排才安心，一个留点变化才舒服。你们需要的是“框架”，不是互相改造。',
+    strong: '一个需要日程表，一个需要呼吸感。太满会窒息，太空会焦虑。',
+    bridge: '定大事，松小事。'
   },
   noveltyNeed: {
-    micro: '你们对新鲜感的需求轻微错位，一个更爱换口味，另一个更珍惜稳定感。',
-    visible: '一个想试试新的，另一个想待在熟悉的舒适区。这个差异处理好是带彼此看新世界，处理不好就是互相嫌弃。',
-    strong: '一个关系里需要火花，一个关系里需要可预期。长期相处最怕一个觉得无聊，一个觉得被打扰。',
-    bridge: '约定“固定安全区 + 定期新鲜感”，别让稳定和刺激互相打架。'
+    micro: '一个更想换口味，一个更珍惜熟悉感。差距不大，但会影响约会和日常。',
+    visible: '一个想开新地图，一个想回舒适区。处理好是新鲜，处理不好是疲惫。',
+    strong: '一个需要火花，一个需要可预期。长期最怕一个无聊，一个被推着走。',
+    bridge: '保留稳定基地，再一起试一点新东西。'
   },
   intimacyNeed: {
-    micro: '你们对陪伴的需求接近，只是一个更喜欢主动确认，另一个更自然地相信关系在。',
-    visible: '一个需要高频连接，一个需要保留私人空间。亲密需求差异不是爱不爱，而是电量管理方式不同。',
-    strong: '一个越喜欢越想靠近，一个越在乎越需要空间保持自己。这里非常容易互相误伤。',
-    bridge: '把“需要陪伴”和“需要独处”都说成需求，不要说成指责。'
+    micro: '一个更爱确认，一个更相信关系自然在。小差异也会影响回复频率。',
+    visible: '一个需要高频连接，一个需要私人空间。不是爱不爱，是靠近方式不同。',
+    strong: '一个越喜欢越想靠近，一个越在乎越怕失去空间。这里最容易互相误伤。',
+    bridge: '把陪伴和独处都说成需求，别说成指责。'
   },
   independenceNeed: {
-    micro: '你们边界感都不弱，只是独立的表达程度不同。一个更愿意一起商量，另一个更想自己先想清楚。',
-    visible: '一个更想保持自己的节奏，另一个更希望被纳入对方生活。最容易卡在“你为什么不告诉我”。',
-    strong: '一个关系里需要共同感，一个关系里需要个人领地。太靠近会压迫，太远又会不安。',
-    bridge: '提前区分“我需要空间”和“我在疏远你”，这两个不是一回事。'
+    micro: '你们都有边界，只是一个更愿意商量，一个更想先自己想清。',
+    visible: '一个希望被纳入生活，一个想保留自己的节奏。别把空间误会成疏远。',
+    strong: '一个要共同感，一个要个人领地。太近会压迫，太远会不安。',
+    bridge: '说“我需要空间”，也记得说“我还在”。'
   },
   conflictDirectness: {
-    micro: '你们处理不满的方式轻微不同，一个更快说出口，一个更会先观察。小心别把慢半拍当成逃避。',
-    visible: '一个有矛盾想马上说清，一个需要先冷静消化。你们吵架的时间差，比吵架内容本身更容易伤人。',
-    strong: '一个冲突来了要当场开会，一个冲突来了先进入飞行模式。没有规则的话，很容易变成追和躲。',
-    bridge: '设置冷静时限：可以先停，但要约定什么时候回来继续说。'
+    micro: '一个更快开口，一个先观察。慢半拍不一定是逃避，可能是在整理。',
+    visible: '一个想马上说清，一个需要先冷静。吵架内容未必致命，时间差才致命。',
+    strong: '一个想当场修复，一个想先下线保命。没有规则，就会变成追和躲。',
+    bridge: '可以暂停，但要约定什么时候回来继续说。'
   },
   decisionSpeed: {
-    micro: '你们决策速度差距不大，只是一个更快拍板，一个更想再确认。',
-    visible: '一个推进很快，一个需要更多信息。快的人容易嫌慢，慢的人容易觉得被催。',
-    strong: '一个像按下启动键，一个像还在读说明书。合作时最怕没有分层：小事拖，大事冲。',
-    bridge: '小事授权快速决定，大事留出确认窗口。'
+    micro: '一个快一点，一个稳一点。小事无所谓，大事会放大差异。',
+    visible: '一个想推进，一个想多看一眼。快的人别催，慢的人也别让对方一直等。',
+    strong: '一个已经按下启动键，一个还在读说明书。合作时很容易节奏打架。',
+    bridge: '小事快速授权，大事留确认窗口。'
   },
   securityNeed: {
-    micro: '你们安全感需求都存在，只是触发方式不一样。一个需要回应，一个需要确定规则。',
-    visible: '一个需要更多确认，另一个可能默认“没说就是没事”。这里很容易出现低成本误会。',
-    strong: '一个关系里需要反复确认，一个觉得确认太多会被束缚。不是谁麻烦，是安全感开关不同。',
-    bridge: '把确认变成固定小动作，而不是每次情绪爆发后的补救。'
+    micro: '你们都需要安全感，只是开关不同：一个要回应，一个要稳定感。',
+    visible: '一个需要确认，另一个默认“没说就是没事”。很多误会都发生在这里。',
+    strong: '一个反复确认才安心，一个确认太多会窒息。不是麻烦，是安全感语言不同。',
+    bridge: '把确认变成固定小动作，不要等到委屈爆炸。'
   },
   controlNeed: {
-    micro: '你们对掌控感的需求只是轻微不同，一个更想定规则，另一个更愿意灵活协商。',
-    visible: '一个更想把节奏握在手里，另一个更讨厌被安排。冲突常常不是事情本身，而是谁说了算。',
-    strong: '一个需要掌控来安心，一个需要自由来呼吸。权力感不处理好，关系会从合作变成拉扯。',
-    bridge: '把“谁决定”拆成不同领域，不要所有事情都争主控权。'
+    micro: '一个更想定规则，一个更愿意协商。差异不大，但会影响谁来拍板。',
+    visible: '一个想握住节奏，一个讨厌被安排。冲突常常不是事，而是谁说了算。',
+    strong: '一个靠掌控安心，一个靠自由呼吸。处理不好，合作会变成拉扯。',
+    bridge: '按领域分主导权，不要所有事都抢方向盘。'
   },
   authenticityNeed: {
-    micro: '你们都重视真实，只是一个更愿意直接袒露，另一个更会看场合。',
-    visible: '一个讨厌关系里的表演感，另一个可能更习惯先照顾场面。最容易误会成“你不够真”或“你太冲”。',
-    strong: '一个宁愿难听也要真，一个宁愿缓一点也要体面。真诚和分寸如果不互相理解，会互相刺伤。',
-    bridge: '用真话，但给真话包一层不伤人的外壳。'
+    micro: '你们都重视真，只是一个更直接，一个更看场合。',
+    visible: '一个讨厌表演感，一个先顾及体面。容易被误会成“不够真”或“太冲”。',
+    strong: '一个宁愿难听也要真，一个宁愿缓一点也要体面。真诚也需要温度。',
+    bridge: '说真话，但别把真话说成刀。'
   },
   selfStability: {
-    micro: '你们自我稳定度差距轻微，一个更容易被当下情绪影响，另一个更能保持主轴。',
-    visible: '一个比较容易跟着关系气氛波动，另一个更像有自己的内部锚点。吸引点是稳定感，摩擦点是理解速度。',
-    strong: '一个需要对方帮自己稳住，一个很怕被卷进情绪风暴。这里处理不好，会一个觉得孤单，一个觉得累。',
-    bridge: '稳定的一方不要只讲道理，波动的一方也尽量说清“我需要什么”。'
+    micro: '一个更容易被气氛带动，一个主轴更稳。差距不大，但能感觉到。',
+    visible: '一个跟着关系波动，一个有自己的锚。吸引点是稳定，摩擦点是理解速度。',
+    strong: '一个需要被稳住，一个怕被卷进情绪风暴。容易一个孤单，一个很累。',
+    bridge: '稳定的人多给温度，波动的人说清需要。'
   }
 };
 
@@ -1058,6 +1111,120 @@ const BAND_LABELS = {
   visible: '明显差异',
   strong: '强差异'
 };
+
+const RELATION_KEYWORD_BANK = {
+  close: ['心动错频', '情绪翻译', '嘴硬心软', '靠近感', '边界感', '慢慢靠近', '被看见', '留一点余地', '温柔对齐', '有话好好说'],
+  collab: ['分工感', '推进力', '边界清楚', '互相补位', '低内耗', '谁来拍板', 'DDL救援', '靠谱搭子', '节奏对齐', '一起把事做成'],
+  highRisk: ['易误读', '要规则', '先别脑补', '别冷处理', '别用沉默惩罚', '把需求说出来'],
+  highSync: ['同频', '默契', '低消耗', '不用解释太多', '懂半句', '松弛感'],
+  highComplement: ['互补', '反差', '补位', '彼此照亮', '互相托底', '刚好相反']
+};
+
+const POETRY_SIGNS = [
+  { id: 'lingxi', quote: '心有灵犀一点通', source: '李商隐《无题》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 72, meaning: '有些话不用讲太满，你们也能接住半句。' },
+  { id: 'jinfenyulu', quote: '金风玉露一相逢，便胜却人间无数', source: '秦观《鹊桥仙》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 74, meaning: '吸引来自反差，不是复制粘贴的相似。' },
+  { id: 'jiuchangshi', quote: '两情若是久长时，又岂在朝朝暮暮', source: '秦观《鹊桥仙》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.conflictRepair >= 68, meaning: '关系不靠时刻黏住，靠稳定回应。' },
+  { id: 'zhangjiangtou', quote: '我住长江头，君住长江尾', source: '李之仪《卜算子》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 50, meaning: '距离有时不是远，是表达节奏没递到。' },
+  { id: 'zhiji', quote: '海内存知己，天涯若比邻', source: '王勃《送杜少府之任蜀州》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.similarity >= 64 && metrics.risk < 55, meaning: '真正同频，不需要天天绑定。' },
+  { id: 'xiangzhi', quote: '结交在相知，骨肉何必亲', source: '两汉佚名《箜篌谣》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 64, meaning: '亲近感不是靠身份，是靠真的懂一点。' },
+  { id: 'taohua', quote: '桃花潭水深千尺，不及汪伦送我情', source: '李白《赠汪伦》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 70, meaning: '你们的情义感，比表面看起来更深。' },
+  { id: 'tianya', quote: '同是天涯沦落人，相逢何必曾相识', source: '白居易《琵琶行》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.risk >= 58, meaning: '你们可能不是一路人，却很容易在某个时刻懂对方。' },
+  { id: 'qingmei', quote: '郎骑竹马来，绕床弄青梅', source: '李白《长干行》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 68 && metrics.complementarity < 62, meaning: '熟悉感很强，不猛烈，但很自然。' },
+  { id: 'cangshan', quote: '曾经沧海难为水，除却巫山不是云', source: '元稹《离思》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 72 && metrics.risk < 55, meaning: '有些关系的记忆点很深，轻易替代不了。' },
+  { id: 'yuanxi', quote: '众里寻他千百度', source: '辛弃疾《青玉案·元夕》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 70 && metrics.risk < 65, meaning: '你们的吸引不是喧闹，是突然对上眼。' },
+  { id: 'renjiu', quote: '人生得一知己足矣', source: '鲁迅赠瞿秋白联语', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 70, meaning: '这段关系贵在被理解，而不只是热闹。' },
+  { id: 'tongpao', quote: '岂曰无衣？与子同袍', source: '《诗经·秦风·无衣》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 68, meaning: '你们适合并肩作战，但要把战术说清。' },
+  { id: 'qianli', quote: '欲穷千里目，更上一层楼', source: '王之涣《登鹳雀楼》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.complementarity >= 68, meaning: '一个补视野，一个补行动，合作会打开新高度。' },
+  { id: 'changfeng', quote: '长风破浪会有时，直挂云帆济沧海', source: '李白《行路难》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 70 && metrics.risk < 60, meaning: '这组搭档适合冲，但别忘了定航线。' },
+  { id: 'xuehai', quote: '纸上得来终觉浅，绝知此事要躬行', source: '陆游《冬夜读书示子聿》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.communicationFit >= 60, meaning: '别只讨论，做起来才知道谁该负责什么。' },
+  { id: 'shanhe', quote: '山重水复疑无路，柳暗花明又一村', source: '陆游《游山西村》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.risk >= 55, meaning: '现在有点卡，不代表没有转圜。换一种说法，路就会出来。' },
+  { id: 'huanghun', quote: '月上柳梢头，人约黄昏后', source: '欧阳修《生查子·元夕》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 60 && metrics.risk < 58, meaning: '这段关系的可爱，在那些愿意赴约的小瞬间。' },
+  { id: 'caishang', quote: '愿得一心人，白头不相离', source: '卓文君《白头吟》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.longTermComfort >= 68, meaning: '如果要走远，最重要的是稳定和真心。' },
+  { id: 'pengyou', quote: '莫愁前路无知己，天下谁人不识君', source: '高适《别董大》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 62, meaning: '你们能给彼此底气，不只是陪伴，也是鼓励。' },
+  { id: 'heyue', quote: '相知无远近，万里尚为邻', source: '张九龄《送韦城李少府》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.similarity >= 60 && metrics.risk < 62, meaning: '真正舒服的关系，不会被距离和频率轻易冲散。' },
+  { id: 'xueyou', quote: '独学而无友，则孤陋而寡闻', source: '《礼记·学记》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.communicationFit >= 62, meaning: '这组搭档的价值，是互相补盲区。' }
+];
+
+const MODERN_SONG_SIGNS = [
+  { id: 'qing-tian', quote: '《晴天》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 54, meaning: '像一场有点遗憾的心动：明明靠近，却总差一句好好说。' },
+  { id: 'qi-li-xiang', quote: '《七里香》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 68, meaning: '舒服感不靠大场面，靠那些细小但有画面的瞬间。' },
+  { id: 'jian-dan-ai', quote: '《简单爱》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk < 45, meaning: '适合少一点猜，多一点直接表达。简单反而更稳。' },
+  { id: 'yu-jian', quote: '《遇见》', source: '孙燕姿', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 65, meaning: '像一次刚好撞上的交集，未必完美，但很难忽略。' },
+  { id: 'hong-dou', quote: '《红豆》', source: '王菲', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 68, meaning: '有些在意不吵闹，但会反复出现。' },
+  { id: 'hao-jiu-bu-jian', quote: '《好久不见》', source: '陈奕迅', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 62, meaning: '拉扯感强，像有话没说完。' },
+  { id: 'wen-wen-de-xing-fu', quote: '《稳稳的幸福》', source: '陈奕迅', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk < 42 && metrics.similarity >= 60, meaning: '最打动人的地方，是低内耗的安心。' },
+  { id: 'zhi-zu', quote: '《知足》', source: '五月天', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 60 && metrics.risk < 58, meaning: '节奏未必一样，但能学会珍惜对方的存在。' },
+  { id: 'xiao-qing-ge', quote: '《小情歌》', source: '苏打绿', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 62, meaning: '温柔不一定大声，愿意靠近就已经很珍贵。' },
+  { id: 'xiao-jiu-wo', quote: '《小酒窝》', source: '林俊杰 / 蔡卓妍', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 65 && metrics.risk < 55, meaning: '甜不是轰轰烈烈，是能让人放松下来的可爱。' },
+  { id: 'tu-ran-hao-xiang-ni', quote: '《突然好想你》', source: '五月天', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 56, meaning: '越是错频，越容易在某个瞬间突然想起对方。' },
+  { id: 'duo-yuan', quote: '《多远都要在一起》', source: 'G.E.M. 邓紫棋', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.conflictRepair >= 65, meaning: '只要愿意修复，距离和节奏都不是最大问题。' },
+  { id: 'guang-hui-sui-yue', quote: '《光辉岁月》', source: 'Beyond', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 70, meaning: '适合一起扛目标，但别把热血用成互相压迫。' },
+  { id: 'ping-fan-zhi-lu', quote: '《平凡之路》', source: '朴树', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.risk < 58, meaning: '不一定轰动，但能把路一步步走出来。' },
+  { id: 'qi-feng-le', quote: '《起风了》', source: '买辣椒也用券', type: 'song', contexts: ['collab', 'close'], fit: ({ metrics }) => metrics.complementarity >= 60, meaning: '像风向不同的人，刚好在某个节点并肩。' },
+  { id: 'dao-xiang', quote: '《稻香》', source: '周杰伦', type: 'song', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.risk < 52, meaning: '适合把复杂关系过简单一点，别忘了最初舒服的感觉。' },
+  { id: 'fu-kuai', quote: '《富士山下》', source: '陈奕迅', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 64, meaning: '适合提醒你们：有些拉扯要温柔放下，不要互相消耗。' },
+  { id: 'ai-hen-jian-dan', quote: '《爱很简单》', source: '陶喆', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 68 && metrics.risk < 50, meaning: '别把喜欢弄得太复杂，真诚回应就够有力量。' },
+  { id: 'hou-lai', quote: '《后来》', source: '刘若英', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 66, meaning: '如果不想变成遗憾，就别把重要的话一直往后放。' },
+  { id: 'dang-ni', quote: '《当你》', source: '王心凌', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.intimacyNeed >= 0 || metrics.similarity >= 0, meaning: '有些在意藏不住，越轻描淡写越明显。' },
+  { id: 'zui-chang', quote: '《最长的电影》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 58, meaning: '这段关系不一定轻松，但很有画面，也很难一句话讲完。' },
+  { id: 'lan-lian-hua', quote: '《蓝莲花》', source: '许巍', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 64, meaning: '适合一起往前走，别在小分歧里忘了大方向。' },
+  { id: 'sheng-huo-bu-zhi', quote: '《生活不止眼前的苟且》', source: '许巍', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.complementarity >= 62, meaning: '你们适合互相提醒：别只盯眼前，也别只谈理想。' },
+  { id: 'guang-nian-zhi-wai', quote: '《光年之外》', source: 'G.E.M. 邓紫棋', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 72, meaning: '反差很强，像两种轨道突然靠近。好看，也需要稳定引力。' }
+];
+
+const RELATION_SIGNS = [...POETRY_SIGNS, ...MODERN_SONG_SIGNS];
+
+
+function expandKeywords(classification, metrics, differences, context) {
+  const base = [...classification.keywords];
+  const ctx = normalizeContext(context);
+  const top = differences[0]?.key;
+  const pool = [
+    ...(RELATION_KEYWORD_BANK[ctx] || []),
+    ...(metrics.risk > 56 ? RELATION_KEYWORD_BANK.highRisk : []),
+    ...(metrics.similarity > 70 ? RELATION_KEYWORD_BANK.highSync : []),
+    ...(metrics.complementarity > 70 ? RELATION_KEYWORD_BANK.highComplement : [])
+  ];
+  const traitWords = {
+    emotionalExpression: ['情绪错频', '需要回应'],
+    intimacyNeed: ['靠近/留白', '陪伴频率'],
+    planningNeed: ['计划差', '节奏要对齐'],
+    conflictDirectness: ['吵架时差', '修复规则'],
+    logicEmotion: ['答案/态度', '先哄再讲理'],
+    independenceNeed: ['边界感', '空间需求'],
+    noveltyNeed: ['新鲜感', '稳定区']
+  }[top] || [];
+  return [...new Set([...base, ...traitWords, ...pool])].slice(0, 6);
+}
+
+function pickPoetrySign(metrics, context, differences) {
+  const ctx = normalizeContext(context);
+  const pool = RELATION_SIGNS.filter(item => item.contexts.includes(ctx));
+  const top = differences[0]?.key || '';
+  const songKeys = ['emotionalExpression', 'intimacyNeed', 'securityNeed', 'conflictDirectness', 'noveltyNeed', 'extraversion', 'logicEmotion'];
+  const preferSong = ctx === 'close' && (songKeys.includes(top) || metrics.complementarity >= 62 || metrics.risk >= 46);
+  const preferred = pool.filter(item => preferSong ? item.type === 'song' : item.type === 'poem');
+  return preferred.find(item => item.fit({ metrics, differences, context: ctx }))
+    || (preferSong ? preferred[0] : null)
+    || pool.find(item => item.fit({ metrics, differences, context: ctx }))
+    || RELATION_SIGNS.find(item => item.id === 'zhiji');
+}
+
+function buildFinalRemark(metrics, classification, differences, context, tone) {
+  const main = differences[0];
+  const reality = normalizeTone(tone) === 'reality';
+  const ctx = normalizeContext(context);
+  if (reality) {
+    if (metrics.risk >= 62) return `最终评语：你们不是不合，是太容易把「${main?.label || '差异'}」听成态度。把需求讲清楚，关系就会少很多误伤。`;
+    if (ctx === 'collab') return '最终评语：你们不用变得一样。把边界、分工和反馈方式说清楚，默契就会慢慢长出来。';
+    return '最终评语：这段关系最需要的不是用力证明，而是少一点猜测，多一点坦白又温柔的表达。';
+  }
+  if (classification.title.includes('高吸引')) return '最终评语：你们像两种很亮的颜色靠近，漂亮是真的，刺眼也可能是真的。愿意彼此调色，就会很好看。';
+  if (classification.title.includes('稳定')) return '最终评语：你们的好不是轰轰烈烈，是日常里那些不用解释太多、却有人愿意懂的瞬间。';
+  if (metrics.complementarity >= 70) return '最终评语：你们的差异不是问题本身，真正重要的是愿不愿意把差异变成照顾，而不是变成指责。';
+  return '最终评语：你们不是要完全同频，能在错频的时候愿意停下来听一听，就已经很珍贵。';
+}
+
 
 function gapBand(value) {
   if (value < 18) return 'micro';
@@ -1368,7 +1535,7 @@ function getTopDifferences(vecA, vecB, nameA, nameB, tone = 'warm_roast') {
       const contrast = `${nameA}更接近“${aSide}”，${nameB}更接近“${bSide}”。`;
       const toneTail = normalizeTone(tone) === 'reality'
         ? copy.bridge
-        : `${copy.bridge} 说人话就是：别急着证明谁正常，先确认你们的按钮确实不在同一个位置。`;
+        : `${copy.bridge} 你们不需要证明谁更正常，只需要把彼此的开关位置说清楚。`;
       return {
         key,
         label: TRAIT_META[key].label,
@@ -1387,42 +1554,16 @@ function getTopDifferences(vecA, vecB, nameA, nameB, tone = 'warm_roast') {
     .slice(0, 4);
 }
 
-function buildSceneCards(context, topDiff, tone) {
+function buildSceneText(context, topDiff, tone) {
   const bridge = topDiff?.bridge || '先把差异说成需求，再一起讨论怎么配合。';
   if (normalizeContext(context) === 'collab') {
-    return [
-      {
-        tag: '搭子版',
-        title: '如果你们是搭子 / 室友 / 旅行伙伴',
-        content: normalizeTone(tone) === 'reality'
-          ? `最重要的是提前说清边界：时间、预算、安静需求、临时变化怎么处理。${bridge}`
-          : `你们适合先把“谁负责什么”说清楚，不然很容易从快乐搭子变成互相吐槽的行走备忘录。${bridge}`
-      },
-      {
-        tag: '项目版',
-        title: '如果你们是学习 / 项目搭档',
-        content: normalizeTone(tone) === 'reality'
-          ? '把目标、截止时间、决策权写在前面。你们不是不能合作，而是不能靠默契硬扛所有流程。'
-          : '你们真正需要的不是“都自觉一点”，而是一个清楚到不能装傻的分工表。模糊才是最大内耗。'
-      }
-    ];
+    return normalizeTone(tone) === 'reality'
+      ? `搭子关系最怕边界模糊：时间、分工、临时变化都要提前说。${bridge}`
+      : `适合一起往前走，但别把默契全交给运气。谁负责什么说清楚，关系会轻很多。${bridge}`;
   }
-  return [
-    {
-      tag: '朋友版',
-      title: '如果你们是朋友 / 闺蜜',
-      content: normalizeTone(tone) === 'reality'
-        ? `保留轻松感，不要把每次不同步都理解成关系变淡。${bridge}`
-        : `你们最适合的朋友模式不是天天黏住，而是“我懂你的怪，你也别审判我的怪”。${bridge}`
-    },
-    {
-      tag: '情侣版',
-      title: '如果你们是情侣 / 暧昧对象',
-      content: normalizeTone(tone) === 'reality'
-        ? '先确认情绪，再讨论方案。亲密关系里，很多争执不是谁更有道理，而是谁先觉得自己没有被理解。'
-        : '你们不是不合，是很容易把“我需要你”说成“你怎么又这样”。先接住情绪，很多问题会少炸一半。'
-    }
-  ];
+  return normalizeTone(tone) === 'reality'
+    ? `朋友和情侣都一样：别把每次不同步都理解成不在乎。${bridge}`
+    : `你们最适合的模式：允许对方和自己不一样，也愿意在关键时刻多靠近一点。${bridge}`;
 }
 
 function createStoryCards(report, inputs, differences) {
@@ -1435,30 +1576,39 @@ function createStoryCards(report, inputs, differences) {
   const context = normalizeContext(inputs.context);
 
   const attraction = metrics.complementarity > metrics.similarity
-    ? `${nameA}和${nameB}的吸引点主要来自“反差”。你们不是复制粘贴型关系，而是一个人身上的亮点，刚好会照到另一个人平时不太擅长的地方。`
-    : `${nameA}和${nameB}的吸引点主要来自“同类感”。你们在底层节奏上不算远，所以很多时刻不用解释太多，也能知道对方大概在想什么。`;
+    ? `${nameA}和${nameB}会被彼此的反差吸引：一个人身上松动的地方，刚好被另一个人接住。`
+    : `${nameA}和${nameB}的靠近感来自同类感：不用解释太多，也能大概知道对方为什么会这样。`;
 
   const friction = mainDiff
-    ? `最明显的卡点在「${mainDiff.label}」：${mainDiff.text}${mainDiff.bridge}`
-    : '你们目前没有特别突出的单点差异，但仍然要避免用自己的表达方式默认对方也一样。';
+    ? `卡点在「${mainDiff.label}」：${mainDiff.text} ${mainDiff.bridge}`
+    : '没有特别尖锐的单点差异，但别默认对方和你用同一种方式表达在乎。';
 
   const softSpot = secondDiff
-    ? `第二个值得注意的细节是「${secondDiff.label}」。${secondDiff.text}${secondDiff.bridge}`
-    : '如果只看总分，你会错过很多细节；真正影响关系的，往往是那些“不严重但反复出现”的小错位。';
+    ? `「${secondDiff.label}」会在小事里反复出现。${secondDiff.text} ${secondDiff.bridge}`
+    : '真正影响关系的，往往是那些“不严重、但总出现”的小错位。';
 
-  const advice = context === 'collab'
-    ? '现实建议：把边界、分工和反馈方式写清楚。你们可以有默契，但不要让所有事情都靠猜。'
-    : '现实建议：把“我需要什么”说出来，而不是让对方从语气、表情和朋友圈更新里做阅读理解。';
+  const sign = report.poetry
+    ? `${report.poetry.type === 'song' ? '现代歌单签' : '关系诗词签'}：${report.poetry.quote}｜${report.poetry.source}。${report.poetry.meaning}`
+    : '关系签文：你们的故事还没写完，先别急着下结论。';
 
-  const cards = [
-    { tag: '吸引点', title: '你们为什么会互相吸引？', content: attraction },
-    { tag: mainDiff?.bandLabel || '差异点', title: '你们最容易卡在哪里？', content: friction },
-    { tag: secondDiff?.bandLabel || '微差', title: '一个更细的隐藏差异', content: softSpot },
-    ...buildSceneCards(context, mainDiff, tone),
-    { tag: tone === 'reality' ? '落地建议' : '温情吐槽', title: '最适合的相处方式', content: tone === 'reality' ? advice : `${advice} 这不是鸡汤，这是降低互相内耗的操作手册。` }
+  const scene = buildSceneText(context, mainDiff, tone);
+
+  const advice = tone === 'reality'
+    ? (context === 'collab'
+      ? '把边界、分工和反馈方式说清楚。真正靠谱的搭档，不靠猜，靠彼此托底。'
+      : '少一点试探，多一点明说。关系最怕的不是差异，是两个人都在等对方先懂。')
+    : (context === 'collab'
+      ? '你们不是不能合作，是需要一个清楚到不能装傻的分工表，也需要一点互相体谅。'
+      : '先接住情绪，再讨论道理。被理解过的人，才更愿意一起解决问题。');
+
+  return [
+    { tag: '吸引点', title: '为什么会靠近', content: attraction },
+    { tag: mainDiff?.bandLabel || '差异点', title: '最容易卡住', content: friction },
+    { tag: secondDiff?.bandLabel || '隐藏点', title: '那个小小的反复', content: softSpot },
+    { tag: report.poetry?.type === 'song' ? '歌单签' : '诗词签', title: '最像你们的一句', content: sign, poem: true },
+    { tag: context === 'collab' ? '搭子/项目' : '朋友/情侣', title: '放进真实关系里', content: scene },
+    { tag: tone === 'reality' ? '落地建议' : '温柔收束', title: '最后一句送给你们', content: advice }
   ];
-
-  return cards;
 }
 
 function buildReport(inputs) {
@@ -1473,10 +1623,13 @@ function buildReport(inputs) {
   const depthCap = sourceCount >= 4 ? 96 : sourceCount >= 3 ? 93 : sourceCount >= 2 ? 90 : 84;
   metrics.total = Math.min(metrics.total, depthCap);
 
-  const classification = classifyReport(metrics, inputs.context);
+  const rawClassification = classifyReport(metrics, inputs.context);
   const differences = getTopDifferences(personaA.vector, personaB.vector, inputs.nameA || 'A', inputs.nameB || 'B', inputs.tone);
-  const storyCards = createStoryCards({ metrics, personaA, personaB }, inputs, differences);
-  return { inputs, personaA, personaB, metrics, classification, differences, storyCards };
+  const classification = { ...rawClassification, keywords: expandKeywords(rawClassification, metrics, differences, inputs.context) };
+  const poetry = pickPoetrySign(metrics, inputs.context, differences);
+  const finalRemark = buildFinalRemark(metrics, classification, differences, inputs.context, inputs.tone);
+  const storyCards = createStoryCards({ metrics, personaA, personaB, poetry, finalRemark }, inputs, differences);
+  return { inputs, personaA, personaB, metrics, classification, differences, storyCards, poetry, finalRemark };
 }
 
 function initSelects() {
@@ -1540,6 +1693,39 @@ function dimensionLabel(key) {
   }[key] || key;
 }
 
+function showScreen(id) {
+  ['homeScreen', 'matchForm', 'resultSection'].forEach(screenId => {
+    const el = document.getElementById(screenId);
+    if (!el) return;
+    if (screenId === id) {
+      el.classList.remove('hidden');
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+      if (screenId === 'resultSection') el.classList.add('hidden');
+    }
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function runSynthesis(report) {
+  const overlay = document.getElementById('synthOverlay');
+  const text = document.getElementById('synthText');
+  const steps = ['正在合成你们的关系气场...', '正在检测互补频率...', '正在挑选关系签文...', '正在生成专属关系报告...'];
+  let i = 0;
+  overlay.classList.remove('hidden');
+  text.textContent = steps[0];
+  const timer = setInterval(() => {
+    i = (i + 1) % steps.length;
+    text.textContent = steps[i];
+  }, 360);
+  setTimeout(() => {
+    clearInterval(timer);
+    overlay.classList.add('hidden');
+    renderReport(report);
+  }, 1050);
+}
+
 function renderReport(report) {
   const { classification, metrics, differences, storyCards, inputs } = report;
   document.getElementById('resultContext').textContent = (CONTEXTS.find(x => x.id === normalizeContext(inputs.context)) || CONTEXTS[0]).title;
@@ -1547,6 +1733,8 @@ function renderReport(report) {
   document.getElementById('totalScore').textContent = `${round(metrics.total)}%`;
   document.getElementById('summaryText').textContent = classification.summary;
   document.getElementById('keywordList').innerHTML = classification.keywords.map(k => `<span>${k}</span>`).join('');
+  document.getElementById('poetrySign').innerHTML = report.poetry ? `<strong>${report.poetry.type === 'song' ? '现代歌单签' : '关系诗词签'}</strong><q>${report.poetry.quote}</q><small>${report.poetry.source} · ${report.poetry.meaning}</small>` : '';
+  document.getElementById('finalRemarkText').textContent = report.finalRemark || '';
 
   document.getElementById('dimensionBars').innerHTML = Object.entries(metrics.dimensions).map(([key, value]) => `
     <div class="bar-row">
@@ -1564,25 +1752,42 @@ function renderReport(report) {
   `).join('');
 
   document.getElementById('reportCards').innerHTML = storyCards.map(card => `
-    <article class="story-card">
+    <article class="story-card ${card.poem ? 'poem-card' : ''}">
       <span class="micro-tag">${card.tag || '关系细节'}</span>
       <h3>${card.title}</h3>
       <p>${card.content}</p>
     </article>
   `).join('');
 
-  document.getElementById('resultSection').classList.remove('hidden');
-  drawPoster(report);
+  showScreen('resultSection');
   state.lastReport = report;
   updateUrl(report.inputs);
-  document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  drawPoster(report);
+
+}
+
+function encodeInputs(inputs) {
+  const json = encodeURIComponent(JSON.stringify(inputs));
+  return btoa(unescape(json)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function decodeInputs(payload) {
+  const normalized = String(payload || '').replace(/-/g, '+').replace(/_/g, '/');
+  const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
+  return JSON.parse(decodeURIComponent(escape(atob(padded))));
+}
+
+function buildReportUrl(inputs) {
+  const url = new URL(window.location.href);
+  url.hash = '';
+  url.searchParams.set('r', encodeInputs(inputs));
+  return url.toString();
 }
 
 function updateUrl(inputs) {
-  const payload = btoa(unescape(encodeURIComponent(JSON.stringify(inputs))));
-  const url = new URL(window.location.href);
-  url.searchParams.set('r', payload);
-  history.replaceState(null, '', url.toString());
+  const url = buildReportUrl(inputs);
+  history.replaceState(null, '', url);
+  return url;
 }
 
 function restoreFromUrl() {
@@ -1590,7 +1795,12 @@ function restoreFromUrl() {
   const encoded = url.searchParams.get('r');
   if (!encoded) return;
   try {
-    const inputs = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    let inputs;
+    try {
+      inputs = decodeInputs(encoded);
+    } catch {
+      inputs = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    }
     document.getElementById('nameA').value = inputs.nameA || '';
     document.getElementById('nameB').value = inputs.nameB || '';
     document.getElementById('mbtiA').value = inputs.mbtiA || 'ENFP';
@@ -1606,6 +1816,65 @@ function restoreFromUrl() {
     renderReport(buildReport(collectInputs()));
   } catch (err) {
     console.warn('无法解析报告链接', err);
+  }
+}
+
+function reportShareText(report) {
+  if (!report) return '我生成了一份 Pair Aura 关系气场报告，想发给你看看。';
+  const title = report.classification?.title || '关系气场报告';
+  const score = round(report.metrics?.total || 0);
+  const keywords = (report.classification?.keywords || []).slice(0, 3).join(' / ');
+  const sign = report.poetry ? `\n关系签：${report.poetry.quote}｜${report.poetry.source}` : '';
+  return `我测了我们的关系气场：${title}，合拍指数 ${score}%。\n关键词：${keywords}${sign}\n你看看像不像我们？`;
+}
+
+async function copyText(text, ok = '已复制') {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert(ok);
+  } catch {
+    prompt('复制这段内容', text);
+  }
+}
+
+async function ensureQrLib() {
+  if (window.QRCode && window.QRCode.toCanvas) return window.QRCode;
+  const sources = [
+    'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm',
+    'https://esm.sh/qrcode@1.5.4'
+  ];
+  for (const src of sources) {
+    try {
+      const mod = await import(src);
+      const qr = mod.default || mod;
+      if (qr && typeof qr.toCanvas === 'function') {
+        window.QRCode = qr;
+        return qr;
+      }
+    } catch {}
+  }
+  return null;
+}
+
+async function drawQr(ctx, url, x, y, size) {
+  ctx.fillStyle = 'rgba(255,255,255,0.96)';
+  roundedRect(ctx, x - 14, y - 14, size + 28, size + 28, 26);
+  ctx.fill();
+  const qr = await ensureQrLib();
+  if (qr) {
+    const qrCanvas = document.createElement('canvas');
+    await qr.toCanvas(qrCanvas, url, { width: size, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#120B2E', light: '#FFFFFF' } });
+    ctx.drawImage(qrCanvas, x, y, size, size);
+    const hint = document.getElementById('shareHint');
+    if (hint) hint.textContent = '二维码已生成。微信里可保存海报，也可以直接复制报告链接发给 TA。';
+  } else {
+    ctx.fillStyle = '#120B2E';
+    ctx.font = '800 22px Arial';
+    ctx.fillText('复制链接', x + 26, y + 68);
+    ctx.font = '600 16px Arial';
+    ctx.fillText('二维码加载失败', x + 18, y + 102);
+    const hint = document.getElementById('shareHint');
+    if (hint) hint.textContent = '二维码库加载失败，但报告链接仍可复制分享到微信。';
   }
 }
 
@@ -1639,7 +1908,7 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 5) {
   return y + lineHeight;
 }
 
-function drawPoster(report) {
+async function drawPoster(report) {
   const canvas = document.getElementById('posterCanvas');
   const ctx = canvas.getContext('2d');
   const { classification, metrics, inputs } = report;
@@ -1675,7 +1944,7 @@ function drawPoster(report) {
 
   ctx.fillStyle = '#78F2C2';
   ctx.font = '800 24px Arial';
-  ctx.fillText('PAIR AURA V8', 96, 128);
+  ctx.fillText('PAIR AURA V13', 96, 128);
 
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '900 62px Arial, sans-serif';
@@ -1707,7 +1976,19 @@ function drawPoster(report) {
 
   ctx.fillStyle = '#CFC7FF';
   ctx.font = '34px Arial, sans-serif';
-  wrapText(ctx, classification.summary, 96, 680, 704, 54, 5);
+  wrapText(ctx, classification.summary, 96, 680, 704, 54, 3);
+
+  if (report.poetry) {
+    ctx.fillStyle = 'rgba(255,230,109,0.12)';
+    roundedRect(ctx, 96, 840, 708, 96, 28);
+    ctx.fill();
+    ctx.fillStyle = '#FFE66D';
+    ctx.font = '800 24px Arial';
+    ctx.fillText(report.poetry && report.poetry.type === 'song' ? '现代歌单签' : '关系诗词签', 128, 880);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 30px Arial, sans-serif';
+    wrapText(ctx, report.poetry.quote, 128, 920, 650, 38, 1);
+  }
 
   ctx.fillStyle = 'rgba(255,255,255,0.14)';
   roundedRect(ctx, 96, 960, 708, 170, 32);
@@ -1719,33 +2000,47 @@ function drawPoster(report) {
   ctx.font = '26px Arial';
   ctx.fillText('不是给你贴标签，是看你和 TA 会发生什么。', 128, 1072);
 
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  roundedRect(ctx, 626, 1156, 140, 140, 24);
-  ctx.fill();
-  ctx.fillStyle = '#120B2E';
-  ctx.font = '900 30px Arial';
-  ctx.fillText('PAIR', 657, 1220);
-  ctx.fillText('AURA', 650, 1258);
+  const reportUrl = buildReportUrl(report.inputs);
+  await drawQr(ctx, reportUrl, 622, 1148, 148);
 
   ctx.fillStyle = '#CFC7FF';
   ctx.font = '24px Arial';
-  ctx.fillText('输入 MBTI / SBTI，生成可分享关系报告', 96, 1228);
+  ctx.fillText('扫码打开这份报告，或输入 MBTI / SBTI 合成你们的关系气场', 96, 1228);
 }
 
 function copyReportLink() {
-  const link = window.location.href;
-  navigator.clipboard?.writeText(link).then(() => {
-    alert('报告链接已复制');
-  }).catch(() => {
-    prompt('复制这个链接', link);
-  });
+  const link = state.lastReport ? buildReportUrl(state.lastReport.inputs) : window.location.href;
+  copyText(link, '报告链接已复制，可以直接发到微信。');
+}
+
+function copyShareText() {
+  if (!state.lastReport) return;
+  const link = buildReportUrl(state.lastReport.inputs);
+  copyText(`${reportShareText(state.lastReport)}
+
+打开报告：${link}`, '分享文案已复制');
+}
+
+async function nativeShareReport() {
+  if (!state.lastReport) return;
+  const url = buildReportUrl(state.lastReport.inputs);
+  const text = reportShareText(state.lastReport);
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Pair Aura 关系气场报告', text, url });
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
+    }
+  }
+  copyShareText();
 }
 
 function downloadPoster() {
   if (!state.lastReport) return;
   const canvas = document.getElementById('posterCanvas');
   const link = document.createElement('a');
-  link.download = 'pair-aura-v10-poster.png';
+  link.download = 'pair-aura-v13-poster.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
@@ -1785,7 +2080,7 @@ function generateDemoReport() {
   renderChips('contextChoices', CONTEXTS, state.context, id => state.context = id);
   renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
   const report = buildReport(collectInputs());
-  renderReport(report);
+  runSynthesis(report);
 }
 
 function init() {
@@ -1794,17 +2089,21 @@ function init() {
   renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
 
   document.getElementById('heroDemoBtn')?.addEventListener('click', generateDemoReport);
+  document.getElementById('heroStartBtn')?.addEventListener('click', () => showScreen('matchForm'));
+  document.getElementById('topStartBtn')?.addEventListener('click', () => showScreen('matchForm'));
 
   document.getElementById('matchForm').addEventListener('submit', event => {
     event.preventDefault();
     const inputs = collectInputs();
     const report = buildReport(inputs);
-    renderReport(report);
+    runSynthesis(report);
   });
   document.getElementById('copyLinkBtn').addEventListener('click', copyReportLink);
+  document.getElementById('copyShareTextBtn').addEventListener('click', copyShareText);
+  document.getElementById('nativeShareBtn').addEventListener('click', nativeShareReport);
   document.getElementById('downloadPosterBtn').addEventListener('click', downloadPoster);
   restoreFromUrl();
-  window.PairAuraV10 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector };
+  window.PairAuraV13 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector };
 }
 
 document.addEventListener('DOMContentLoaded', init);
