@@ -3,37 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pair Aura V7｜关系气场报告</title>
+  <title>Pair Aura V8｜关系气场报告</title>
   <meta name="description" content="输入两个人的 MBTI / SBTI 类型，生成关系气场、合拍指数和差异分析。" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <div class="ambient ambient-pink"></div>
+  <div class="ambient ambient-blue"></div>
+  <div class="ambient ambient-green"></div>
   <main class="app-shell">
-    <section class="hero glass-card">
+    <nav class="topbar glass-card soft-border">
+      <div class="brand-mark"><span>PA</span></div>
+      <div>
+        <strong>Pair Aura V8</strong>
+        <p>关系气场报告 · Neon Social Card</p>
+      </div>
+      <a class="topbar-link" href="#matchForm">开始合成</a>
+    </nav>
+
+    <section class="hero premium-card">
       <div class="hero-copy">
-        <p class="eyebrow">Pair Aura V7 · Neon Relation Report</p>
-        <h1>合成你们的<br />关系气场</h1>
-        <p class="hero-subtitle">先输入两个人的类型，再核对结果，最后选择关系组和报告语气。不是判断谁好谁坏，而是看你们在一起会发生什么。</p>
+        <p class="eyebrow">Neon Aura Relationship Lab</p>
+        <h1>把两个人的类型<br /><span>合成一份关系说明书</span></h1>
+        <p class="hero-subtitle">保留轻娱乐，但提高质感和细节：先输入两个人的 MBTI / SBTI，再用更细的特质差异库生成更像“你们”的评价。</p>
         <div class="hero-actions">
-          <a class="ghost-link" href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">MBTI 先去测 / 核对结果</a>
-          <a class="ghost-link" href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI 先去测 / 核对结果</a>
+          <a class="ghost-link" href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">MBTI 去测 / 核对</a>
+          <a class="ghost-link" href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI 去测 / 核对</a>
+        </div>
+        <div class="hero-metrics" aria-label="产品特性">
+          <span><b>2</b> 个关系组</span>
+          <span><b>2</b> 种语气</span>
+          <span><b>16+</b> 特质维度</span>
         </div>
       </div>
-      <div class="aura-stage" aria-hidden="true">
-        <div class="orb orb-a"><span>A</span></div>
-        <div class="orb orb-b"><span>B</span></div>
-        <div class="aura-ring"></div>
+      <div class="aura-console" aria-hidden="true">
+        <div class="aura-stage">
+          <div class="orb orb-a"><span>A</span></div>
+          <div class="orb orb-b"><span>B</span></div>
+          <div class="aura-ring ring-one"></div>
+          <div class="aura-ring ring-two"></div>
+          <div class="aura-spark s1"></div>
+          <div class="aura-spark s2"></div>
+        </div>
+        <div class="console-card c1">情绪同步 · 74</div>
+        <div class="console-card c2">摩擦提醒 · 真实表达</div>
+        <div class="console-card c3">关系关键词 · 互补 / 拉扯</div>
       </div>
     </section>
 
     <form id="matchForm" class="form-grid" autocomplete="off">
-      <section class="glass-card section-card">
+      <section class="glass-card section-card step-card featured-step">
         <div class="step-heading">
           <span class="step-index">01</span>
           <div>
             <h2>输入两个人的类型</h2>
-            <p>每个人至少填写一个结果即可生成。MBTI 更偏行为风格，SBTI 更偏互联网关系梗感。</p>
+            <p>每个人至少填 MBTI。SBTI 可以增加梗感和情绪标签。旁边保留官网入口，方便先去测或核对。</p>
           </div>
+        </div>
+
+        <div class="official-strip">
+          <span>先去测 / 核对结果</span>
+          <a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">16Personalities MBTI</a>
+          <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI</a>
         </div>
 
         <div class="people-grid">
@@ -83,33 +114,33 @@
         </div>
       </section>
 
-      <section class="glass-card section-card">
+      <section class="glass-card section-card step-card compact-step">
         <div class="step-heading">
           <span class="step-index">02</span>
           <div>
             <h2>选择关系组</h2>
-            <p>同一组人，在情侣、朋友、室友或搭档场景下，权重不同，分数也会不同。</p>
+            <p>只保留两组，降低选择成本；报告里再展开到朋友、情侣、搭子、项目搭档。</p>
           </div>
         </div>
-        <div id="contextChoices" class="chip-grid" role="radiogroup" aria-label="选择关系组"></div>
+        <div id="contextChoices" class="chip-grid two-choice" role="radiogroup" aria-label="选择关系组"></div>
       </section>
 
-      <section class="glass-card section-card">
+      <section class="glass-card section-card step-card compact-step">
         <div class="step-heading">
           <span class="step-index">03</span>
           <div>
             <h2>选择报告语气</h2>
-            <p>同一套数据，不同语气会影响表达方式，但不会改变分数。</p>
+            <p>语气只影响表达，不改变算法分数。温情吐槽负责传播，现实建议负责落地。</p>
           </div>
         </div>
-        <div id="toneChoices" class="chip-grid" role="radiogroup" aria-label="选择报告语气"></div>
+        <div id="toneChoices" class="chip-grid two-choice" role="radiogroup" aria-label="选择报告语气"></div>
       </section>
 
       <button class="primary-button" type="submit">开始合成关系气场</button>
     </form>
 
     <section id="resultSection" class="result-section hidden" aria-live="polite">
-      <article class="result-hero glass-card">
+      <article class="result-hero premium-card result-premium">
         <div class="result-text">
           <p class="eyebrow" id="resultContext">RELATION AURA</p>
           <h2 id="resultTitle">关系类型</h2>
@@ -122,32 +153,40 @@
         <div class="score-orbit" aria-hidden="true">
           <div class="mini-orb mini-a"></div>
           <div class="mini-orb mini-b"></div>
+          <div class="orbit-line"></div>
           <div class="spark"></div>
         </div>
       </article>
 
       <div class="result-grid">
-        <article class="glass-card result-card">
-          <h3>6 个关系维度</h3>
+        <article class="glass-card result-card data-card">
+          <div class="card-title-row"><h3>6 个关系维度</h3><span>Data View</span></div>
           <div id="dimensionBars" class="bars"></div>
         </article>
-        <article class="glass-card result-card">
-          <h3>差异 Top 3</h3>
+        <article class="glass-card result-card data-card">
+          <div class="card-title-row"><h3>差异 Top 3</h3><span>Trait Gap</span></div>
           <div id="differenceList" class="difference-list"></div>
         </article>
       </div>
 
-      <div id="reportCards" class="report-cards"></div>
+      <section class="insight-section">
+        <div class="section-title-row">
+          <p class="eyebrow">Micro Trait Library</p>
+          <h3>特质细节评价</h3>
+          <p>这里不是单纯换语气，而是根据差距轻微 / 中等 / 强烈，给出不同评价。</p>
+        </div>
+        <div id="reportCards" class="report-cards"></div>
+      </section>
 
       <article class="glass-card algorithm-card">
         <h3>算法说明</h3>
-        <p>V7 使用 Big Five 启发的人格向量作为中间层，将 MBTI 的连续特质、A/T 稳定度和 SBTI 娱乐标签转成可比较的关系维度，再分别计算相似、互补、摩擦和场景适配。分数是关系讨论入口，不是心理诊断或关系判决。</p>
+        <p>V8 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数是关系讨论入口，不是心理诊断或关系判决。</p>
       </article>
 
       <section class="share-panel glass-card">
         <div>
           <h3>分享这份报告</h3>
-          <p>生成一张短报告海报，适合发给 TA 或发到群里讨论。</p>
+          <p>海报强化了关系标题、合拍指数和一句话总结，适合发给 TA 或发到群里讨论。</p>
         </div>
         <div class="share-actions">
           <button id="copyLinkBtn" class="secondary-button" type="button">复制报告链接</button>
