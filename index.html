@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pair Aura V9｜关系气场报告</title>
-  <meta name="description" content="输入两个人的 MBTI / SBTI 类型，生成关系气场、合拍指数和差异分析。" />
+  <title>Pair Aura V10｜关系气场报告</title>
+  <meta name="description" content="不是给你贴标签，是看你和 TA 会发生什么。输入两个人的 MBTI / SBTI，生成一份能发给 TA 的关系说明书。" />
   <style>
 :root {
-  --bg: #090719;
-  --bg2: #120b2e;
-  --panel: rgba(255, 255, 255, 0.105);
-  --panel-strong: rgba(255, 255, 255, 0.18);
-  --line: rgba(255, 255, 255, 0.18);
-  --line-strong: rgba(255, 255, 255, 0.32);
-  --text: #ffffff;
-  --muted: #cfc7ff;
-  --soft: rgba(255, 255, 255, 0.66);
-  --purple: #7b61ff;
-  --pink: #ff5ca8;
-  --blue: #46d9ff;
-  --green: #78f2c2;
-  --yellow: #ffe66d;
+  --bg: #080B1E;
+  --bg2: #15112f;
+  --panel: rgba(255, 255, 255, 0.088);
+  --panel-strong: rgba(255, 255, 255, 0.15);
+  --line: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.28);
+  --text: #F8F7FF;
+  --muted: #B9B5D6;
+  --soft: rgba(255, 255, 255, 0.68);
+  --purple: #8B74FF;
+  --pink: #FF5CA8;
+  --blue: #55D7FF;
+  --green: #7CF7D4;
+  --yellow: #FFE66D;
   --danger: #ff6c8e;
   --radius-xl: 34px;
   --radius-lg: 26px;
@@ -87,9 +87,9 @@ a { color: inherit; }
 .app-shell {
   position: relative;
   z-index: 1;
-  width: min(1180px, calc(100% - 28px));
+  width: min(1120px, calc(100% - 28px));
   margin: 0 auto;
-  padding: 24px 0 80px;
+  padding: 22px 0 80px;
 }
 .glass-card, .premium-card {
   border: 1px solid var(--line);
@@ -148,11 +148,11 @@ a { color: inherit; }
 }
 
 .hero {
-  min-height: 520px;
-  padding: clamp(26px, 5.2vw, 62px);
+  min-height: 500px;
+  padding: clamp(24px, 4.6vw, 54px);
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 28px;
+  grid-template-columns: .92fr 1.08fr;
+  gap: clamp(20px, 4vw, 48px);
   align-items: center;
 }
 .hero > * { position: relative; z-index: 1; }
@@ -166,9 +166,11 @@ a { color: inherit; }
 }
 .hero h1 {
   margin: 0;
-  font-size: clamp(3.15rem, 7.4vw, 6.7rem);
-  line-height: .94;
-  letter-spacing: -.07em;
+  max-width: 620px;
+  font-size: clamp(2.65rem, 6vw, 4.85rem);
+  line-height: 1.02;
+  letter-spacing: -.055em;
+  font-weight: 850;
 }
 .hero h1 span {
   background: linear-gradient(90deg, #fff, #f6dcff 35%, #9eefff 70%, #baffdf);
@@ -177,13 +179,35 @@ a { color: inherit; }
   color: transparent;
 }
 .hero-subtitle {
-  max-width: 690px;
-  margin: 24px 0 0;
+  max-width: 610px;
+  margin: 22px 0 0;
   color: var(--muted);
-  font-size: clamp(1rem, 2vw, 1.17rem);
+  font-size: clamp(1rem, 1.8vw, 1.14rem);
   line-height: 1.82;
 }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.hero-primary, .hero-secondary {
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.16);
+  font-weight: 900;
+  cursor: pointer;
+}
+.hero-primary {
+  color: #120b2e;
+  background: linear-gradient(135deg, var(--yellow), var(--pink) 52%, var(--blue));
+  box-shadow: 0 18px 48px rgba(255,92,168,.28);
+}
+.hero-secondary {
+  color: #fff;
+  background: rgba(255,255,255,.085);
+}
+.hero-primary:hover, .hero-secondary:hover { transform: translateY(-2px); filter: saturate(1.12); }
 .ghost-link, .primary-button, .secondary-button, .chip, .select-with-link a, .official-strip a, .topbar-link {
   transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease, filter .18s ease;
 }
@@ -221,17 +245,21 @@ a { color: inherit; }
   color: var(--muted);
 }
 .hero-metrics b { color: #fff; font-size: 1.08em; }
+.hero-proof { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; color: rgba(255,255,255,.76); font-size: .92rem; }
+.hero-proof span { padding: 8px 11px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.052); }
+.value-line { display:block; margin-bottom: 4px; color:#fff; font-weight:850; }
+
 
 .aura-console {
   position: relative;
-  min-height: 400px;
+  min-height: 390px;
 }
 .aura-stage {
   position: absolute;
   inset: 4% 2% 12% 2%;
   display: grid;
   place-items: center;
-  border-radius: 42px;
+  border-radius: 34px;
   border: 1px solid rgba(255,255,255,.12);
   background:
     radial-gradient(circle at 35% 45%, rgba(255,92,168,.18), transparent 30%),
@@ -331,11 +359,11 @@ h2, h3, p { margin-top: 0; }
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin: 0 0 18px;
-  padding: 12px;
-  border-radius: 22px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.12);
+  margin: -4px 0 18px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.1);
   position: relative;
   z-index: 1;
 }
@@ -619,7 +647,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
 @media (max-width: 540px) {
   .app-shell { width: min(100% - 18px, 1180px); padding-top: 10px; }
   .hero, .section-card, .result-hero, .result-card, .algorithm-card, .share-panel, .insight-section { border-radius: 26px; }
-  .hero h1 { font-size: clamp(2.9rem, 15vw, 4.2rem); }
+  .hero h1 { font-size: clamp(2.42rem, 12vw, 3.6rem); }
   .step-heading { gap: 12px; }
   .step-index { width: 42px; height: 42px; flex-basis: 42px; }
   .official-strip a { width: 100%; }
@@ -642,25 +670,25 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
     <nav class="topbar glass-card soft-border">
       <div class="brand-mark"><span>PA</span></div>
       <div>
-        <strong>Pair Aura V9</strong>
-        <p>关系气场报告 · Neon Social Card</p>
+        <strong>Pair Aura V10</strong>
+        <p>关系气场报告</p>
       </div>
       <a class="topbar-link" href="#matchForm">开始合成</a>
     </nav>
 
     <section class="hero premium-card">
       <div class="hero-copy">
-        <p class="eyebrow">Neon Aura Relationship Lab</p>
-        <h1>把两个人的类型<br /><span>合成一份关系说明书</span></h1>
-        <p class="hero-subtitle">保留轻娱乐，但提高质感和细节：先输入两个人的 MBTI / SBTI，再用更细的特质差异库生成更像“你们”的评价。</p>
+        <p class="eyebrow">Pair Aura</p>
+        <h1>你和 TA，<br /><span>是哪种关系气场？</span></h1>
+        <p class="hero-subtitle"><span class="value-line">不是给你贴标签，是看你和 TA 会发生什么。</span>输入两个人的 MBTI / SBTI，生成一份能发给 TA 的关系说明书。</p>
         <div class="hero-actions">
-          <a class="ghost-link" href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">MBTI 去测 / 核对</a>
-          <a class="ghost-link" href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI 去测 / 核对</a>
+          <a class="hero-primary" href="#matchForm">开始生成报告</a>
+          <button class="hero-secondary" id="heroDemoBtn" type="button">看一个示例</button>
         </div>
-        <div class="hero-metrics" aria-label="产品特性">
-          <span><b>2</b> 个关系组</span>
-          <span><b>2</b> 种语气</span>
-          <span><b>16+</b> 特质维度</span>
+        <div class="hero-proof" aria-label="使用提示">
+          <span>无需登录</span>
+          <span>30 秒完成</span>
+          <span>可生成分享海报</span>
         </div>
       </div>
       <div class="aura-console" aria-hidden="true">
@@ -672,9 +700,9 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
           <div class="aura-spark s1"></div>
           <div class="aura-spark s2"></div>
         </div>
-        <div class="console-card c1">情绪同步 · 74</div>
-        <div class="console-card c2">摩擦提醒 · 真实表达</div>
-        <div class="console-card c3">关系关键词 · 互补 / 拉扯</div>
+        <div class="console-card c1">相似度 · 74</div>
+        <div class="console-card c2">摩擦点 · 真实表达</div>
+        <div class="console-card c3">互补 / 拉扯 / 容易上头</div>
       </div>
     </section>
 
@@ -684,14 +712,14 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
           <span class="step-index">01</span>
           <div>
             <h2>输入两个人的类型</h2>
-            <p>每个人至少填 MBTI。SBTI 可以增加梗感和情绪标签。旁边保留官网入口，方便先去测或核对。</p>
+            <p>先把 A 和 B 的人格碎片放进来。官网入口只作为辅助，别让测评打断生成路径。</p>
           </div>
         </div>
 
         <div class="official-strip">
-          <span>先去测 / 核对结果</span>
-          <a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">16Personalities MBTI</a>
-          <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI</a>
+          <span>不知道自己的类型？</span>
+          <a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">MBTI 去测 / 核对</a>
+          <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI 去测 / 核对</a>
         </div>
 
         <div class="people-grid">
@@ -757,7 +785,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
           <span class="step-index">03</span>
           <div>
             <h2>选择报告语气</h2>
-            <p>语气只影响表达，不改变算法分数。温情吐槽负责传播，现实建议负责落地。</p>
+            <p>温情吐槽适合发给 TA，现实建议适合看清相处规则。</p>
           </div>
         </div>
         <div id="toneChoices" class="chip-grid two-choice" role="radiogroup" aria-label="选择报告语气"></div>
@@ -800,14 +828,14 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
         <div class="section-title-row">
           <p class="eyebrow">Micro Trait Library</p>
           <h3>特质细节评价</h3>
-          <p>这里不是单纯换语气，而是根据差距轻微 / 中等 / 强烈，给出不同评价。</p>
+          <p>根据特质差距的轻微 / 明显 / 强烈变化，生成更像你们的评价。</p>
         </div>
         <div id="reportCards" class="report-cards"></div>
       </section>
 
       <article class="glass-card algorithm-card">
         <h3>算法说明</h3>
-        <p>V9 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数是关系讨论入口，不是心理诊断或关系判决。</p>
+        <p>V10 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数是关系讨论入口，不是心理诊断或关系判决。</p>
       </article>
 
       <section class="share-panel glass-card">
@@ -1689,7 +1717,7 @@ function drawPoster(report) {
   ctx.fillText('测测你和 TA 的关系气场', 128, 1018);
   ctx.fillStyle = '#CFC7FF';
   ctx.font = '26px Arial';
-  ctx.fillText('不是看你是谁，而是看你们在一起会发生什么。', 128, 1072);
+  ctx.fillText('不是给你贴标签，是看你和 TA 会发生什么。', 128, 1072);
 
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
   roundedRect(ctx, 626, 1156, 140, 140, 24);
@@ -1717,7 +1745,7 @@ function downloadPoster() {
   if (!state.lastReport) return;
   const canvas = document.getElementById('posterCanvas');
   const link = document.createElement('a');
-  link.download = 'pair-aura-v8-poster.png';
+  link.download = 'pair-aura-v10-poster.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
@@ -1743,10 +1771,29 @@ function runQualitySelfCheck() {
   return checks;
 }
 
+function generateDemoReport() {
+  document.getElementById('nameA').value = '我';
+  document.getElementById('nameB').value = 'TA';
+  document.getElementById('mbtiA').value = 'ENFP';
+  document.getElementById('mbtiB').value = 'ISTJ';
+  document.getElementById('identityA').value = 'T';
+  document.getElementById('identityB').value = 'A';
+  document.getElementById('sbtiA').value = 'LOVE-R';
+  document.getElementById('sbtiB').value = 'CTRL';
+  state.context = 'close';
+  state.tone = 'warm_roast';
+  renderChips('contextChoices', CONTEXTS, state.context, id => state.context = id);
+  renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
+  const report = buildReport(collectInputs());
+  renderReport(report);
+}
+
 function init() {
   initSelects();
   renderChips('contextChoices', CONTEXTS, state.context, id => state.context = id);
   renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
+
+  document.getElementById('heroDemoBtn')?.addEventListener('click', generateDemoReport);
 
   document.getElementById('matchForm').addEventListener('submit', event => {
     event.preventDefault();
@@ -1757,7 +1804,7 @@ function init() {
   document.getElementById('copyLinkBtn').addEventListener('click', copyReportLink);
   document.getElementById('downloadPosterBtn').addEventListener('click', downloadPoster);
   restoreFromUrl();
-  window.PairAuraV8 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector };
+  window.PairAuraV10 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector };
 }
 
 document.addEventListener('DOMContentLoaded', init);
