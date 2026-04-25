@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pair Aura V14｜关系气场报告</title>
+  <title>Pair Aura｜关系气场报告</title>
   <meta name="description" content="输入两个人的 MBTI / SBTI / 九型人格，生成一份双人关系说明书：看哪里同频、哪里互补、哪里容易互相触发。" />
   <style>
 :root {
@@ -773,6 +773,81 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
   .mini-orb { width: 140px; top: 72px; }
 }
 
+/* Final visual polish: keep original layout, upgrade texture and hierarchy */
+:root {
+  --bg: #07081B;
+  --bg2: #151036;
+  --panel: rgba(255,255,255,.092);
+  --panel-strong: rgba(255,255,255,.17);
+  --line: rgba(255,255,255,.16);
+  --text: #fbfaff;
+  --muted: #c8c3e6;
+  --pink: #ff5ca8;
+  --blue: #54d9ff;
+  --green: #81f8d6;
+  --yellow: #ffe779;
+}
+body {
+  font-family: Inter, "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,92,168,.34), transparent 30%),
+    radial-gradient(circle at 86% 12%, rgba(84,217,255,.30), transparent 32%),
+    radial-gradient(circle at 54% 108%, rgba(129,248,214,.18), transparent 42%),
+    linear-gradient(150deg, #07081b 0%, #151036 52%, #050711 100%);
+}
+.glass-card, .premium-card {
+  background: linear-gradient(145deg, rgba(255,255,255,.145), rgba(255,255,255,.064));
+  border-color: rgba(255,255,255,.16);
+  box-shadow: 0 26px 88px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.topbar { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+.brand-mark { box-shadow: 0 0 36px rgba(255,92,168,.42), inset 0 1px 0 rgba(255,255,255,.35); }
+.hero h1 { letter-spacing: -.062em; text-wrap: balance; }
+.hero-subtitle { color: rgba(248,247,255,.76); text-wrap: balance; }
+.value-line { color: rgba(255,255,255,.93); font-weight: 760; }
+.review-chip {
+  background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.06));
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 14px 34px rgba(0,0,0,.22);
+}
+.hero-proof span, .keyword-list span {
+  background: rgba(255,255,255,.105);
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+}
+.person-card, .story-card, .algorithm-card, .share-panel, .result-card {
+  border-color: rgba(255,255,255,.16);
+  background: linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+}
+.primary-button, .hero-primary {
+  box-shadow: 0 18px 56px rgba(255,92,168,.31), 0 0 0 1px rgba(255,255,255,.12) inset;
+}
+.primary-button:hover, .hero-primary:hover, .secondary-button:hover, .hero-secondary:hover, .topbar-link:hover { transform: translateY(-2px); }
+.poetry-sign, .final-remark {
+  border: 1px solid rgba(255,230,121,.24);
+  background: linear-gradient(135deg, rgba(255,230,121,.14), rgba(255,92,168,.09));
+  box-shadow: 0 18px 52px rgba(0,0,0,.24);
+}
+.final-remark { color: #fff; font-weight: 780; line-height: 1.72; }
+.micro-tag { letter-spacing: .08em; }
+.story-card h3 { text-wrap: balance; }
+.story-card p { color: rgba(248,247,255,.74); line-height: 1.72; }
+.bar-fill { background: linear-gradient(90deg, var(--pink), var(--blue), var(--green)); }
+input, select, button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid rgba(129,248,214,.45);
+  outline-offset: 3px;
+}
+@media (max-width: 540px) {
+  .hero { min-height: auto; padding-top: 28px; }
+  .hero h1 { font-size: clamp(2.28rem, 11vw, 3.28rem); }
+  .hero-subtitle { line-height: 1.72; }
+  .floating-reviews { gap: 8px; }
+  .review-chip { font-size: .82rem; }
+  .result-text .score-line span, .score-line span { font-size: clamp(4.2rem, 22vw, 7rem); }
+  .share-actions { grid-template-columns: 1fr; }
+}
+
   </style>
 </head>
 <body>
@@ -790,7 +865,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
     <nav class="topbar glass-card soft-border">
       <div class="brand-mark"><span>PA</span></div>
       <div>
-        <strong>Pair Aura V15</strong>
+        <strong>Pair Aura</strong>
         <p>关系气场报告</p>
       </div>
       <button class="topbar-link" id="topStartBtn" type="button">开始合成</button>
@@ -800,11 +875,11 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
       <div class="hero-copy">
         <p class="eyebrow">Pair Aura</p>
         <h1>合成你们的<br /><span>关系气场</span></h1>
-        <p class="hero-subtitle"><span class="value-line">输入两个人的 MBTI / SBTI / 九型人格，生成一份双人关系说明书。</span>看看你们哪里同频、哪里互补，哪里容易互相触发。</p>
+        <p class="hero-subtitle"><span class="value-line">输入两个人的 MBTI / SBTI / 九型人格，生成一份双人关系说明书。</span>看见同频、互补与触发点，也把差异翻译成更好相处的方式。</p>
         <div class="floating-reviews" aria-label="关系锐评示例">
-          <span class="review-chip">“适合聊天，不一定适合一起做项目。”</span>
-          <span class="review-chip">“一个负责开脑洞，一个负责把事情落地。”</span>
-          <span class="review-chip">“不是不合，是你们的节奏需要翻译。”</span>
+          <span class="review-chip">“聊得来，不代表做事节奏也同频。”</span>
+          <span class="review-chip">“一个点亮想法，一个把想法落到地上。”</span>
+          <span class="review-chip">“不是不合，是需要把彼此的节奏翻译清楚。”</span>
         </div>
         <div class="hero-actions">
           <button class="hero-primary" id="heroStartBtn" type="button">开始合成关系</button>
@@ -849,6 +924,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
           <span>不知道自己的类型？</span>
           <a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">MBTI 去测 / 核对</a>
           <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI 去测 / 核对</a>
+          <a href="https://www.enneagraminstitute.com/" target="_blank" rel="noopener">九型去测 / 了解</a>
           <span>九型可选，不知道就不填</span>
         </div>
 
@@ -874,7 +950,10 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
               <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">核对结果</a>
             </div>
             <label class="field-label" for="enneaA">九型人格（可选）</label>
-            <select id="enneaA"></select>
+            <div class="select-with-link">
+              <select id="enneaA"></select>
+              <a href="https://www.enneagraminstitute.com/" target="_blank" rel="noopener">去了解</a>
+            </div>
           </article>
 
           <article class="person-card" data-person="B">
@@ -898,7 +977,10 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
               <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">核对结果</a>
             </div>
             <label class="field-label" for="enneaB">九型人格（可选）</label>
-            <select id="enneaB"></select>
+            <div class="select-with-link">
+              <select id="enneaB"></select>
+              <a href="https://www.enneagraminstitute.com/" target="_blank" rel="noopener">去了解</a>
+            </div>
           </article>
         </div>
       </section>
@@ -971,20 +1053,20 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
         <div class="section-title-row">
           <p class="eyebrow">Micro Trait Library</p>
           <h3>特质细节评价</h3>
-          <p>根据特质差距的轻微 / 明显 / 强烈变化，生成更像你们的评价。</p>
+          <p>每张卡只讲一个真实差异：哪里靠近，哪里错频，怎么少一点内耗。</p>
         </div>
         <div id="reportCards" class="report-cards"></div>
       </section>
 
       <article class="glass-card algorithm-card">
         <h3>算法说明</h3>
-        <p>V14 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数只是关系讨论入口，不做心理诊断，也不替任何关系下判决。</p>
+        <p>当前算法以 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度、SBTI 和可选九型转成可比较维度，再计算相似、互补、摩擦和场景适配。九型只作为动机层补充，不强制填写；分数只是关系讨论入口，不做心理诊断，也不替任何关系下判决。</p>
       </article>
 
       <section class="share-panel glass-card">
         <div>
           <h3>分享这份报告</h3>
-          <p>海报强化了关系标题、合拍指数和一句话总结，适合发给 TA 或发到群里讨论。</p>
+          <p>海报保留关系标题、合拍指数、关键词和二维码，适合发给朋友、搭子或 TA。</p>
         </div>
         <div class="share-link-box">
           <input id="shareLinkPreview" readonly aria-label="当前报告分享链接" />
@@ -998,7 +1080,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
         </div>
         <p id="shareHint" class="share-hint">报告链接会写进二维码。微信里可直接发链接，也可以保存海报扫码打开。</p>
         <div class="telemetry-panel" id="telemetryPanel">
-          <strong>站长数据说明：</strong>当前页面支持匿名回传生成报告、复制链接、下载海报等事件。只有在代码里配置 <code>ANALYTICS_ENDPOINT</code> 且用户未取消授权时才会上报。
+          <strong>匿名数据说明：</strong>当前页面支持匿名回传生成报告、复制链接、下载海报等事件。只有在代码里配置 <code>ANALYTICS_ENDPOINT</code> 且用户未取消授权时才会上报。
         </div>
         <canvas id="posterCanvas" width="900" height="1350" aria-label="分享海报预览"></canvas>
       </section>
@@ -1008,7 +1090,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
   <script>
 'use strict';
 
-const APP_VERSION = 'V15';
+const APP_BUILD = 'pair-aura';
 // 透明数据回传：填入你自己的 Google Apps Script / Supabase / Cloudflare Worker 接口后才会启用。
 // 注意：必须保留页面里的用户授权提示；不要做隐藏采集。
 const ANALYTICS_ENDPOINT = '';
@@ -1436,7 +1518,7 @@ function buildAnalyticsPayload(eventName, report = state.lastReport, extra = {})
   const classification = report?.classification || {};
   const differences = report?.differences || [];
   return {
-    version: APP_VERSION,
+    product: APP_BUILD,
     event: eventName,
     sessionId: getSessionId(),
     timestamp: new Date().toISOString(),
@@ -1851,7 +1933,7 @@ function buildReport(inputs) {
   inputs.tone = normalizeTone(inputs.tone);
   const metrics = calculateMetrics(personaA.vector, personaB.vector, inputs.context);
 
-  // Confidence and input-depth corrections keep V8 honest and prevent shallow inputs from becoming 100%.
+  // Confidence and input-depth corrections prevent shallow inputs from becoming over-confident.
   const sourceCount = personaA.sourceCount + personaB.sourceCount;
   const depthCap = sourceCount >= 4 ? 96 : sourceCount >= 3 ? 93 : sourceCount >= 2 ? 90 : 84;
   metrics.total = Math.min(metrics.total, depthCap);
@@ -2207,7 +2289,7 @@ async function drawPoster(report) {
 
   ctx.fillStyle = '#78F2C2';
   ctx.font = '800 24px Arial';
-  ctx.fillText('PAIR AURA V15', 96, 128);
+  ctx.fillText('PAIR AURA', 96, 128);
 
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '900 62px Arial, sans-serif';
@@ -2309,7 +2391,7 @@ async function downloadPoster() {
   try { if (state.posterPromise) await state.posterPromise; } catch {}
   const canvas = document.getElementById('posterCanvas');
   const link = document.createElement('a');
-  link.download = 'pair-aura-v15-poster.png';
+  link.download = 'pair-aura-poster.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
   if (hint) hint.textContent = '海报已生成：可以保存图片，二维码会打开这份报告。';
@@ -2377,7 +2459,7 @@ function init() {
   document.getElementById('downloadPosterBtn').addEventListener('click', downloadPoster);
   document.getElementById('openReportLinkBtn').addEventListener('click', openReportLink);
   restoreFromUrl();
-  window.PairAuraV14 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector, getLocalEvents: () => JSON.parse(localStorage.getItem('pairAuraLocalEvents') || '[]'), lastAnalyticsPayload: () => state.lastAnalyticsPayload };
+  window.PairAura = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector, getLocalEvents: () => JSON.parse(localStorage.getItem('pairAuraLocalEvents') || '[]'), lastAnalyticsPayload: () => state.lastAnalyticsPayload };
 }
 
 document.addEventListener('DOMContentLoaded', init);
