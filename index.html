@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pair Aura V13｜关系气场报告</title>
+  <title>Pair Aura V14｜关系气场报告</title>
   <meta name="description" content="不是给你贴标签，是看你和 TA 会发生什么。输入两个人的 MBTI / SBTI，生成一份能发给 TA 的关系说明书。" />
   <style>
 :root {
@@ -671,6 +671,79 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
   box-shadow: var(--shadow-soft);
 }
 
+
+.floating-reviews {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+.review-chip {
+  width: fit-content;
+  max-width: min(520px, 100%);
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: rgba(255,255,255,.92);
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 14px 34px rgba(0,0,0,.18);
+  font-size: .92rem;
+  line-height: 1.45;
+  animation: reviewFloat 6.8s ease-in-out infinite alternate;
+}
+.review-chip:nth-child(2) { margin-left: 26px; animation-delay: -2s; }
+.review-chip:nth-child(3) { margin-left: 8px; animation-delay: -4s; }
+@keyframes reviewFloat { from { transform: translate3d(0,0,0); } to { transform: translate3d(12px,-8px,0); } }
+.data-consent {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: .92rem;
+}
+.data-consent label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.data-consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--green); flex: 0 0 auto; }
+.data-consent strong { color: #fff; }
+.telemetry-panel {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.06);
+  border: 1px dashed rgba(255,255,255,.18);
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.65;
+}
+.telemetry-panel strong { color: #fff; }
+.telemetry-panel code {
+  color: #baffdf;
+  background: rgba(120,242,194,.08);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.share-link-box {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+.share-link-box input {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.075);
+  color: #fff;
+  padding: 0 14px;
+  outline: none;
+}
+.share-link-box input:focus { border-color: rgba(120,242,194,.42); box-shadow: 0 0 0 3px rgba(120,242,194,.11); }
+@media (max-width: 680px) { .share-link-box { grid-template-columns: 1fr; } }
+
 @media (max-width: 880px) {
   .topbar { grid-template-columns: auto 1fr; }
   .topbar-link { display: none; }
@@ -717,7 +790,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
     <nav class="topbar glass-card soft-border">
       <div class="brand-mark"><span>PA</span></div>
       <div>
-        <strong>Pair Aura V13</strong>
+        <strong>Pair Aura V14</strong>
         <p>关系气场报告</p>
       </div>
       <button class="topbar-link" id="topStartBtn" type="button">开始合成</button>
@@ -726,8 +799,13 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
     <section id="homeScreen" class="hero premium-card screen active">
       <div class="hero-copy">
         <p class="eyebrow">Pair Aura</p>
-        <h1>你和 TA，<br /><span>是哪种关系气场？</span></h1>
-        <p class="hero-subtitle"><span class="value-line">不是给你贴标签，是看你和 TA 会发生什么。</span>输入两个人的 MBTI / SBTI，生成一份能发给 TA 的关系说明书。</p>
+        <h1>两个人之间，<br /><span>会发生什么？</span></h1>
+        <p class="hero-subtitle"><span class="value-line">不只看你是谁，也看你们如何相处。</span>输入两个人的 MBTI / SBTI，把相似、差异、互补和容易误会的地方翻译成一份有人情味的关系说明书。</p>
+        <div class="floating-reviews" aria-label="关系锐评示例">
+          <span class="review-chip">“不是不合，是一个在等回应，一个在等空间。”</span>
+          <span class="review-chip">“合作最怕的不是能力差，是默认对方会自动懂。”</span>
+          <span class="review-chip">“有些关系的关键，不是更像，而是愿意互相翻译。”</span>
+        </div>
         <div class="hero-actions">
           <button class="hero-primary" id="heroStartBtn" type="button">开始生成报告</button>
           <button class="hero-secondary" id="heroDemoBtn" type="button">看一个示例</button>
@@ -735,7 +813,7 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
         <div class="hero-proof" aria-label="使用提示">
           <span>无需登录</span>
           <span>30 秒完成</span>
-          <span>可生成分享海报</span>
+          <span>链接 + 海报可分享</span>
         </div>
       </div>
       <div class="aura-console" aria-hidden="true">
@@ -747,9 +825,9 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
           <div class="aura-spark s1"></div>
           <div class="aura-spark s2"></div>
         </div>
-        <div class="console-card c1">相似度 · 74</div>
-        <div class="console-card c2">摩擦点 · 真实表达</div>
-        <div class="console-card c3">互补 / 拉扯 / 容易上头</div>
+        <div class="console-card c1">对比 · 谁更靠近，谁更需要空间</div>
+        <div class="console-card c2">卡点 · 情绪、边界、节奏</div>
+        <div class="console-card c3">适用 · 朋友 / 情侣 / 搭子 / 项目</div>
       </div>
     </section>
 
@@ -839,6 +917,13 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
         <div id="toneChoices" class="chip-grid two-choice" role="radiogroup" aria-label="选择报告语气"></div>
       </section>
 
+      <div class="data-consent">
+        <label for="usageConsent">
+          <input id="usageConsent" type="checkbox" checked />
+          <span><strong>允许匿名记录本次生成数据，用于优化文案和分数。</strong><br />只记录类型、关系组、分数、关键词、操作事件；不记录昵称、联系方式和任何聊天内容。你可以取消勾选。</span>
+        </label>
+      </div>
+
       <button class="primary-button" type="submit">开始合成关系气场</button>
     </form>
 
@@ -885,13 +970,17 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
 
       <article class="glass-card algorithm-card">
         <h3>算法说明</h3>
-        <p>V13 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数是关系讨论入口，不是心理诊断或关系判决。</p>
+        <p>V14 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数只是关系讨论入口，不做心理诊断，也不替任何关系下判决。</p>
       </article>
 
       <section class="share-panel glass-card">
         <div>
           <h3>分享这份报告</h3>
           <p>海报强化了关系标题、合拍指数和一句话总结，适合发给 TA 或发到群里讨论。</p>
+        </div>
+        <div class="share-link-box">
+          <input id="shareLinkPreview" readonly aria-label="当前报告分享链接" />
+          <button id="openReportLinkBtn" class="secondary-button" type="button">打开检查</button>
         </div>
         <div class="share-actions">
           <button id="copyLinkBtn" class="secondary-button" type="button">复制报告链接</button>
@@ -900,6 +989,9 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
           <button id="downloadPosterBtn" class="secondary-button" type="button">下载可扫码海报</button>
         </div>
         <p id="shareHint" class="share-hint">报告链接会写进二维码。微信里可直接发链接，也可以保存海报扫码打开。</p>
+        <div class="telemetry-panel" id="telemetryPanel">
+          <strong>站长数据说明：</strong>当前页面支持匿名回传生成报告、复制链接、下载海报等事件。只有在代码里配置 <code>ANALYTICS_ENDPOINT</code> 且用户未取消授权时才会上报。
+        </div>
         <canvas id="posterCanvas" width="900" height="1350" aria-label="分享海报预览"></canvas>
       </section>
     </section>
@@ -907,6 +999,11 @@ select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow
 
   <script>
 'use strict';
+
+const APP_VERSION = 'V14';
+// 透明数据回传：填入你自己的 Google Apps Script / Supabase / Cloudflare Worker 接口后才会启用。
+// 注意：必须保留页面里的用户授权提示；不要做隐藏采集。
+const ANALYTICS_ENDPOINT = '';
 
 const MBTI_TYPES = [
   'INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP',
@@ -1017,7 +1114,7 @@ const TRAIT_COPY = {
   agreeableness: {
     micro: '一个更顾及气氛，一个更习惯说清。你们都不是难相处，只是温柔的方式不同。',
     visible: '一个先照顾感受，一个先指出问题。被误会时，别急着证明自己没错。',
-    strong: '一个怕伤人，一个怕没用。话说出来之前，最好先给对方一点安全感。',
+    strong: '一个怕话太重，一个怕问题被绕过去。话说出来之前，先让对方知道你不是来攻击的。',
     bridge: '先表达善意，再表达不同。'
   },
   conscientiousness: {
@@ -1215,14 +1312,14 @@ function buildFinalRemark(metrics, classification, differences, context, tone) {
   const reality = normalizeTone(tone) === 'reality';
   const ctx = normalizeContext(context);
   if (reality) {
-    if (metrics.risk >= 62) return `最终评语：你们不是不合，是太容易把「${main?.label || '差异'}」听成态度。把需求讲清楚，关系就会少很多误伤。`;
+    if (metrics.risk >= 62) return `最终评语：你们不是不合，是太容易把「${main?.label || '差异'}」听成态度。把需要讲清楚，很多误伤就不会绕远路。`;
     if (ctx === 'collab') return '最终评语：你们不用变得一样。把边界、分工和反馈方式说清楚，默契就会慢慢长出来。';
-    return '最终评语：这段关系最需要的不是用力证明，而是少一点猜测，多一点坦白又温柔的表达。';
+    return '最终评语：这段关系最需要的不是证明谁在乎，而是少一点猜测，多一点坦白、也多一点温柔。';
   }
   if (classification.title.includes('高吸引')) return '最终评语：你们像两种很亮的颜色靠近，漂亮是真的，刺眼也可能是真的。愿意彼此调色，就会很好看。';
   if (classification.title.includes('稳定')) return '最终评语：你们的好不是轰轰烈烈，是日常里那些不用解释太多、却有人愿意懂的瞬间。';
   if (metrics.complementarity >= 70) return '最终评语：你们的差异不是问题本身，真正重要的是愿不愿意把差异变成照顾，而不是变成指责。';
-  return '最终评语：你们不是要完全同频，能在错频的时候愿意停下来听一听，就已经很珍贵。';
+  return '最终评语：你们不必完全同频。错频的时候，还愿意停下来听一听，就已经很珍贵。';
 }
 
 
@@ -1264,7 +1361,9 @@ const WEIGHTS_BY_CONTEXT = {
 let state = {
   context: 'close',
   tone: 'warm_roast',
-  lastReport: null
+  lastReport: null,
+  lastAnalyticsPayload: null,
+  posterPromise: null
 };
 
 const clamp = (n, min = 0, max = 100) => Math.max(min, Math.min(max, n));
@@ -1274,6 +1373,93 @@ const gap = (a, b, key) => Math.abs((a[key] ?? 50) - (b[key] ?? 50));
 const scoreFromGap = (g, scale = 1.18) => clamp(100 - g * scale);
 const idealGapScore = (g, ideal, scale = 1.65) => clamp(100 - Math.abs(g - ideal) * scale);
 const signedLabel = (v, key) => v >= 50 ? TRAIT_META[key].high : TRAIT_META[key].low;
+
+function getSessionId() {
+  try {
+    const key = 'pairAuraSessionId';
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = `pa_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
+      localStorage.setItem(key, id);
+    }
+    return id;
+  } catch {
+    return `pa_${Date.now().toString(36)}`;
+  }
+}
+
+function usageConsentEnabled() {
+  const el = document.getElementById('usageConsent');
+  return !el || Boolean(el.checked);
+}
+
+function anonymizeInputs(inputs = {}) {
+  return {
+    context: normalizeContext(inputs.context),
+    tone: normalizeTone(inputs.tone),
+    mbtiA: inputs.mbtiA || '',
+    mbtiB: inputs.mbtiB || '',
+    identityA: inputs.identityA || '',
+    identityB: inputs.identityB || '',
+    sbtiA: inputs.sbtiA || '',
+    sbtiB: inputs.sbtiB || '',
+    hasNicknameA: Boolean(inputs.nameA && inputs.nameA !== 'A'),
+    hasNicknameB: Boolean(inputs.nameB && inputs.nameB !== 'B')
+  };
+}
+
+function buildAnalyticsPayload(eventName, report = state.lastReport, extra = {}) {
+  const metrics = report?.metrics || {};
+  const classification = report?.classification || {};
+  const differences = report?.differences || [];
+  return {
+    version: APP_VERSION,
+    event: eventName,
+    sessionId: getSessionId(),
+    timestamp: new Date().toISOString(),
+    urlPath: location.pathname,
+    viewport: { width: window.innerWidth, height: window.innerHeight },
+    input: anonymizeInputs(report?.inputs || collectInputsSafe()),
+    result: report ? {
+      title: classification.title || '',
+      score: round(metrics.total || 0),
+      similarity: round(metrics.similarity || 0),
+      complementarity: round(metrics.complementarity || 0),
+      risk: round(metrics.risk || 0),
+      keywords: (classification.keywords || []).slice(0, 5),
+      signType: report.poetry?.type || '',
+      signId: report.poetry?.id || '',
+      topDifferences: differences.slice(0, 3).map(item => ({ key: item.key, label: item.label, gap: item.gap, band: item.band }))
+    } : null,
+    extra
+  };
+}
+
+function collectInputsSafe() {
+  try { return collectInputs(); }
+  catch { return { context: state.context, tone: state.tone }; }
+}
+
+async function recordUsageEvent(eventName, report = state.lastReport, extra = {}) {
+  const payload = buildAnalyticsPayload(eventName, report, extra);
+  state.lastAnalyticsPayload = payload;
+  try {
+    const localLog = JSON.parse(localStorage.getItem('pairAuraLocalEvents') || '[]');
+    localLog.push(payload);
+    localStorage.setItem('pairAuraLocalEvents', JSON.stringify(localLog.slice(-30)));
+  } catch {}
+  if (!ANALYTICS_ENDPOINT || !usageConsentEnabled()) return;
+  try {
+    const body = JSON.stringify(payload);
+    if (navigator.sendBeacon) {
+      const ok = navigator.sendBeacon(ANALYTICS_ENDPOINT, new Blob([body], { type: 'application/json' }));
+      if (ok) return;
+    }
+    await fetch(ANALYTICS_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, mode: 'no-cors', keepalive: true });
+  } catch (err) {
+    console.warn('匿名数据回传失败', err);
+  }
+}
 
 function getBaseVector() {
   return {
@@ -1535,7 +1721,7 @@ function getTopDifferences(vecA, vecB, nameA, nameB, tone = 'warm_roast') {
       const contrast = `${nameA}更接近“${aSide}”，${nameB}更接近“${bSide}”。`;
       const toneTail = normalizeTone(tone) === 'reality'
         ? copy.bridge
-        : `${copy.bridge} 你们不需要证明谁更正常，只需要把彼此的开关位置说清楚。`;
+        : `${copy.bridge} 你们不用争谁更对，把彼此的需要说清楚，关系就会轻一点。`;
       return {
         key,
         label: TRAIT_META[key].label,
@@ -1723,6 +1909,7 @@ function runSynthesis(report) {
     clearInterval(timer);
     overlay.classList.add('hidden');
     renderReport(report);
+    recordUsageEvent('report_generated', report);
   }, 1050);
 }
 
@@ -1762,7 +1949,9 @@ function renderReport(report) {
   showScreen('resultSection');
   state.lastReport = report;
   updateUrl(report.inputs);
-  drawPoster(report);
+  updateShareControls(report);
+  state.posterPromise = drawPoster(report);
+  recordUsageEvent('report_viewed', report);
 
 }
 
@@ -1790,6 +1979,20 @@ function updateUrl(inputs) {
   return url;
 }
 
+function updateShareControls(report = state.lastReport) {
+  if (!report) return '';
+  const link = buildReportUrl(report.inputs);
+  const input = document.getElementById('shareLinkPreview');
+  if (input) input.value = link;
+  return link;
+}
+
+function openReportLink() {
+  const link = state.lastReport ? buildReportUrl(state.lastReport.inputs) : window.location.href;
+  window.open(link, '_blank', 'noopener,noreferrer');
+  recordUsageEvent('open_report_link');
+}
+
 function restoreFromUrl() {
   const url = new URL(window.location.href);
   const encoded = url.searchParams.get('r');
@@ -1813,7 +2016,9 @@ function restoreFromUrl() {
     state.tone = normalizeTone(inputs.tone || 'warm_roast');
     renderChips('contextChoices', CONTEXTS, state.context, id => state.context = id);
     renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
-    renderReport(buildReport(collectInputs()));
+    const restoredReport = buildReport(collectInputs());
+    renderReport(restoredReport);
+    recordUsageEvent('report_restored_from_link', restoredReport);
   } catch (err) {
     console.warn('无法解析报告链接', err);
   }
@@ -1825,7 +2030,7 @@ function reportShareText(report) {
   const score = round(report.metrics?.total || 0);
   const keywords = (report.classification?.keywords || []).slice(0, 3).join(' / ');
   const sign = report.poetry ? `\n关系签：${report.poetry.quote}｜${report.poetry.source}` : '';
-  return `我测了我们的关系气场：${title}，合拍指数 ${score}%。\n关键词：${keywords}${sign}\n你看看像不像我们？`;
+  return `我测了我们的关系气场：${title}，合拍指数 ${score}%。\n关键词：${keywords}${sign}\n这份报告不替我们下结论，只是把相似、差异和容易误会的地方说清楚。你看看像不像我们？`;
 }
 
 async function copyText(text, ok = '已复制') {
@@ -1867,6 +2072,7 @@ async function drawQr(ctx, url, x, y, size) {
     ctx.drawImage(qrCanvas, x, y, size, size);
     const hint = document.getElementById('shareHint');
     if (hint) hint.textContent = '二维码已生成。微信里可保存海报，也可以直接复制报告链接发给 TA。';
+    recordUsageEvent('qr_generated_success', state.lastReport, { urlLength: String(url || '').length });
   } else {
     ctx.fillStyle = '#120B2E';
     ctx.font = '800 22px Arial';
@@ -1875,6 +2081,7 @@ async function drawQr(ctx, url, x, y, size) {
     ctx.fillText('二维码加载失败', x + 18, y + 102);
     const hint = document.getElementById('shareHint');
     if (hint) hint.textContent = '二维码库加载失败，但报告链接仍可复制分享到微信。';
+    recordUsageEvent('qr_generated_fail', state.lastReport, { urlLength: String(url || '').length });
   }
 }
 
@@ -1944,7 +2151,7 @@ async function drawPoster(report) {
 
   ctx.fillStyle = '#78F2C2';
   ctx.font = '800 24px Arial';
-  ctx.fillText('PAIR AURA V13', 96, 128);
+  ctx.fillText('PAIR AURA V14', 96, 128);
 
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '900 62px Arial, sans-serif';
@@ -1998,36 +2205,39 @@ async function drawPoster(report) {
   ctx.fillText('测测你和 TA 的关系气场', 128, 1018);
   ctx.fillStyle = '#CFC7FF';
   ctx.font = '26px Arial';
-  ctx.fillText('不是给你贴标签，是看你和 TA 会发生什么。', 128, 1072);
+  ctx.fillText('不只看你是谁，也看你们如何相处。', 128, 1072);
 
   const reportUrl = buildReportUrl(report.inputs);
   await drawQr(ctx, reportUrl, 622, 1148, 148);
 
   ctx.fillStyle = '#CFC7FF';
   ctx.font = '24px Arial';
-  ctx.fillText('扫码打开这份报告，或输入 MBTI / SBTI 合成你们的关系气场', 96, 1228);
+  ctx.fillText('扫码打开报告，也可以测朋友、情侣、搭子和项目关系', 96, 1228);
 }
 
 function copyReportLink() {
-  const link = state.lastReport ? buildReportUrl(state.lastReport.inputs) : window.location.href;
+  const link = state.lastReport ? updateShareControls(state.lastReport) : window.location.href;
   copyText(link, '报告链接已复制，可以直接发到微信。');
+  recordUsageEvent('copy_report_link');
 }
 
 function copyShareText() {
   if (!state.lastReport) return;
-  const link = buildReportUrl(state.lastReport.inputs);
+  const link = updateShareControls(state.lastReport);
   copyText(`${reportShareText(state.lastReport)}
 
 打开报告：${link}`, '分享文案已复制');
+  recordUsageEvent('copy_share_text');
 }
 
 async function nativeShareReport() {
   if (!state.lastReport) return;
-  const url = buildReportUrl(state.lastReport.inputs);
+  const url = updateShareControls(state.lastReport);
   const text = reportShareText(state.lastReport);
   if (navigator.share) {
     try {
       await navigator.share({ title: 'Pair Aura 关系气场报告', text, url });
+      recordUsageEvent('native_share_success');
       return;
     } catch (err) {
       if (err && err.name === 'AbortError') return;
@@ -2036,13 +2246,18 @@ async function nativeShareReport() {
   copyShareText();
 }
 
-function downloadPoster() {
+async function downloadPoster() {
   if (!state.lastReport) return;
+  const hint = document.getElementById('shareHint');
+  if (hint) hint.textContent = '正在整理可扫码海报，请稍等一秒...';
+  try { if (state.posterPromise) await state.posterPromise; } catch {}
   const canvas = document.getElementById('posterCanvas');
   const link = document.createElement('a');
-  link.download = 'pair-aura-v13-poster.png';
+  link.download = 'pair-aura-v14-poster.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
+  if (hint) hint.textContent = '海报已生成：可以保存图片，二维码会打开这份报告。';
+  recordUsageEvent('download_poster');
 }
 
 function runQualitySelfCheck() {
@@ -2102,8 +2317,9 @@ function init() {
   document.getElementById('copyShareTextBtn').addEventListener('click', copyShareText);
   document.getElementById('nativeShareBtn').addEventListener('click', nativeShareReport);
   document.getElementById('downloadPosterBtn').addEventListener('click', downloadPoster);
+  document.getElementById('openReportLinkBtn').addEventListener('click', openReportLink);
   restoreFromUrl();
-  window.PairAuraV13 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector };
+  window.PairAuraV14 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector, getLocalEvents: () => JSON.parse(localStorage.getItem('pairAuraLocalEvents') || '[]'), lastAnalyticsPayload: () => state.lastAnalyticsPayload };
 }
 
 document.addEventListener('DOMContentLoaded', init);
