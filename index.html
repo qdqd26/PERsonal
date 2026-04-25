@@ -2,2328 +2,423 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pair Aura V14｜关系气场报告</title>
-  <meta name="description" content="不是给你贴标签，是看你和 TA 会发生什么。输入两个人的 MBTI / SBTI，生成一份能发给 TA 的关系说明书。" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="输入两个人的 MBTI / SBTI / 九型人格，生成一份双人关系气场说明书。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pair Aura 关系气场报告" />
+  <meta property="og:description" content="看看你们哪里同频、哪里互补、哪里容易互相触发。" />
+  <title>Pair Aura V15｜关系气场报告</title>
   <style>
-:root {
-  --bg: #080B1E;
-  --bg2: #15112f;
-  --panel: rgba(255, 255, 255, 0.088);
-  --panel-strong: rgba(255, 255, 255, 0.15);
-  --line: rgba(255, 255, 255, 0.14);
-  --line-strong: rgba(255, 255, 255, 0.28);
-  --text: #F8F7FF;
-  --muted: #B9B5D6;
-  --soft: rgba(255, 255, 255, 0.68);
-  --purple: #8B74FF;
-  --pink: #FF5CA8;
-  --blue: #55D7FF;
-  --green: #7CF7D4;
-  --yellow: #FFE66D;
-  --danger: #ff6c8e;
-  --radius-xl: 34px;
-  --radius-lg: 26px;
-  --shadow: 0 28px 90px rgba(0, 0, 0, 0.44);
-  --shadow-soft: 0 18px 55px rgba(0, 0, 0, 0.26);
-}
+    :root {
+      --bg: #080b1f;
+      --bg2: #151034;
+      --card: rgba(255,255,255,.095);
+      --card2: rgba(255,255,255,.14);
+      --line: rgba(255,255,255,.16);
+      --text: #f8f7ff;
+      --muted: #bbb5dc;
+      --pink: #ff5ca8;
+      --blue: #55d7ff;
+      --green: #78f2c2;
+      --yellow: #ffe66d;
+      --purple: #7b61ff;
+      --shadow: 0 30px 90px rgba(0,0,0,.34);
+      --radius: 30px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(255,92,168,.30), transparent 30%),
+        radial-gradient(circle at 86% 8%, rgba(85,215,255,.27), transparent 34%),
+        radial-gradient(circle at 58% 90%, rgba(120,242,194,.18), transparent 34%),
+        linear-gradient(135deg, var(--bg), var(--bg2) 54%, #07111f);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; opacity: .35;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at 50% 30%, black, transparent 70%);
+    }
+    .app { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 16px 0 42px; position: relative; z-index: 1; }
+    .glass { background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.065)); border: 1px solid var(--line); box-shadow: var(--shadow); backdrop-filter: blur(22px); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px; border-radius: 24px; position: sticky; top: 10px; z-index: 10; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-badge { width: 42px; height: 42px; display:grid; place-items:center; border-radius: 15px; background: linear-gradient(135deg, var(--pink), var(--blue)); color: #fff; font-weight: 900; box-shadow: 0 12px 35px rgba(255,92,168,.25); }
+    .brand strong { display: block; letter-spacing: -.02em; }
+    .brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    button, select, input { font: inherit; }
+    button { border: 0; cursor: pointer; color: inherit; }
+    .top-btn, .ghost-btn, .main-btn, .secondary-btn { border-radius: 999px; padding: 12px 18px; font-weight: 800; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+    .top-btn, .secondary-btn { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.17); }
+    .top-btn:hover, .secondary-btn:hover, .ghost-btn:hover { transform: translateY(-2px); background: rgba(255,255,255,.16); }
+    .main-btn { background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue)); box-shadow: 0 18px 50px rgba(123,97,255,.32); }
+    .main-btn:hover { transform: translateY(-2px) scale(1.01); }
+    .ghost-btn { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16); }
+    .screen { display: none; animation: screenIn .42s ease both; }
+    .screen.active { display: block; }
+    @keyframes screenIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  min-height: 100vh;
-  margin: 0;
-  color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(255, 92, 168, 0.32), transparent 28%),
-    radial-gradient(circle at 88% 6%, rgba(70, 217, 255, 0.28), transparent 28%),
-    radial-gradient(circle at 50% 110%, rgba(120, 242, 194, 0.15), transparent 35%),
-    linear-gradient(145deg, #090719 0%, #17103b 48%, #050712 100%);
-  background-attachment: fixed;
-  overflow-x: hidden;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 54px 54px;
-  mask-image: radial-gradient(circle at 50% 14%, black, transparent 72%);
-}
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 50% 0%, transparent 0 38%, rgba(0,0,0,0.28) 100%);
-  mix-blend-mode: multiply;
-}
+    .hero { min-height: calc(100vh - 98px); display: grid; grid-template-columns: .92fr 1.08fr; align-items: center; gap: 30px; padding: clamp(22px, 4vw, 46px); border-radius: 36px; margin-top: 14px; overflow: hidden; position: relative; }
+    .hero::after { content: ""; position: absolute; inset: auto -20% -42% 20%; height: 52%; background: radial-gradient(circle, rgba(255,230,109,.15), transparent 62%); pointer-events:none; }
+    .eyebrow { margin: 0 0 14px; color: var(--green); text-transform: uppercase; letter-spacing: .15em; font-size: 12px; font-weight: 900; }
+    h1, h2, h3 { margin: 0; letter-spacing: -.055em; }
+    .hero h1 { font-size: clamp(48px, 7.5vw, 86px); line-height: .92; font-weight: 900; max-width: 700px; }
+    .hero h1 span { display: inline-block; background: linear-gradient(100deg, #fff, var(--yellow), var(--pink), var(--blue)); -webkit-background-clip: text; color: transparent; }
+    .hero-sub { margin: 24px 0 0; max-width: 680px; color: #e8e3ff; line-height: 1.8; font-size: clamp(16px, 2vw, 20px); }
+    .hero-sub strong { color: #fff; font-weight: 900; }
+    .scene-tags { display: flex; flex-wrap: wrap; gap: 9px; margin: 20px 0 0; }
+    .scene-tags span { padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.14); color: #f4f1ff; font-size: 13px; }
+    .floating-lines { display: grid; gap: 9px; margin: 22px 0 0; max-width: 650px; }
+    .floating-lines span { width: fit-content; max-width: 100%; padding: 10px 13px; border-radius: 16px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.14); color: #fefefe; font-size: 13px; line-height: 1.5; animation: floatChip 4.4s ease-in-out infinite; }
+    .floating-lines span:nth-child(2){ margin-left: 36px; animation-delay: .5s; }
+    .floating-lines span:nth-child(3){ animation-delay: 1s; }
+    .floating-lines span:nth-child(4){ margin-left: 20px; animation-delay: 1.4s; }
+    @keyframes floatChip { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 0; }
+    .proof { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; color: var(--muted); font-size: 13px; }
+    .proof span::before { content: "✦"; color: var(--yellow); margin-right: 6px; }
+    .aura-visual { min-height: 500px; position: relative; display:grid; place-items:center; }
+    .orb { position: absolute; width: 240px; aspect-ratio: 1; border-radius: 50%; filter: blur(.2px); box-shadow: inset 0 0 55px rgba(255,255,255,.20), 0 0 70px rgba(255,255,255,.10); animation: orbFloat 7s ease-in-out infinite; }
+    .orb-a { left: 12%; top: 22%; background: radial-gradient(circle at 30% 30%, #fff, var(--pink) 15%, rgba(123,97,255,.82) 48%, rgba(255,92,168,.05) 72%); }
+    .orb-b { right: 8%; top: 28%; background: radial-gradient(circle at 35% 28%, #fff, var(--blue) 18%, rgba(120,242,194,.76) 52%, rgba(85,215,255,.04) 74%); animation-delay: -2s; }
+    @keyframes orbFloat { 0%,100%{ transform: translateY(0) scale(1); } 50%{ transform: translateY(-18px) scale(1.04); } }
+    .fusion { width: 320px; height: 320px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: radial-gradient(circle, rgba(255,230,109,.20), rgba(255,92,168,.10) 36%, transparent 68%); box-shadow: 0 0 95px rgba(255,230,109,.14); animation: pulse 5.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity: .72; } 50% { transform: scale(1.08); opacity: .96; } }
+    .orbit-note { position: absolute; padding: 12px 14px; border-radius: 18px; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.15); font-size: 13px; color: #fff; box-shadow: 0 15px 42px rgba(0,0,0,.22); }
+    .n1 { top: 8%; right: 9%; } .n2 { left: 4%; bottom: 23%; } .n3 { right: 6%; bottom: 14%; }
 
-.ambient {
-  position: fixed;
-  width: 420px;
-  height: 420px;
-  border-radius: 999px;
-  filter: blur(72px);
-  opacity: .48;
-  pointer-events: none;
-  animation: drift 11s ease-in-out infinite alternate;
-}
-.ambient-pink { left: -130px; top: 160px; background: rgba(255,92,168,.5); }
-.ambient-blue { right: -120px; top: 42px; background: rgba(70,217,255,.42); animation-delay: -3s; }
-.ambient-green { left: 42%; bottom: -170px; background: rgba(120,242,194,.26); animation-delay: -6s; }
+    .form { margin-top: 18px; display: grid; gap: 18px; }
+    .section { border-radius: 32px; padding: clamp(20px, 3vw, 32px); }
+    .step-head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 18px; }
+    .num { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 16px; display:grid; place-items:center; font-weight:900; background: linear-gradient(135deg, var(--pink), var(--blue)); box-shadow: 0 15px 38px rgba(85,215,255,.2); }
+    .step-head h2 { font-size: clamp(24px, 3vw, 34px); }
+    .step-head p { margin: 6px 0 0; color: var(--muted); line-height: 1.65; }
+    .people { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    .person { border-radius: 28px; padding: 18px; background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.14); }
+    .person-top { display:flex; justify-content:space-between; align-items:center; gap: 14px; margin-bottom: 14px; }
+    .badge { display:inline-grid; place-items:center; width: 34px; height:34px; border-radius: 13px; background: rgba(255,255,255,.12); color: var(--yellow); font-weight: 900; margin-right: 8px; }
+    .name { width: min(100%, 170px); background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.13); color:#fff; border-radius: 14px; padding: 11px 12px; outline: 0; }
+    .field { display: block; margin: 12px 0 7px; color: #fff; font-size: 13px; font-weight: 800; }
+    select, input[type=text], textarea { width: 100%; background: rgba(2,3,16,.34); color: var(--text); border: 1px solid rgba(255,255,255,.14); border-radius: 15px; padding: 12px 13px; outline: 0; }
+    select:focus, input:focus, textarea:focus { border-color: rgba(120,242,194,.55); box-shadow: 0 0 0 3px rgba(120,242,194,.10); }
+    .select-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items:center; }
+    .small-link { color: #08111f; background: var(--green); text-decoration: none; padding: 11px 12px; border-radius: 14px; font-weight: 900; font-size: 12px; white-space: nowrap; }
+    details.qbox { margin-top: 14px; border-radius: 18px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.11); overflow: hidden; }
+    details.qbox summary { cursor: pointer; list-style: none; padding: 13px 14px; color: #fff; font-weight: 900; }
+    details.qbox summary::-webkit-details-marker { display:none; }
+    .q-list { display: grid; gap: 10px; padding: 0 14px 14px; }
+    .q-list label { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .official { margin: 14px 0 18px; display:flex; flex-wrap:wrap; gap: 10px; align-items:center; color: var(--muted); }
+    .official a { color: #07111f; background: #fff; text-decoration:none; font-weight:900; padding: 9px 12px; border-radius: 999px; font-size: 13px; }
+    .chips { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .chip { text-align:left; padding: 17px; border-radius: 24px; background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.13); min-height: 112px; }
+    .chip.active { border-color: rgba(120,242,194,.55); background: linear-gradient(135deg, rgba(120,242,194,.16), rgba(85,215,255,.09)); box-shadow: 0 18px 55px rgba(120,242,194,.12); }
+    .chip strong { display:block; font-size: 18px; margin-bottom: 6px; }
+    .chip span { display:block; color: var(--muted); line-height:1.55; font-size: 13px; }
+    .consent { color: var(--muted); line-height: 1.6; font-size: 13px; }
+    .consent label { display:flex; gap: 10px; align-items:flex-start; }
+    .sticky-submit { position: sticky; bottom: 14px; z-index: 8; width: min(100%, 520px); justify-self: center; }
 
-@keyframes drift { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(22px,-18px,0) scale(1.08); } }
-@keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-18px) scale(1.03); } }
-@keyframes pulse { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: .98; transform: scale(1.06); } }
-@keyframes sparkMove { 0%,100% { transform: translateY(0) rotate(10deg); opacity: .7; } 50% { transform: translateY(-18px) rotate(-8deg); opacity: 1; } }
-
-button, input, select { font: inherit; }
-a { color: inherit; }
-.app-shell {
-  position: relative;
-  z-index: 1;
-  width: min(1120px, calc(100% - 28px));
-  margin: 0 auto;
-  padding: 22px 0 80px;
-}
-.glass-card, .premium-card {
-  border: 1px solid var(--line);
-  background: linear-gradient(138deg, rgba(255,255,255,0.15), rgba(255,255,255,0.062));
-  box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  border-radius: var(--radius-xl);
-}
-.premium-card {
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.16);
-}
-.premium-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(120deg, rgba(255,255,255,.2), transparent 28%, transparent 70%, rgba(120,242,194,.12)),
-    radial-gradient(circle at 22% 18%, rgba(255,92,168,.2), transparent 30%),
-    radial-gradient(circle at 86% 20%, rgba(70,217,255,.18), transparent 28%);
-  pointer-events: none;
-}
-.soft-border { border-color: rgba(255,255,255,.14); }
-
-.topbar {
-  min-height: 70px;
-  padding: 12px 14px;
-  margin-bottom: 18px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-}
-.brand-mark {
-  width: 46px;
-  height: 46px;
-  border-radius: 17px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--pink), var(--purple) 48%, var(--blue));
-  box-shadow: 0 0 32px rgba(255,92,168,.38);
-  font-weight: 1000;
-}
-.topbar strong { display: block; letter-spacing: -.03em; }
-.topbar p { margin: 2px 0 0; color: var(--muted); font-size: .82rem; }
-.topbar-link {
-  padding: 11px 16px;
-  border-radius: 999px;
-  text-decoration: none;
-  background: rgba(255,255,255,.11);
-  border: 1px solid rgba(255,255,255,.18);
-  color: #fff;
-  font-weight: 800;
-}
-
-.hero {
-  min-height: 500px;
-  padding: clamp(24px, 4.6vw, 54px);
-  display: grid;
-  grid-template-columns: .92fr 1.08fr;
-  gap: clamp(20px, 4vw, 48px);
-  align-items: center;
-}
-.hero > * { position: relative; z-index: 1; }
-.eyebrow {
-  margin: 0 0 12px;
-  color: var(--green);
-  font-size: .76rem;
-  letter-spacing: .17em;
-  text-transform: uppercase;
-  font-weight: 900;
-}
-.hero h1 {
-  margin: 0;
-  max-width: 620px;
-  font-size: clamp(2.65rem, 6vw, 4.85rem);
-  line-height: 1.02;
-  letter-spacing: -.055em;
-  font-weight: 850;
-}
-.hero h1 span {
-  background: linear-gradient(90deg, #fff, #f6dcff 35%, #9eefff 70%, #baffdf);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.hero-subtitle {
-  max-width: 610px;
-  margin: 22px 0 0;
-  color: var(--muted);
-  font-size: clamp(1rem, 1.8vw, 1.14rem);
-  line-height: 1.82;
-}
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.hero-primary, .hero-secondary {
-  min-height: 52px;
-  padding: 0 22px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  border: 1px solid rgba(255,255,255,.16);
-  font-weight: 900;
-  cursor: pointer;
-}
-.hero-primary {
-  color: #120b2e;
-  background: linear-gradient(135deg, var(--yellow), var(--pink) 52%, var(--blue));
-  box-shadow: 0 18px 48px rgba(255,92,168,.28);
-}
-.hero-secondary {
-  color: #fff;
-  background: rgba(255,255,255,.085);
-}
-.hero-primary:hover, .hero-secondary:hover { transform: translateY(-2px); filter: saturate(1.12); }
-.ghost-link, .primary-button, .secondary-button, .chip, .select-with-link a, .official-strip a, .topbar-link {
-  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease, filter .18s ease;
-}
-.ghost-link, .select-with-link a, .official-strip a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  padding: 0 16px;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 999px;
-  background: rgba(255,255,255,.08);
-  color: #fff;
-  text-decoration: none;
-  font-weight: 800;
-  white-space: nowrap;
-}
-.ghost-link:first-child { background: linear-gradient(135deg, rgba(255,92,168,.26), rgba(123,97,255,.18)); }
-.ghost-link:hover, .select-with-link a:hover, .official-strip a:hover, .secondary-button:hover, .chip:hover, .topbar-link:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,.46);
-  background: rgba(255,255,255,.16);
-}
-.hero-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 26px;
-}
-.hero-metrics span {
-  padding: 10px 13px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.075);
-  color: var(--muted);
-}
-.hero-metrics b { color: #fff; font-size: 1.08em; }
-.hero-proof { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; color: rgba(255,255,255,.76); font-size: .92rem; }
-.hero-proof span { padding: 8px 11px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.052); }
-.value-line { display:block; margin-bottom: 4px; color:#fff; font-weight:850; }
-
-
-.aura-console {
-  position: relative;
-  min-height: 390px;
-}
-.aura-stage {
-  position: absolute;
-  inset: 4% 2% 12% 2%;
-  display: grid;
-  place-items: center;
-  border-radius: 34px;
-  border: 1px solid rgba(255,255,255,.12);
-  background:
-    radial-gradient(circle at 35% 45%, rgba(255,92,168,.18), transparent 30%),
-    radial-gradient(circle at 64% 43%, rgba(70,217,255,.18), transparent 30%),
-    rgba(255,255,255,.045);
-  overflow: hidden;
-}
-.aura-stage::before {
-  content: "";
-  position: absolute;
-  inset: 34px;
-  border-radius: 50%;
-  border: 1px dashed rgba(255,255,255,.18);
-}
-.orb {
-  position: absolute;
-  width: min(42vw, 230px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  filter: drop-shadow(0 0 70px rgba(255,255,255,.18));
-  animation: float 5.4s ease-in-out infinite;
-  mix-blend-mode: screen;
-}
-.orb span { font-size: 3.6rem; font-weight: 1000; color: rgba(255,255,255,.9); text-shadow: 0 0 30px rgba(255,255,255,.35); }
-.orb-a { left: 12%; top: 26%; background: radial-gradient(circle at 35% 28%, #fff, #ffb4dd 12%, #ff5ca8 44%, rgba(123,97,255,.2) 74%, transparent); }
-.orb-b { right: 12%; top: 32%; background: radial-gradient(circle at 35% 28%, #fff, #bff5ff 12%, #46d9ff 46%, rgba(120,242,194,.2) 76%, transparent); animation-delay: -1.8s; }
-.aura-ring {
-  position: absolute;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.28);
-  box-shadow: 0 0 70px rgba(123,97,255,.32), inset 0 0 50px rgba(255,255,255,.08);
-  animation: pulse 4.8s ease-in-out infinite;
-}
-.ring-two { width: 390px; height: 390px; border-color: rgba(120,242,194,.18); animation-delay: -2s; }
-.aura-spark {
-  position: absolute;
-  width: 12px;
-  height: 82px;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, transparent, var(--yellow), transparent);
-  filter: drop-shadow(0 0 18px rgba(255,230,109,.95));
-  animation: sparkMove 3.4s ease-in-out infinite;
-}
-.s1 { left: 48%; top: 31%; transform: rotate(22deg); }
-.s2 { left: 55%; top: 54%; transform: rotate(-40deg); animation-delay: -1.4s; }
-.console-card {
-  position: absolute;
-  z-index: 3;
-  padding: 13px 16px;
-  border-radius: 18px;
-  background: rgba(5,3,18,.54);
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: 0 18px 50px rgba(0,0,0,.3);
-  color: #fff;
-  font-weight: 850;
-  backdrop-filter: blur(16px);
-}
-.c1 { left: 0; top: 26px; }
-.c2 { right: 0; bottom: 42px; }
-.c3 { left: 12%; bottom: 0; color: var(--yellow); }
-
-.form-grid { display: grid; gap: 18px; margin-top: 20px; }
-.section-card { padding: clamp(20px, 3vw, 30px); position: relative; overflow: hidden; }
-.step-card::after {
-  content: "";
-  position: absolute;
-  inset: auto -12% -40% auto;
-  width: 260px;
-  height: 260px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(70,217,255,.12), transparent 64%);
-  pointer-events: none;
-}
-.featured-step { border-color: rgba(255,255,255,.24); box-shadow: var(--shadow); }
-.compact-step { background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.055)); }
-.step-heading { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 22px; position: relative; z-index: 1; }
-.step-index {
-  flex: 0 0 48px;
-  width: 48px;
-  height: 48px;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--pink), var(--purple) 55%, var(--blue));
-  box-shadow: 0 0 35px rgba(255,92,168,.28);
-  font-weight: 1000;
-}
-h2, h3, p { margin-top: 0; }
-.step-heading h2 { margin: 0 0 8px; font-size: clamp(1.35rem, 2.8vw, 2.05rem); letter-spacing: -.04em; }
-.step-heading p { margin: 0; color: var(--muted); line-height: 1.62; }
-.official-strip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin: -4px 0 18px;
-  padding: 10px 12px;
-  border-radius: 18px;
-  background: rgba(255,255,255,.045);
-  border: 1px solid rgba(255,255,255,.1);
-  position: relative;
-  z-index: 1;
-}
-.official-strip span { color: var(--muted); font-size: .88rem; font-weight: 800; }
-.people-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; position: relative; z-index: 1; }
-.person-card {
-  padding: 20px;
-  border-radius: 28px;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.065)),
-    radial-gradient(circle at 20% 0%, rgba(255,92,168,.09), transparent 36%);
-  border: 1px solid rgba(255,255,255,.16);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
-}
-.person-card[data-person="B"] { background: linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.065)), radial-gradient(circle at 80% 0%, rgba(70,217,255,.11), transparent 36%); }
-.person-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
-.person-header h3 { margin: 7px 0 0; letter-spacing: -.03em; }
-.person-badge {
-  display: inline-grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.12);
-  color: var(--yellow);
-  font-weight: 1000;
-}
-.field-label { display: block; margin: 14px 0 8px; color: rgba(255,255,255,.75); font-size: .9rem; font-weight: 850; }
-.name-input, select {
-  width: 100%;
-  min-height: 46px;
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 16px;
-  background: rgba(5, 3, 18, .42);
-  color: #fff;
-  padding: 0 14px;
-  outline: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-}
-.name-input { max-width: 160px; }
-select:focus, .name-input:focus { border-color: rgba(120,242,194,.5); box-shadow: 0 0 0 4px rgba(120,242,194,.1); }
-.select-with-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
-.select-with-link a { min-height: 46px; font-size: .9rem; padding: 0 14px; }
-.chip-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; position: relative; z-index: 1; }
-.chip {
-  min-height: 112px;
-  text-align: left;
-  padding: 18px;
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
-  color: #fff;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.chip::after {
-  content: "";
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  right: -50px;
-  bottom: -70px;
-  background: radial-gradient(circle, rgba(255,230,109,.18), transparent 68%);
-}
-.chip strong { display: block; margin-bottom: 8px; font-size: 1.04rem; }
-.chip span { display: block; color: var(--muted); line-height: 1.5; font-size: .92rem; }
-.chip.active {
-  border-color: rgba(120,242,194,.76);
-  background: linear-gradient(135deg, rgba(120,242,194,.19), rgba(123,97,255,.12));
-  box-shadow: 0 0 38px rgba(120,242,194,.16), inset 0 1px 0 rgba(255,255,255,.12);
-}
-.primary-button {
-  min-height: 64px;
-  width: 100%;
-  border: 0;
-  border-radius: 24px;
-  background: linear-gradient(135deg, var(--yellow), var(--pink) 48%, var(--blue));
-  color: #120b2e;
-  font-size: 1.08rem;
-  font-weight: 1000;
-  cursor: pointer;
-  box-shadow: 0 18px 60px rgba(255,92,168,.25);
-}
-.primary-button:hover { transform: translateY(-2px); filter: saturate(1.15); }
-
-.hidden { display: none !important; }
-.screen { animation: screenIn .55s cubic-bezier(.2,.8,.2,1) both; }
-.screen:not(.active) { display: none !important; }
-@keyframes screenIn { from { opacity: 0; transform: translateY(24px) scale(.985); filter: blur(10px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
-.synth-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(circle at 50% 45%, rgba(255,92,168,.18), transparent 34%), rgba(4,6,18,.72);
-  backdrop-filter: blur(22px);
-}
-.synth-card {
-  width: min(420px, calc(100vw - 38px));
-  min-height: 260px;
-  padding: 26px;
-  display: grid;
-  place-items: center;
-  gap: 18px;
-  text-align: center;
-}
-.synth-orbits { position: relative; width: 190px; height: 128px; }
-.synth-orbits span { position: absolute; top: 26px; width: 96px; height: 96px; border-radius: 50%; mix-blend-mode: screen; animation: synthPulse 1.4s ease-in-out infinite alternate; }
-.synth-orbits span:first-child { left: 18px; background: radial-gradient(circle at 32% 28%, #fff, #ff9ad0 14%, #ff5ca8 58%, transparent 78%); }
-.synth-orbits span:nth-child(2) { right: 18px; background: radial-gradient(circle at 32% 28%, #fff, #a7f0ff 14%, #55d7ff 58%, transparent 78%); animation-delay: -.35s; }
-.synth-orbits i { position: absolute; left: 88px; top: 18px; width: 14px; height: 112px; border-radius: 999px; background: linear-gradient(transparent, var(--yellow), transparent); filter: drop-shadow(0 0 22px var(--yellow)); animation: sparkMove 1.4s ease-in-out infinite; }
-.synth-card p { margin: 0; color: #fff; font-weight: 900; letter-spacing: -.02em; }
-@keyframes synthPulse { from { transform: translateX(-5px) scale(.95); opacity: .72; } to { transform: translateX(5px) scale(1.06); opacity: 1; } }
-.poetry-sign { margin-top: 20px; padding: 16px 18px; border-radius: 22px; border: 1px solid rgba(255,230,109,.22); background: linear-gradient(135deg, rgba(255,230,109,.12), rgba(255,92,168,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
-.poetry-sign strong { display: block; color: var(--yellow); margin-bottom: 7px; letter-spacing: .03em; }
-.poetry-sign q { display: block; color: #fff; font-size: clamp(1.02rem, 2vw, 1.24rem); font-weight: 900; line-height: 1.55; }
-.poetry-sign small { display: block; margin-top: 6px; color: var(--muted); }
-.final-remark { margin-top: 16px; color: #fff; font-size: clamp(1.05rem, 2vw, 1.26rem); line-height: 1.7; font-weight: 850; }
-.mobile-progress { position: sticky; top: 10px; z-index: 5; display: none; margin-bottom: 14px; padding: 9px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(16px); }
-.mobile-progress span { flex: 1; text-align: center; padding: 8px 10px; border-radius: 999px; color: var(--muted); font-size: .78rem; font-weight: 900; }
-.mobile-progress span.active { color: #160a2a; background: linear-gradient(135deg, var(--yellow), var(--green)); }
-.story-card.poem-card { border-color: rgba(255,230,109,.24); background: linear-gradient(135deg, rgba(255,230,109,.10), rgba(85,215,255,.07)); }
-
-.result-section { margin-top: 22px; display: grid; gap: 18px; }
-.result-hero {
-  min-height: 460px;
-  padding: clamp(26px, 5vw, 56px);
-  display: grid;
-  grid-template-columns: 1.05fr .95fr;
-  align-items: center;
-  gap: 24px;
-}
-.result-premium::after {
-  content: "";
-  position: absolute;
-  width: 560px;
-  height: 560px;
-  right: -180px;
-  top: -160px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(255,230,109,.12), transparent 64%);
-}
-.result-text { position: relative; z-index: 1; }
-.result-text h2 {
-  margin: 0;
-  max-width: 780px;
-  font-size: clamp(2.5rem, 6.4vw, 5.8rem);
-  line-height: .95;
-  letter-spacing: -.065em;
-}
-.score-line { display: flex; align-items: flex-end; gap: 14px; margin: 24px 0 18px; }
-.score-line span {
-  font-size: clamp(4rem, 10vw, 8rem);
-  line-height: .82;
-  font-weight: 1000;
-  background: linear-gradient(90deg, var(--yellow), var(--pink), var(--blue));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.score-line small { margin-bottom: 9px; color: var(--muted); font-weight: 900; }
-.keyword-list { display: flex; flex-wrap: wrap; gap: 10px; }
-.keyword-list span {
-  padding: 9px 13px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.14);
-  color: #fff;
-  font-weight: 850;
-}
-.summary-text { max-width: 740px; margin: 18px 0 0; color: var(--muted); font-size: 1.08rem; line-height: 1.85; }
-.score-orbit {
-  position: relative;
-  min-height: 340px;
-  border-radius: 40px;
-  background: rgba(255,255,255,.045);
-  border: 1px solid rgba(255,255,255,.11);
-  overflow: hidden;
-  z-index: 1;
-}
-.mini-orb {
-  position: absolute;
-  width: 185px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  top: 86px;
-  mix-blend-mode: screen;
-}
-.mini-a { left: 17%; background: radial-gradient(circle at 36% 24%, #fff, #ff9cd1 12%, #ff5ca8 46%, transparent 76%); }
-.mini-b { right: 17%; background: radial-gradient(circle at 36% 24%, #fff, #baf4ff 12%, #46d9ff 46%, transparent 76%); }
-.orbit-line {
-  position: absolute;
-  inset: 48px;
-  border-radius: 50%;
-  border: 1px dashed rgba(255,255,255,.22);
-}
-.spark {
-  position: absolute;
-  left: 49%;
-  top: 44%;
-  width: 24px;
-  height: 86px;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, transparent, #ffe66d, transparent);
-  filter: drop-shadow(0 0 25px rgba(255,230,109,.9));
-  transform: rotate(28deg);
-  animation: sparkMove 3s ease-in-out infinite;
-}
-.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.result-card, .algorithm-card, .share-panel { padding: clamp(20px, 3vw, 28px); }
-.card-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-.card-title-row h3, .algorithm-card h3, .share-panel h3 { margin: 0; font-size: 1.26rem; letter-spacing: -.03em; }
-.card-title-row span { color: var(--green); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 900; }
-.bars { display: grid; gap: 16px; }
-.bar-top { display: flex; justify-content: space-between; color: #fff; font-weight: 850; margin-bottom: 8px; }
-.bar-track {
-  height: 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.1);
-  overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue), var(--green));
-  box-shadow: 0 0 20px rgba(70,217,255,.4);
-}
-.difference-list { display: grid; gap: 12px; }
-.diff-item {
-  padding: 15px;
-  border-radius: 20px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.12);
-}
-.diff-item strong { display: flex; justify-content: space-between; gap: 10px; color: #fff; }
-.diff-item strong span:last-child { color: var(--yellow); }
-.diff-item p { margin: 10px 0 0; color: var(--muted); line-height: 1.6; }
-.diff-item em { display: block; margin-top: 9px; color: rgba(255,255,255,.84); font-style: normal; }
-.insight-section {
-  padding: clamp(20px, 3vw, 30px);
-  border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.045));
-  border: 1px solid rgba(255,255,255,.14);
-}
-.section-title-row { display: grid; gap: 5px; margin-bottom: 16px; }
-.section-title-row h3 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.35rem); letter-spacing: -.05em; }
-.section-title-row p:last-child { margin: 0; color: var(--muted); line-height: 1.5; }
-.report-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.story-card {
-  position: relative;
-  padding: 22px;
-  min-height: 190px;
-  border-radius: 28px;
-  border: 1px solid rgba(255,255,255,.15);
-  background:
-    radial-gradient(circle at 15% 0%, rgba(255,92,168,.13), transparent 38%),
-    linear-gradient(135deg, rgba(255,255,255,.105), rgba(255,255,255,.052));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
-  overflow: hidden;
-}
-.story-card::after {
-  content: "";
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  right: -60px;
-  bottom: -70px;
-  background: radial-gradient(circle, rgba(70,217,255,.2), transparent 70%);
-}
-.story-card h3 { margin: 0 0 12px; font-size: 1.15rem; letter-spacing: -.03em; }
-.story-card p { margin: 0; color: var(--muted); line-height: 1.74; }
-.story-card .micro-tag {
-  display: inline-flex;
-  margin-bottom: 10px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255,230,109,.12);
-  color: var(--yellow);
-  border: 1px solid rgba(255,230,109,.18);
-  font-size: .78rem;
-  font-weight: 900;
-}
-.algorithm-card p, .share-panel p { color: var(--muted); line-height: 1.72; margin-bottom: 0; }
-.share-panel { display: grid; gap: 18px; }
-.share-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.share-hint { margin: 0; color: var(--muted); line-height: 1.7; font-size: .94rem; }
-.secondary-button {
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.2);
-  background: rgba(255,255,255,.09);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 850;
-}
-#posterCanvas {
-  width: min(100%, 360px);
-  height: auto;
-  border-radius: 24px;
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: var(--shadow-soft);
-}
-
-
-.floating-reviews {
-  display: grid;
-  gap: 10px;
-  margin-top: 18px;
-}
-.review-chip {
-  width: fit-content;
-  max-width: min(520px, 100%);
-  padding: 10px 14px;
-  border-radius: 999px;
-  color: rgba(255,255,255,.92);
-  background: rgba(255,255,255,.09);
-  border: 1px solid rgba(255,255,255,.16);
-  box-shadow: 0 14px 34px rgba(0,0,0,.18);
-  font-size: .92rem;
-  line-height: 1.45;
-  animation: reviewFloat 6.8s ease-in-out infinite alternate;
-}
-.review-chip:nth-child(2) { margin-left: 26px; animation-delay: -2s; }
-.review-chip:nth-child(3) { margin-left: 8px; animation-delay: -4s; }
-@keyframes reviewFloat { from { transform: translate3d(0,0,0); } to { transform: translate3d(12px,-8px,0); } }
-.data-consent {
-  margin-top: 18px;
-  padding: 14px 16px;
-  border-radius: 22px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.12);
-  color: var(--muted);
-  line-height: 1.65;
-  font-size: .92rem;
-}
-.data-consent label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
-.data-consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--green); flex: 0 0 auto; }
-.data-consent strong { color: #fff; }
-.telemetry-panel {
-  margin-top: 14px;
-  padding: 14px 16px;
-  border-radius: 22px;
-  background: rgba(255,255,255,.06);
-  border: 1px dashed rgba(255,255,255,.18);
-  color: var(--muted);
-  font-size: .9rem;
-  line-height: 1.65;
-}
-.telemetry-panel strong { color: #fff; }
-.telemetry-panel code {
-  color: #baffdf;
-  background: rgba(120,242,194,.08);
-  padding: 2px 6px;
-  border-radius: 8px;
-}
-
-.share-link-box {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: center;
-}
-.share-link-box input {
-  width: 100%;
-  min-width: 0;
-  height: 48px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.075);
-  color: #fff;
-  padding: 0 14px;
-  outline: none;
-}
-.share-link-box input:focus { border-color: rgba(120,242,194,.42); box-shadow: 0 0 0 3px rgba(120,242,194,.11); }
-@media (max-width: 680px) { .share-link-box { grid-template-columns: 1fr; } }
-
-@media (max-width: 880px) {
-  .topbar { grid-template-columns: auto 1fr; }
-  .topbar-link { display: none; }
-  .hero, .result-hero { grid-template-columns: 1fr; }
-  .aura-console { min-height: 340px; }
-  .people-grid, .result-grid, .report-cards { grid-template-columns: 1fr; }
-  .chip-grid { grid-template-columns: 1fr; }
-  .select-with-link { grid-template-columns: 1fr; }
-  .select-with-link a { width: 100%; }
-  .name-input { max-width: 130px; }
-}
-
-@media (max-width: 540px) {
-  .app-shell { width: min(100% - 18px, 1180px); padding-top: 10px; }
-  .hero, .section-card, .result-hero, .result-card, .algorithm-card, .share-panel, .insight-section { border-radius: 26px; }
-  .hero h1 { font-size: clamp(2.42rem, 12vw, 3.6rem); }
-  .step-heading { gap: 12px; }
-  .step-index { width: 42px; height: 42px; flex-basis: 42px; }
-  .official-strip a { width: 100%; }
-  .aura-console { min-height: 310px; }
-  .console-card { font-size: .82rem; }
-  .mobile-progress { display: flex; }
-  .orb { width: 190px; }
-  .orb-a { left: 6%; }
-  .orb-b { right: 6%; }
-  .score-orbit { min-height: 270px; }
-  .mini-orb { width: 140px; top: 72px; }
-}
-
+    .result { margin-top: 18px; display: grid; gap: 18px; }
+    .result-hero { display:grid; grid-template-columns: 1.15fr .85fr; gap: 18px; border-radius: 34px; padding: clamp(22px, 4vw, 42px); overflow:hidden; position:relative; }
+    .result-title { font-size: clamp(36px, 6vw, 62px); line-height: 1; }
+    .score { margin: 18px 0 12px; font-size: clamp(72px, 12vw, 135px); font-weight: 1000; line-height: .85; background: linear-gradient(100deg, var(--yellow), var(--pink), var(--blue)); -webkit-background-clip: text; color: transparent; }
+    .score small { font-size: 16px; color: var(--muted); -webkit-text-fill-color: var(--muted); font-weight: 800; }
+    .keywords { display:flex; flex-wrap:wrap; gap: 9px; margin: 14px 0; }
+    .keywords span { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15); border-radius: 999px; padding: 8px 11px; font-size: 13px; }
+    .summary, .final { color: #e7e2ff; line-height: 1.75; margin: 12px 0 0; }
+    .sign { margin-top: 15px; padding: 15px; border-radius: 22px; background: rgba(255,230,109,.10); border: 1px solid rgba(255,230,109,.22); }
+    .sign q { display:block; font-size: 21px; color: #fff; margin: 5px 0; }
+    .sign small { color: #fff1ae; line-height: 1.5; }
+    .score-visual { min-height: 310px; position:relative; display:grid; place-items:center; }
+    .small-orb { position:absolute; width: 160px; aspect-ratio:1; border-radius:50%; filter: blur(.2px); }
+    .small-a { left: 14%; top: 22%; background: radial-gradient(circle, #fff, var(--pink) 20%, rgba(123,97,255,.18) 70%); }
+    .small-b { right: 12%; top: 34%; background: radial-gradient(circle, #fff, var(--blue) 20%, rgba(120,242,194,.14) 70%); }
+    .sparkline { width: 220px; height: 220px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background: radial-gradient(circle, rgba(255,230,109,.22), transparent 65%); }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .card { padding: clamp(19px, 3vw, 28px); border-radius: 30px; }
+    .card-head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom: 16px; }
+    .card-head h3 { font-size: 22px; }
+    .card-head span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+    .compare-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .compare-person { border-radius: 24px; padding: 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); }
+    .compare-person h4 { margin: 0 0 10px; font-size: 18px; }
+    .compare-tags { display:flex; flex-wrap:wrap; gap:8px; }
+    .compare-tags span { padding: 7px 10px; border-radius:999px; font-size:12px; background: rgba(255,255,255,.10); color:#fff; }
+    .bars { display:grid; gap:13px; }
+    .bar-top { display:flex; justify-content:space-between; color:#fff; font-size: 13px; margin-bottom: 7px; }
+    .track { height: 10px; border-radius:999px; overflow:hidden; background: rgba(255,255,255,.10); }
+    .fill { height:100%; border-radius:999px; background: linear-gradient(90deg, var(--pink), var(--blue), var(--green)); }
+    .diffs { display:grid; gap: 11px; }
+    .diff { padding:14px; border-radius:20px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.11); }
+    .diff strong { display:flex; justify-content:space-between; gap:8px; font-size:14px; }
+    .diff p { margin:8px 0 0; color:var(--muted); line-height:1.6; font-size:13px; }
+    .story-grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:14px; }
+    .story { min-height: 210px; padding:18px; border-radius:28px; background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.06)); border:1px solid rgba(255,255,255,.13); position:relative; overflow:hidden; }
+    .story::after { content:""; position:absolute; right:-40px; top:-50px; width:140px; height:140px; border-radius:50%; background: radial-gradient(circle, rgba(255,92,168,.18), transparent 70%); }
+    .story .tag { display:inline-block; color:#08111f; background:var(--yellow); border-radius:999px; padding:6px 9px; font-size:11px; font-weight:900; margin-bottom:12px; }
+    .story h3 { font-size: 20px; margin-bottom: 10px; }
+    .story p { color:#e6e1ff; line-height:1.7; margin:0; font-size:14px; }
+    .share-panel { display:grid; gap:14px; }
+    .share-link { display:grid; grid-template-columns: 1fr auto; gap:10px; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; }
+    .poster-templates { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; }
+    .poster-templates button { padding: 12px; border-radius: 18px; background: rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); font-weight:900; font-size:12px; }
+    .poster-templates button.active { background: linear-gradient(135deg, rgba(255,92,168,.22), rgba(85,215,255,.18)); border-color: rgba(120,242,194,.45); }
+    canvas { width: min(100%, 420px); border-radius: 26px; border:1px solid rgba(255,255,255,.16); background:#120B2E; display:block; margin: 8px auto 0; }
+    .hint { color: var(--muted); line-height:1.6; font-size:13px; }
+    .telemetry { color: var(--muted); line-height: 1.6; font-size: 12px; }
+    .loading { position: fixed; inset: 0; z-index: 99; display:none; place-items:center; background: rgba(5,5,15,.62); backdrop-filter: blur(16px); }
+    .loading.show { display:grid; }
+    .load-card { width:min(92vw, 360px); text-align:center; border-radius:30px; padding:28px; }
+    .load-orb { width:95px; height:95px; margin:0 auto 18px; border-radius:50%; background: radial-gradient(circle,#fff,var(--pink) 20%, var(--blue) 55%, transparent 76%); box-shadow: 0 0 55px rgba(85,215,255,.38); animation: pulse 1.3s ease-in-out infinite; }
+    .toast { position: fixed; left:50%; bottom: 28px; transform: translateX(-50%); padding: 12px 16px; border-radius:999px; background: rgba(10,8,28,.9); border:1px solid rgba(255,255,255,.14); color:#fff; z-index: 100; opacity:0; pointer-events:none; transition: opacity .2s, transform .2s; }
+    .toast.show { opacity:1; transform: translate(-50%, -6px); }
+    @media (max-width: 850px) {
+      .app { width: min(100% - 18px, 1180px); padding-bottom: 26px; }
+      .hero { grid-template-columns: 1fr; min-height: auto; padding: 24px; }
+      .hero h1 { font-size: clamp(42px, 12vw, 64px); }
+      .aura-visual { min-height: 320px; }
+      .orb { width: 170px; } .fusion { width: 230px; height:230px; }
+      .orbit-note { font-size:12px; }
+      .n1 { top:5%; right: 2%; } .n2 { left:0; bottom:12%; } .n3 { right:0; bottom: 2%; }
+      .people, .grid2, .result-hero, .compare-grid { grid-template-columns: 1fr; }
+      .chips { grid-template-columns: 1fr; }
+      .story-grid { grid-template-columns: 1fr; }
+      .poster-templates { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .share-link { grid-template-columns: 1fr; }
+      .topbar { padding:10px; }
+      .top-btn { display:none; }
+    }
   </style>
 </head>
 <body>
-  <div class="ambient ambient-pink"></div>
-  <div class="ambient ambient-blue"></div>
-  <div class="ambient ambient-green"></div>
-  <div id="synthOverlay" class="synth-overlay hidden" aria-live="polite">
-    <div class="synth-card glass-card">
-      <div class="synth-orbits"><span></span><span></span><i></i></div>
-      <p id="synthText">正在合成你们的关系气场...</p>
-    </div>
-  </div>
-
-  <main class="app-shell">
-    <nav class="topbar glass-card soft-border">
-      <div class="brand-mark"><span>PA</span></div>
-      <div>
-        <strong>Pair Aura V14</strong>
-        <p>关系气场报告</p>
-      </div>
-      <button class="topbar-link" id="topStartBtn" type="button">开始合成</button>
+  <div class="loading" id="loading"><div class="load-card glass"><div class="load-orb"></div><p id="loadText">正在合成你们的关系气场...</p></div></div>
+  <main class="app">
+    <nav class="topbar glass">
+      <div class="brand"><div class="brand-badge">PA</div><div><strong>Pair Aura V15</strong><span>双人关系气场报告</span></div></div>
+      <button class="top-btn" id="topStartBtn">开始合成</button>
     </nav>
 
-    <section id="homeScreen" class="hero premium-card screen active">
-      <div class="hero-copy">
-        <p class="eyebrow">Pair Aura</p>
-        <h1>两个人之间，<br /><span>会发生什么？</span></h1>
-        <p class="hero-subtitle"><span class="value-line">不只看你是谁，也看你们如何相处。</span>输入两个人的 MBTI / SBTI，把相似、差异、互补和容易误会的地方翻译成一份有人情味的关系说明书。</p>
-        <div class="floating-reviews" aria-label="关系锐评示例">
-          <span class="review-chip">“不是不合，是一个在等回应，一个在等空间。”</span>
-          <span class="review-chip">“合作最怕的不是能力差，是默认对方会自动懂。”</span>
-          <span class="review-chip">“有些关系的关键，不是更像，而是愿意互相翻译。”</span>
+    <section class="screen hero glass active" id="homeScreen">
+      <div>
+        <p class="eyebrow">Neon Aura · Relationship Lens</p>
+        <h1>合成你们的<br><span>关系气场</span></h1>
+        <p class="hero-sub"><strong>输入两个人的 MBTI / SBTI / 九型人格，生成一份双人关系说明书。</strong><br>看看你们哪里同频、哪里互补、哪里容易互相触发。</p>
+        <div class="scene-tags"><span>情侣</span><span>朋友</span><span>室友</span><span>饭搭子</span><span>旅行搭子</span><span>项目队友</span></div>
+        <div class="floating-lines" aria-label="素材库锐评示例">
+          <span>“适合聊天，不一定适合一起做项目。”</span>
+          <span>“一个想马上说清楚，一个想先冷静一下。”</span>
+          <span>“一个负责开脑洞，一个负责把事情落地。”</span>
+          <span>“不是不合，是你们的节奏需要翻译。”</span>
         </div>
-        <div class="hero-actions">
-          <button class="hero-primary" id="heroStartBtn" type="button">开始生成报告</button>
-          <button class="hero-secondary" id="heroDemoBtn" type="button">看一个示例</button>
-        </div>
-        <div class="hero-proof" aria-label="使用提示">
-          <span>无需登录</span>
-          <span>30 秒完成</span>
-          <span>链接 + 海报可分享</span>
-        </div>
+        <div class="hero-actions"><button class="main-btn" id="heroStartBtn">开始合成关系</button><button class="ghost-btn" id="heroDemoBtn">先看示例报告</button></div>
+        <div class="proof"><span>无需登录</span><span>30 秒极速版</span><span>可生成二维码海报</span><span>匿名反馈可关闭</span></div>
       </div>
-      <div class="aura-console" aria-hidden="true">
-        <div class="aura-stage">
-          <div class="orb orb-a"><span>A</span></div>
-          <div class="orb orb-b"><span>B</span></div>
-          <div class="aura-ring ring-one"></div>
-          <div class="aura-ring ring-two"></div>
-          <div class="aura-spark s1"></div>
-          <div class="aura-spark s2"></div>
-        </div>
-        <div class="console-card c1">对比 · 谁更靠近，谁更需要空间</div>
-        <div class="console-card c2">卡点 · 情绪、边界、节奏</div>
-        <div class="console-card c3">适用 · 朋友 / 情侣 / 搭子 / 项目</div>
+      <div class="aura-visual" aria-hidden="true">
+        <div class="orb orb-a"></div><div class="orb orb-b"></div><div class="fusion"></div>
+        <div class="orbit-note n1">对比：谁更靠近</div><div class="orbit-note n2">卡点：哪里容易误读</div><div class="orbit-note n3">输出：关系说明书</div>
       </div>
     </section>
 
-    <form id="matchForm" class="form-grid screen" autocomplete="off">
-      <div class="mobile-progress" aria-hidden="true"><span class="active">1 输入</span><span>2 关系</span><span>3 语气</span></div>
-      <section class="glass-card section-card step-card featured-step">
-        <div class="step-heading">
-          <span class="step-index">01</span>
-          <div>
-            <h2>输入两个人的类型</h2>
-            <p>先把 A 和 B 的人格碎片放进来。官网入口只作为辅助，别让测评打断生成路径。</p>
-          </div>
-        </div>
-
-        <div class="official-strip">
-          <span>不知道自己的类型？</span>
-          <a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">MBTI 去测 / 核对</a>
-          <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI 去测 / 核对</a>
-        </div>
-
-        <div class="people-grid">
-          <article class="person-card" data-person="A">
-            <div class="person-header">
-              <div>
-                <span class="person-badge">A</span>
-                <h3>第一个人</h3>
-              </div>
-              <input id="nameA" class="name-input" maxlength="8" placeholder="昵称，可不填" />
-            </div>
-            <label class="field-label" for="mbtiA">MBTI / 16 型人格</label>
-            <div class="select-with-link">
-              <select id="mbtiA" required></select>
-              <a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">先去测</a>
-            </div>
-            <label class="field-label" for="identityA">A/T 稳定度</label>
-            <select id="identityA"></select>
-            <label class="field-label" for="sbtiA">SBTI 娱乐人格</label>
-            <div class="select-with-link">
-              <select id="sbtiA"></select>
-              <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">核对结果</a>
-            </div>
-          </article>
-
-          <article class="person-card" data-person="B">
-            <div class="person-header">
-              <div>
-                <span class="person-badge">B</span>
-                <h3>第二个人</h3>
-              </div>
-              <input id="nameB" class="name-input" maxlength="8" placeholder="昵称，可不填" />
-            </div>
-            <label class="field-label" for="mbtiB">MBTI / 16 型人格</label>
-            <div class="select-with-link">
-              <select id="mbtiB" required></select>
-              <a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">先去测</a>
-            </div>
-            <label class="field-label" for="identityB">A/T 稳定度</label>
-            <select id="identityB"></select>
-            <label class="field-label" for="sbtiB">SBTI 娱乐人格</label>
-            <div class="select-with-link">
-              <select id="sbtiB"></select>
-              <a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">核对结果</a>
-            </div>
-          </article>
+    <form class="screen form" id="matchForm" autocomplete="off">
+      <section class="section glass">
+        <div class="step-head"><div class="num">01</div><div><h2>合成你们的人格碎片</h2><p>每个人至少填写一项即可生成；MBTI 负责相处方式，SBTI 负责梗感，九型负责深层动机，6 个小问题补足现实互动。</p></div></div>
+        <div class="official"><span>不知道自己的类型？</span><a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">MBTI 去测 / 核对</a><a href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">SBTI 去测 / 核对</a></div>
+        <div class="people">
+          <article class="person" data-person="A"><div class="person-top"><h3><span class="badge">A</span>第一个人</h3><input class="name" id="nameA" maxlength="8" placeholder="昵称，可不填"></div><div id="personFieldsA"></div></article>
+          <article class="person" data-person="B"><div class="person-top"><h3><span class="badge">B</span>第二个人</h3><input class="name" id="nameB" maxlength="8" placeholder="昵称，可不填"></div><div id="personFieldsB"></div></article>
         </div>
       </section>
-
-      <section class="glass-card section-card step-card compact-step">
-        <div class="step-heading">
-          <span class="step-index">02</span>
-          <div>
-            <h2>选择关系组</h2>
-            <p>只保留两组，降低选择成本；报告里再展开到朋友、情侣、搭子、项目搭档。</p>
-          </div>
-        </div>
-        <div id="contextChoices" class="chip-grid two-choice" role="radiogroup" aria-label="选择关系组"></div>
-      </section>
-
-      <section class="glass-card section-card step-card compact-step">
-        <div class="step-heading">
-          <span class="step-index">03</span>
-          <div>
-            <h2>选择报告语气</h2>
-            <p>温情吐槽适合发给 TA，现实建议适合看清相处规则。</p>
-          </div>
-        </div>
-        <div id="toneChoices" class="chip-grid two-choice" role="radiogroup" aria-label="选择报告语气"></div>
-      </section>
-
-      <div class="data-consent">
-        <label for="usageConsent">
-          <input id="usageConsent" type="checkbox" checked />
-          <span><strong>允许匿名记录本次生成数据，用于优化文案和分数。</strong><br />只记录类型、关系组、分数、关键词、操作事件；不记录昵称、联系方式和任何聊天内容。你可以取消勾选。</span>
-        </label>
-      </div>
-
-      <button class="primary-button" type="submit">开始合成关系气场</button>
+      <section class="section glass"><div class="step-head"><div class="num">02</div><div><h2>选择关系组</h2><p>不把你们塞进单一场景；先选大方向，报告里再展开情侣、朋友、搭子、项目等具体语境。</p></div></div><div class="chips" id="contextChoices"></div></section>
+      <section class="section glass"><div class="step-head"><div class="num">03</div><div><h2>选择报告语气</h2><p>温情吐槽更适合转发，现实建议更适合看清规则。</p></div></div><div class="chips" id="toneChoices"></div></section>
+      <section class="section glass consent"><label><input id="usageConsent" type="checkbox" checked><span><strong>允许匿名记录本次生成数据，用于优化文案和分数。</strong><br>只记录类型、关系组、分数、关键词、操作事件；不记录昵称、联系方式和聊天内容。</span></label></section>
+      <button class="main-btn sticky-submit" type="submit">开始合成关系气场</button>
     </form>
 
-    <section id="resultSection" class="result-section hidden screen" aria-live="polite">
-      <article class="result-hero premium-card result-premium">
-        <div class="result-text">
-          <p class="eyebrow" id="resultContext">RELATION AURA</p>
-          <h2 id="resultTitle">关系类型</h2>
-          <div class="score-line">
-            <span id="totalScore">--</span><small>合拍指数</small>
-          </div>
-          <div id="keywordList" class="keyword-list"></div>
-          <p id="summaryText" class="summary-text"></p>
-          <div id="poetrySign" class="poetry-sign"></div>
-          <p id="finalRemarkText" class="final-remark"></p>
-        </div>
-        <div class="score-orbit" aria-hidden="true">
-          <div class="mini-orb mini-a"></div>
-          <div class="mini-orb mini-b"></div>
-          <div class="orbit-line"></div>
-          <div class="spark"></div>
-        </div>
-      </article>
-
-      <div class="result-grid">
-        <article class="glass-card result-card data-card">
-          <div class="card-title-row"><h3>6 个关系维度</h3><span>Data View</span></div>
-          <div id="dimensionBars" class="bars"></div>
-        </article>
-        <article class="glass-card result-card data-card">
-          <div class="card-title-row"><h3>差异 Top 3</h3><span>Trait Gap</span></div>
-          <div id="differenceList" class="difference-list"></div>
-        </article>
-      </div>
-
-      <section class="insight-section">
-        <div class="section-title-row">
-          <p class="eyebrow">Micro Trait Library</p>
-          <h3>特质细节评价</h3>
-          <p>根据特质差距的轻微 / 明显 / 强烈变化，生成更像你们的评价。</p>
-        </div>
-        <div id="reportCards" class="report-cards"></div>
-      </section>
-
-      <article class="glass-card algorithm-card">
-        <h3>算法说明</h3>
-        <p>V14 保留 Big Five 启发的人格向量作为中间层，将 MBTI、A/T 稳定度和 SBTI 标签转成可比较维度，再计算相似、互补、摩擦和场景适配。分数只是关系讨论入口，不做心理诊断，也不替任何关系下判决。</p>
-      </article>
-
-      <section class="share-panel glass-card">
-        <div>
-          <h3>分享这份报告</h3>
-          <p>海报强化了关系标题、合拍指数和一句话总结，适合发给 TA 或发到群里讨论。</p>
-        </div>
-        <div class="share-link-box">
-          <input id="shareLinkPreview" readonly aria-label="当前报告分享链接" />
-          <button id="openReportLinkBtn" class="secondary-button" type="button">打开检查</button>
-        </div>
-        <div class="share-actions">
-          <button id="copyLinkBtn" class="secondary-button" type="button">复制报告链接</button>
-          <button id="copyShareTextBtn" class="secondary-button" type="button">复制分享文案</button>
-          <button id="nativeShareBtn" class="secondary-button" type="button">发给 TA</button>
-          <button id="downloadPosterBtn" class="secondary-button" type="button">下载可扫码海报</button>
-        </div>
-        <p id="shareHint" class="share-hint">报告链接会写进二维码。微信里可直接发链接，也可以保存海报扫码打开。</p>
-        <div class="telemetry-panel" id="telemetryPanel">
-          <strong>站长数据说明：</strong>当前页面支持匿名回传生成报告、复制链接、下载海报等事件。只有在代码里配置 <code>ANALYTICS_ENDPOINT</code> 且用户未取消授权时才会上报。
-        </div>
-        <canvas id="posterCanvas" width="900" height="1350" aria-label="分享海报预览"></canvas>
-      </section>
+    <section class="screen result" id="resultSection">
+      <article class="result-hero glass"><div><p class="eyebrow" id="resultContext">RELATION AURA</p><h2 class="result-title" id="resultTitle">关系类型</h2><div class="score"><span id="totalScore">--%</span><small> 合拍指数</small></div><div class="keywords" id="keywordList"></div><p class="summary" id="summaryText"></p><div class="sign" id="relationSign"></div><p class="final" id="finalRemarkText"></p></div><div class="score-visual"><div class="small-orb small-a"></div><div class="small-orb small-b"></div><div class="sparkline"></div></div></article>
+      <article class="card glass"><div class="card-head"><h3>A/B 对比卡</h3><span>Personality Split</span></div><div class="compare-grid" id="compareCard"></div></article>
+      <div class="grid2"><article class="card glass"><div class="card-head"><h3>6 个关系维度</h3><span>Data View</span></div><div class="bars" id="dimensionBars"></div></article><article class="card glass"><div class="card-head"><h3>差异 Top 3</h3><span>Trait Gap</span></div><div class="diffs" id="differenceList"></div></article></div>
+      <article class="card glass"><div class="card-head"><h3>关系故事卡</h3><span>Story Cards</span></div><div class="story-grid" id="storyCards"></div></article>
+      <article class="card glass share-panel"><div><h3>分享这份报告</h3><p class="hint">选择一张海报模板，保存图片或复制链接发给对方。二维码会打开同一份报告。</p></div><div class="poster-templates" id="posterTemplates"></div><div class="share-link"><input id="shareLinkPreview" readonly><button class="secondary-btn" id="openReportLinkBtn" type="button">打开检查</button></div><div class="actions"><button class="secondary-btn" id="copyLinkBtn" type="button">复制链接</button><button class="secondary-btn" id="copyShareTextBtn" type="button">复制文案</button><button class="secondary-btn" id="nativeShareBtn" type="button">发给 TA</button><button class="secondary-btn" id="downloadPosterBtn" type="button">下载海报</button><button class="secondary-btn" id="restartBtn" type="button">重新生成</button></div><p class="hint" id="shareHint">报告链接会写进二维码。微信里可直接发链接，也可以保存海报扫码打开。</p><canvas id="posterCanvas" width="900" height="1350"></canvas><p class="telemetry">匿名统计只在你允许时启用，用于查看生成、复制、下载等行为，不记录昵称和身份。</p></article>
     </section>
   </main>
-
+  <div class="toast" id="toast"></div>
   <script>
 'use strict';
-
-const APP_VERSION = 'V14';
-// 透明数据回传：填入你自己的 Google Apps Script / Supabase / Cloudflare Worker 接口后才会启用。
-// 注意：必须保留页面里的用户授权提示；不要做隐藏采集。
+const APP_VERSION = 'V15';
 const ANALYTICS_ENDPOINT = '';
-
-const MBTI_TYPES = [
-  'INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP',
-  'ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP'
-];
-
-const IDENTITY_OPTIONS = [
-  { value: 'unknown', label: '不知道 / 不填' },
-  { value: 'A', label: 'A｜更稳定、抗压、少内耗' },
-  { value: 'T', label: 'T｜更敏感、进取、容易自我怀疑' }
-];
-
+const MBTI_TYPES = ['', 'INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP'];
+const IDENTITY_OPTIONS = [{value:'unknown',label:'不知道 / 不填'},{value:'A',label:'A｜更稳定、抗压、少内耗'},{value:'T',label:'T｜更敏感、进取、容易自我怀疑'}];
 const SBTI_TYPES = [
-  { code: '', label: '不填写 SBTI' },
-  { code: 'CTRL', label: 'CTRL｜拿捏者' },
-  { code: 'LOVE-R', label: 'LOVE-R｜恋爱脑诗人' },
-  { code: 'MONK', label: 'MONK｜清修型独立人' },
-  { code: 'SOLO', label: 'SOLO｜独行玩家' },
-  { code: 'HHHH', label: 'HHHH｜快乐发电机' },
-  { code: 'DEAD', label: 'DEAD｜情绪省电模式' },
-  { code: 'ZZZZ', label: 'ZZZZ｜装睡型高手' },
-  { code: 'OJBK', label: 'OJBK｜随缘通过型' },
-  { code: 'IMSB', label: 'IMSB｜敏感脑补机' },
-  { code: 'ATM-ER', label: 'ATM-er｜付出型老好人' },
-  { code: 'SHIT', label: '冷眼吐槽家' },
-  { code: 'FIRE', label: 'FIRE｜高燃行动派' },
-  { code: 'ICE', label: 'ICE｜冷静观察者' },
-  { code: 'MOON', label: 'MOON｜夜间情绪家' },
-  { code: 'SUN', label: 'SUN｜太阳能社交人' },
-  { code: 'CUBE', label: 'CUBE｜秩序方块' },
-  { code: 'FLOW', label: 'FLOW｜顺流随性派' },
-  { code: 'CAT', label: 'CAT｜边界感猫猫' },
-  { code: 'DOG', label: 'DOG｜热情陪伴型' },
-  { code: 'NPC', label: 'NPC｜低调配合型' },
-  { code: 'BOSS', label: 'BOSS｜掌控推进型' },
-  { code: 'CLOWN', label: 'CLOWN｜气氛喜剧人' },
-  { code: 'DIVA', label: 'DIVA｜戏剧高光型' },
-  { code: 'TANK', label: 'TANK｜抗压坦克' },
-  { code: 'BUBBLE', label: 'BUBBLE｜泡泡幻想家' },
-  { code: 'STONE', label: 'STONE｜沉默稳定石' },
-  { code: 'WAVE', label: 'WAVE｜情绪浪潮型' }
+  { code:'', label:'不填写 SBTI' }, { code:'CTRL', label:'CTRL｜拿捏者' }, { code:'LOVE-R', label:'LOVE-R｜恋爱脑诗人' }, { code:'MONK', label:'MONK｜清修型独立人' }, { code:'SOLO', label:'SOLO｜独行玩家' }, { code:'HHHH', label:'HHHH｜快乐发电机' }, { code:'DEAD', label:'DEAD｜情绪省电模式' }, { code:'ZZZZ', label:'ZZZZ｜装睡型高手' }, { code:'OJBK', label:'OJBK｜随缘通过型' }, { code:'IMSB', label:'IMSB｜敏感脑补机' }, { code:'ATM-ER', label:'ATM-er｜付出型老好人' }, { code:'SHIT', label:'SHIT｜冷眼吐槽家' }, { code:'FIRE', label:'FIRE｜高燃行动派' }, { code:'ICE', label:'ICE｜冷静观察者' }, { code:'MOON', label:'MOON｜夜间情绪家' }, { code:'SUN', label:'SUN｜太阳能社交人' }, { code:'CUBE', label:'CUBE｜秩序方块' }, { code:'FLOW', label:'FLOW｜顺流随性派' }, { code:'CAT', label:'CAT｜边界感猫猫' }, { code:'DOG', label:'DOG｜热情陪伴型' }, { code:'NPC', label:'NPC｜低调配合型' }, { code:'BOSS', label:'BOSS｜掌控推进型' }, { code:'CLOWN', label:'CLOWN｜气氛喜剧人' }, { code:'DIVA', label:'DIVA｜戏剧高光型' }, { code:'TANK', label:'TANK｜抗压坦克' }, { code:'BUBBLE', label:'BUBBLE｜泡泡幻想家' }, { code:'STONE', label:'STONE｜沉默稳定石' }, { code:'WAVE', label:'WAVE｜情绪浪潮型' }
 ];
-
+const ENNEAGRAM_TYPES = [
+  { value:'', label:'不填写九型人格' }, { value:'1', label:'1｜完美主义者' }, { value:'2', label:'2｜助人者' }, { value:'3', label:'3｜成就者' }, { value:'4', label:'4｜浪漫个人主义者' }, { value:'5', label:'5｜观察者' }, { value:'6', label:'6｜忠诚怀疑者' }, { value:'7', label:'7｜享乐探索者' }, { value:'8', label:'8｜挑战者' }, { value:'9', label:'9｜和平调停者' }
+];
 const CONTEXTS = [
-  {
-    id: 'close',
-    title: '友谊 / 情侣',
-    desc: '把朋友、暧昧、情侣放进同一情感关系组，报告里再拆成朋友版和情侣版。'
-  },
-  {
-    id: 'collab',
-    title: '搭子 / 学习 / 项目',
-    desc: '适合室友、旅行搭子、学习搭子和项目搭档，重点看边界、分工和推进节奏。'
-  }
+  { id:'close', title:'友谊 / 情侣', desc:'朋友、闺蜜、暧昧、情侣、室友的情感连接。' },
+  { id:'collab', title:'搭子 / 学习 / 项目', desc:'学习搭子、项目队友、旅行搭子、社团伙伴。' }
 ];
-
 const TONES = [
-  { id: 'warm_roast', title: '温情吐槽', desc: '保留温柔，但会说几句像朋友一样的真话。' },
-  { id: 'reality', title: '现实建议', desc: '更像关系说明书，直接告诉你们怎么减少内耗。' }
+  { id:'warm_roast', title:'温情吐槽', desc:'有梗但不伤人，适合发给 TA 看。' },
+  { id:'reality', title:'现实建议', desc:'更清醒，直接看边界、分工和风险。' }
 ];
-
-function normalizeContext(id) {
-  if (['romantic', 'friendship'].includes(id)) return 'close';
-  if (['roommate', 'teamwork'].includes(id)) return 'collab';
-  return id || 'close';
-}
-
-function normalizeTone(id) {
-  if (['warm', 'roast', 'meme'].includes(id)) return 'warm_roast';
-  if (['realistic', 'reality'].includes(id)) return 'reality';
-  return id || 'warm_roast';
-}
-
+const POSTER_TEMPLATES = [
+  { id:'standard', title:'标准结果' }, { id:'xhs', title:'留白金句' }, { id:'roast', title:'吐槽版' }, { id:'invite', title:'邀请 TA' }
+];
+const QUESTIONS = [
+  { id:'reply', text:'回复消息', a:'看到就想回', b:'有空再集中回', patchA:{ intimacyNeed:8, securityNeed:5, emotionalExpression:4 }, patchB:{ independenceNeed:8, decisionSpeed:-5, emotionalExpression:-3 } },
+  { id:'conflict', text:'有矛盾时', a:'马上说清楚', b:'先冷静一下', patchA:{ conflictDirectness:12, decisionSpeed:6 }, patchB:{ conflictDirectness:-10, selfStability:5, emotionalExpression:-4 } },
+  { id:'comfort', text:'难过时希望对方', a:'先安慰我', b:'帮我分析问题', patchA:{ logicEmotion:10, intimacyNeed:7, emotionalExpression:5 }, patchB:{ logicEmotion:-12, controlNeed:4, conflictDirectness:3 } },
+  { id:'pace', text:'理想相处节奏', a:'高频分享', b:'彼此独立', patchA:{ intimacyNeed:12, extraversion:5, securityNeed:5 }, patchB:{ independenceNeed:12, intimacyNeed:-5 } },
+  { id:'plan', text:'做计划方式', a:'提前安排好', b:'到时候看情况', patchA:{ planningNeed:13, conscientiousness:8, securityNeed:4 }, patchB:{ planningNeed:-12, noveltyNeed:8, controlNeed:-6 } },
+  { id:'complaint', text:'表达不满时', a:'直接说出来', b:'委婉暗示 / 先憋着', patchA:{ conflictDirectness:12, authenticityNeed:7 }, patchB:{ conflictDirectness:-9, neuroticism:5, agreeableness:5 } }
+];
 const TRAIT_META = {
-  extraversion: { label: '社交能量', low: '内收慢热', high: '外放主动' },
-  openness: { label: '想象 / 开放', low: '现实稳妥', high: '抽象新鲜' },
-  agreeableness: { label: '共情合作', low: '理性锋利', high: '温和共情' },
-  conscientiousness: { label: '责任计划', low: '随性灵活', high: '计划明确' },
-  neuroticism: { label: '压力敏感', low: '情绪稳定', high: '细腻敏感' },
-  logicEmotion: { label: '理性 - 感性', low: '理性解决', high: '情绪感受' },
-  emotionalExpression: { label: '情绪表达', low: '先收起来', high: '直接写脸上' },
-  planningNeed: { label: '计划需求', low: '看情况再说', high: '提前安排' },
-  noveltyNeed: { label: '新鲜感需求', low: '稳定重复', high: '探索变化' },
-  intimacyNeed: { label: '亲密需求', low: '需要空间', high: '需要高频连接' },
-  independenceNeed: { label: '独立需求', low: '愿意依赖', high: '强边界感' },
-  conflictDirectness: { label: '冲突直接度', low: '先消化', high: '马上说清' },
-  decisionSpeed: { label: '决策速度', low: '谨慎观察', high: '快速推进' },
-  securityNeed: { label: '安全感需求', low: '不太焦虑', high: '需要确认' },
-  controlNeed: { label: '掌控需求', low: '开放协商', high: '想掌控节奏' },
-  authenticityNeed: { label: '真实表达', low: '场面优先', high: '真诚优先' },
-  selfStability: { label: '自我稳定度', low: '易波动', high: '自我稳定' }
+  extraversion:{label:'社交能量',low:'内收慢热',high:'外放主动'}, openness:{label:'想象 / 开放',low:'现实稳妥',high:'抽象新鲜'}, agreeableness:{label:'共情合作',low:'理性锋利',high:'温和共情'}, conscientiousness:{label:'责任计划',low:'随性灵活',high:'计划明确'}, neuroticism:{label:'压力敏感',low:'情绪稳定',high:'细腻敏感'}, logicEmotion:{label:'理性 - 感性',low:'理性解决',high:'情绪感受'}, emotionalExpression:{label:'情绪表达',low:'先收起来',high:'直接写脸上'}, planningNeed:{label:'计划需求',low:'看情况再说',high:'提前安排'}, noveltyNeed:{label:'新鲜感需求',low:'稳定重复',high:'探索变化'}, intimacyNeed:{label:'亲密需求',low:'需要空间',high:'需要高频连接'}, independenceNeed:{label:'独立需求',low:'愿意依赖',high:'强边界感'}, conflictDirectness:{label:'冲突直接度',low:'先消化',high:'马上说清'}, decisionSpeed:{label:'决策速度',low:'谨慎观察',high:'快速推进'}, securityNeed:{label:'安全感需求',low:'不太焦虑',high:'需要确认'}, controlNeed:{label:'掌控需求',low:'开放协商',high:'想掌控节奏'}, authenticityNeed:{label:'真实表达',low:'场面优先',high:'真诚优先'}, selfStability:{label:'自我稳定度',low:'易波动',high:'自我稳定'}
 };
-
-
 const TRAIT_COPY = {
-  extraversion: {
-    micro: '你们的社交电量只是轻微错拍：一个先靠近，一个先观察。刚刚好，不吵也不冷。',
-    visible: '一个靠互动充电，一个靠安静回血。别把沉默当冷淡，也别把热闹当打扰。',
-    strong: '一个像把灯打开，一个像把门轻轻带上。靠近会有火花，也需要给彼此留电量。',
-    bridge: '热闹的人少追问，安静的人多给一句回应。'
-  },
-  openness: {
-    micro: '一个多一点想象，一个多一点现实。不是路线相反，是看世界的镜头不一样。',
-    visible: '一个先看可能性，一个先看能不能落地。最好的状态是：别急着否定对方。',
-    strong: '一个在脑海里放烟花，一个在现实里搭地基。差异很大，但也很能互补。',
-    bridge: '先让灵感落座，再请现实把门。'
-  },
-  agreeableness: {
-    micro: '一个更顾及气氛，一个更习惯说清。你们都不是难相处，只是温柔的方式不同。',
-    visible: '一个先照顾感受，一个先指出问题。被误会时，别急着证明自己没错。',
-    strong: '一个怕话太重，一个怕问题被绕过去。话说出来之前，先让对方知道你不是来攻击的。',
-    bridge: '先表达善意，再表达不同。'
-  },
-  conscientiousness: {
-    micro: '一个更想提前准备，一个更能临场发挥。小差异会出现在约定、出门和 deadline 里。',
-    visible: '一个靠计划安心，一个靠弹性自在。谁都没错，只是安全感来源不同。',
-    strong: '一个心里有时间表，一个相信船到桥头自然直。能互补，也很容易互相着急。',
-    bridge: '把关键节点定住，把过程留给呼吸。'
-  },
-  neuroticism: {
-    micro: '你们的敏感点不一样：一个在意语气，一个在意不确定。小心别让小事变成心事。',
-    visible: '一个会多想一点，一个更容易放过。不是矫情，也不是冷漠。',
-    strong: '一个心里警报响得很快，一个还没意识到发生了什么。最需要的是解释，不是反驳。',
-    bridge: '先承认对方被触发了，再讨论事情本身。'
-  },
-  logicEmotion: {
-    micro: '一个更想要答案，一个更想要态度。差距不大，但安慰方式会不一样。',
-    visible: '一个在找解决方案，一个在等一句“我懂你”。两种在乎，别翻译错。',
-    strong: '一个打开理性频道，一个打开情绪频道。都在努力，但容易像没听见对方。',
-    bridge: '先问：你现在需要被抱住，还是一起想办法？'
-  },
-  emotionalExpression: {
-    micro: '一个表情更快，一个反应更慢。不是没感觉，是情绪抵达时间不同。',
-    visible: '一个把情绪写在脸上，一个先放进心里处理。最怕一个等回应，一个在沉默。',
-    strong: '一个像实时弹幕，一个像夜里才亮的灯。表达差异大，但不代表谁不在乎。',
-    bridge: '快的人别逼问，慢的人别消失。'
-  },
-  planningNeed: {
-    micro: '一个更想要方向，一个更愿意随机。差异轻，但会影响出行和约定。',
-    visible: '一个提前安排才安心，一个留点变化才舒服。你们需要的是“框架”，不是互相改造。',
-    strong: '一个需要日程表，一个需要呼吸感。太满会窒息，太空会焦虑。',
-    bridge: '定大事，松小事。'
-  },
-  noveltyNeed: {
-    micro: '一个更想换口味，一个更珍惜熟悉感。差距不大，但会影响约会和日常。',
-    visible: '一个想开新地图，一个想回舒适区。处理好是新鲜，处理不好是疲惫。',
-    strong: '一个需要火花，一个需要可预期。长期最怕一个无聊，一个被推着走。',
-    bridge: '保留稳定基地，再一起试一点新东西。'
-  },
-  intimacyNeed: {
-    micro: '一个更爱确认，一个更相信关系自然在。小差异也会影响回复频率。',
-    visible: '一个需要高频连接，一个需要私人空间。不是爱不爱，是靠近方式不同。',
-    strong: '一个越喜欢越想靠近，一个越在乎越怕失去空间。这里最容易互相误伤。',
-    bridge: '把陪伴和独处都说成需求，别说成指责。'
-  },
-  independenceNeed: {
-    micro: '你们都有边界，只是一个更愿意商量，一个更想先自己想清。',
-    visible: '一个希望被纳入生活，一个想保留自己的节奏。别把空间误会成疏远。',
-    strong: '一个要共同感，一个要个人领地。太近会压迫，太远会不安。',
-    bridge: '说“我需要空间”，也记得说“我还在”。'
-  },
-  conflictDirectness: {
-    micro: '一个更快开口，一个先观察。慢半拍不一定是逃避，可能是在整理。',
-    visible: '一个想马上说清，一个需要先冷静。吵架内容未必致命，时间差才致命。',
-    strong: '一个想当场修复，一个想先下线保命。没有规则，就会变成追和躲。',
-    bridge: '可以暂停，但要约定什么时候回来继续说。'
-  },
-  decisionSpeed: {
-    micro: '一个快一点，一个稳一点。小事无所谓，大事会放大差异。',
-    visible: '一个想推进，一个想多看一眼。快的人别催，慢的人也别让对方一直等。',
-    strong: '一个已经按下启动键，一个还在读说明书。合作时很容易节奏打架。',
-    bridge: '小事快速授权，大事留确认窗口。'
-  },
-  securityNeed: {
-    micro: '你们都需要安全感，只是开关不同：一个要回应，一个要稳定感。',
-    visible: '一个需要确认，另一个默认“没说就是没事”。很多误会都发生在这里。',
-    strong: '一个反复确认才安心，一个确认太多会窒息。不是麻烦，是安全感语言不同。',
-    bridge: '把确认变成固定小动作，不要等到委屈爆炸。'
-  },
-  controlNeed: {
-    micro: '一个更想定规则，一个更愿意协商。差异不大，但会影响谁来拍板。',
-    visible: '一个想握住节奏，一个讨厌被安排。冲突常常不是事，而是谁说了算。',
-    strong: '一个靠掌控安心，一个靠自由呼吸。处理不好，合作会变成拉扯。',
-    bridge: '按领域分主导权，不要所有事都抢方向盘。'
-  },
-  authenticityNeed: {
-    micro: '你们都重视真，只是一个更直接，一个更看场合。',
-    visible: '一个讨厌表演感，一个先顾及体面。容易被误会成“不够真”或“太冲”。',
-    strong: '一个宁愿难听也要真，一个宁愿缓一点也要体面。真诚也需要温度。',
-    bridge: '说真话，但别把真话说成刀。'
-  },
-  selfStability: {
-    micro: '一个更容易被气氛带动，一个主轴更稳。差距不大，但能感觉到。',
-    visible: '一个跟着关系波动，一个有自己的锚。吸引点是稳定，摩擦点是理解速度。',
-    strong: '一个需要被稳住，一个怕被卷进情绪风暴。容易一个孤单，一个很累。',
-    bridge: '稳定的人多给温度，波动的人说清需要。'
-  }
+  extraversion:{micro:'你们只是热闹开关不在同一档，不用把安静误会成冷淡。',visible:'一个靠互动充电，一个靠独处回血。靠近可以，但别忘了给彼此留电量。',strong:'一个像群聊发动机，一个像勿扰模式常驻。吸引是真的，耗电也是真的。',bridge:'热闹的人少追问，安静的人多给一句回应。'},
+  openness:{micro:'一个多一点想象，一个多一点现实；镜头不同，不代表方向相反。',visible:'一个先看可能性，一个先看能不能落地。别急着否定，对方可能在补你没看到的那半边。',strong:'一个在脑海里放烟花，一个在现实里搭地基。差异很大，但也很能互补。',bridge:'先让灵感落座，再请现实把门。'},
+  agreeableness:{micro:'一个更顾气氛，一个更想说清；两种温柔，表达顺序不同。',visible:'一个先照顾感受，一个先指出问题。别急着证明自己没错，先让对方知道你不是来攻击的。',strong:'一个怕话太重，一个怕问题被绕过去。你们需要的是“有温度地说真话”。',bridge:'先表达善意，再表达不同。'},
+  conscientiousness:{micro:'一个更想提前准备，一个更能临场发挥。小差异会出现在约定和 deadline 里。',visible:'一个靠计划安心，一个靠弹性自在。谁都没错，只是安全感来源不同。',strong:'一个心里有时间表，一个相信船到桥头自然直。能互补，也很容易互相着急。',bridge:'把关键节点定住，把过程留给呼吸。'},
+  neuroticism:{micro:'你们的敏感点不一样：一个在意语气，一个在意不确定。',visible:'一个会多想一点，一个更容易放过。不是矫情，也不是冷漠。',strong:'一个心里警报响得很快，一个还没意识到发生了什么。最需要的是解释，不是反驳。',bridge:'先承认对方被触发了，再讨论事情本身。'},
+  logicEmotion:{micro:'一个更想要答案，一个更想要态度。差距不大，但安慰方式会不一样。',visible:'一个在找解决方案，一个在等一句“我懂你”。两种在乎，别翻译错。',strong:'一个打开理性频道，一个打开情绪频道。都在努力，却容易像没听见对方。',bridge:'先问：你现在需要被抱住，还是一起想办法？'},
+  emotionalExpression:{micro:'一个表情更快，一个反应更慢。不是没感觉，是情绪抵达时间不同。',visible:'一个把情绪写在脸上，一个先放进心里处理。最怕一个等回应，一个在沉默。',strong:'一个像实时弹幕，一个像夜里才亮的灯。表达差异大，但不代表谁不在乎。',bridge:'快的人别逼问，慢的人别消失。'},
+  planningNeed:{micro:'一个更想要方向，一个更愿意随机。差异轻，但会影响出行和约定。',visible:'一个提前安排才安心，一个留点变化才舒服。你们需要的是框架，不是互相改造。',strong:'一个需要日程表，一个需要呼吸感。太满会窒息，太空会焦虑。',bridge:'定大事，松小事。'},
+  noveltyNeed:{micro:'一个更想换口味，一个更珍惜熟悉感。差距不大，但会影响日常选择。',visible:'一个想开新地图，一个想回舒适区。处理好是新鲜，处理不好是疲惫。',strong:'一个需要火花，一个需要可预期。长期最怕一个无聊，一个被推着走。',bridge:'保留稳定基地，再一起试一点新东西。'},
+  intimacyNeed:{micro:'一个更爱确认，一个更相信关系自然在。小差异也会影响回复频率。',visible:'一个需要高频连接，一个需要私人空间。不是爱不爱，是靠近方式不同。',strong:'一个越喜欢越想靠近，一个越在乎越怕失去空间。这里最容易互相误伤。',bridge:'把陪伴和独处都说成需求，别说成指责。'},
+  independenceNeed:{micro:'你们都有边界，只是一个更愿意商量，一个更想先自己想清。',visible:'一个希望被纳入生活，一个想保留自己的节奏。别把空间误会成疏远。',strong:'一个要共同感，一个要个人领地。太近会压迫，太远会不安。',bridge:'说“我需要空间”，也记得说“我还在”。'},
+  conflictDirectness:{micro:'一个更快开口，一个先观察。慢半拍不一定是逃避，可能是在整理。',visible:'一个想马上说清，一个需要先冷静。吵架内容未必致命，时间差才致命。',strong:'一个想当场修复，一个想先下线保命。没有规则，就会变成追和躲。',bridge:'可以暂停，但要约定什么时候回来继续说。'},
+  decisionSpeed:{micro:'一个快一点，一个稳一点。小事无所谓，大事会放大差异。',visible:'一个想推进，一个想多看一眼。快的人别催，慢的人也别让对方一直等。',strong:'一个已经按下启动键，一个还在读说明书。合作时很容易节奏打架。',bridge:'小事快速授权，大事留确认窗口。'},
+  securityNeed:{micro:'你们都需要安全感，只是开关不同：一个要回应，一个要稳定感。',visible:'一个需要确认，另一个默认“没说就是没事”。很多误会都发生在这里。',strong:'一个反复确认才安心，一个确认太多会窒息。不是麻烦，是安全感语言不同。',bridge:'把确认变成固定小动作，不要等到委屈爆炸。'},
+  controlNeed:{micro:'一个更想定规则，一个更愿意协商。差异不大，但会影响谁来拍板。',visible:'一个想握住节奏，一个讨厌被安排。冲突常常不是事，而是谁说了算。',strong:'一个靠掌控安心，一个靠自由呼吸。处理不好，合作会变成拉扯。',bridge:'按领域分主导权，不要所有事都抢方向盘。'},
+  authenticityNeed:{micro:'你们都重视真，只是一个更直接，一个更看场合。',visible:'一个讨厌表演感，一个先顾及体面。容易被误会成“不够真”或“太冲”。',strong:'一个宁愿难听也要真，一个宁愿缓一点也要体面。真诚也需要温度。',bridge:'说真话，但别把真话说成刀。'},
+  selfStability:{micro:'一个更容易被气氛带动，一个主轴更稳。差距不大，但能感觉到。',visible:'一个跟着关系波动，一个有自己的锚。吸引点是稳定，摩擦点是理解速度。',strong:'一个需要被稳住，一个怕被卷进情绪风暴。容易一个孤单，一个很累。',bridge:'稳定的人多给温度，波动的人说清需要。'}
 };
-
-const BAND_LABELS = {
-  micro: '轻微差异',
-  visible: '明显差异',
-  strong: '强差异'
-};
-
-const RELATION_KEYWORD_BANK = {
-  close: ['心动错频', '情绪翻译', '嘴硬心软', '靠近感', '边界感', '慢慢靠近', '被看见', '留一点余地', '温柔对齐', '有话好好说'],
-  collab: ['分工感', '推进力', '边界清楚', '互相补位', '低内耗', '谁来拍板', 'DDL救援', '靠谱搭子', '节奏对齐', '一起把事做成'],
-  highRisk: ['易误读', '要规则', '先别脑补', '别冷处理', '别用沉默惩罚', '把需求说出来'],
-  highSync: ['同频', '默契', '低消耗', '不用解释太多', '懂半句', '松弛感'],
-  highComplement: ['互补', '反差', '补位', '彼此照亮', '互相托底', '刚好相反']
-};
-
-const POETRY_SIGNS = [
-  { id: 'lingxi', quote: '心有灵犀一点通', source: '李商隐《无题》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 72, meaning: '有些话不用讲太满，你们也能接住半句。' },
-  { id: 'jinfenyulu', quote: '金风玉露一相逢，便胜却人间无数', source: '秦观《鹊桥仙》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 74, meaning: '吸引来自反差，不是复制粘贴的相似。' },
-  { id: 'jiuchangshi', quote: '两情若是久长时，又岂在朝朝暮暮', source: '秦观《鹊桥仙》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.conflictRepair >= 68, meaning: '关系不靠时刻黏住，靠稳定回应。' },
-  { id: 'zhangjiangtou', quote: '我住长江头，君住长江尾', source: '李之仪《卜算子》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 50, meaning: '距离有时不是远，是表达节奏没递到。' },
-  { id: 'zhiji', quote: '海内存知己，天涯若比邻', source: '王勃《送杜少府之任蜀州》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.similarity >= 64 && metrics.risk < 55, meaning: '真正同频，不需要天天绑定。' },
-  { id: 'xiangzhi', quote: '结交在相知，骨肉何必亲', source: '两汉佚名《箜篌谣》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 64, meaning: '亲近感不是靠身份，是靠真的懂一点。' },
-  { id: 'taohua', quote: '桃花潭水深千尺，不及汪伦送我情', source: '李白《赠汪伦》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 70, meaning: '你们的情义感，比表面看起来更深。' },
-  { id: 'tianya', quote: '同是天涯沦落人，相逢何必曾相识', source: '白居易《琵琶行》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.risk >= 58, meaning: '你们可能不是一路人，却很容易在某个时刻懂对方。' },
-  { id: 'qingmei', quote: '郎骑竹马来，绕床弄青梅', source: '李白《长干行》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 68 && metrics.complementarity < 62, meaning: '熟悉感很强，不猛烈，但很自然。' },
-  { id: 'cangshan', quote: '曾经沧海难为水，除却巫山不是云', source: '元稹《离思》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 72 && metrics.risk < 55, meaning: '有些关系的记忆点很深，轻易替代不了。' },
-  { id: 'yuanxi', quote: '众里寻他千百度', source: '辛弃疾《青玉案·元夕》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 70 && metrics.risk < 65, meaning: '你们的吸引不是喧闹，是突然对上眼。' },
-  { id: 'renjiu', quote: '人生得一知己足矣', source: '鲁迅赠瞿秋白联语', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 70, meaning: '这段关系贵在被理解，而不只是热闹。' },
-  { id: 'tongpao', quote: '岂曰无衣？与子同袍', source: '《诗经·秦风·无衣》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 68, meaning: '你们适合并肩作战，但要把战术说清。' },
-  { id: 'qianli', quote: '欲穷千里目，更上一层楼', source: '王之涣《登鹳雀楼》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.complementarity >= 68, meaning: '一个补视野，一个补行动，合作会打开新高度。' },
-  { id: 'changfeng', quote: '长风破浪会有时，直挂云帆济沧海', source: '李白《行路难》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 70 && metrics.risk < 60, meaning: '这组搭档适合冲，但别忘了定航线。' },
-  { id: 'xuehai', quote: '纸上得来终觉浅，绝知此事要躬行', source: '陆游《冬夜读书示子聿》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.communicationFit >= 60, meaning: '别只讨论，做起来才知道谁该负责什么。' },
-  { id: 'shanhe', quote: '山重水复疑无路，柳暗花明又一村', source: '陆游《游山西村》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.risk >= 55, meaning: '现在有点卡，不代表没有转圜。换一种说法，路就会出来。' },
-  { id: 'huanghun', quote: '月上柳梢头，人约黄昏后', source: '欧阳修《生查子·元夕》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 60 && metrics.risk < 58, meaning: '这段关系的可爱，在那些愿意赴约的小瞬间。' },
-  { id: 'caishang', quote: '愿得一心人，白头不相离', source: '卓文君《白头吟》', type: 'poem', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.longTermComfort >= 68, meaning: '如果要走远，最重要的是稳定和真心。' },
-  { id: 'pengyou', quote: '莫愁前路无知己，天下谁人不识君', source: '高适《别董大》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 62, meaning: '你们能给彼此底气，不只是陪伴，也是鼓励。' },
-  { id: 'heyue', quote: '相知无远近，万里尚为邻', source: '张九龄《送韦城李少府》', type: 'poem', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.similarity >= 60 && metrics.risk < 62, meaning: '真正舒服的关系，不会被距离和频率轻易冲散。' },
-  { id: 'xueyou', quote: '独学而无友，则孤陋而寡闻', source: '《礼记·学记》', type: 'poem', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.communicationFit >= 62, meaning: '这组搭档的价值，是互相补盲区。' }
+const BAND_LABELS = { micro:'轻微差异', visible:'明显差异', strong:'强差异' };
+const RELATION_KEYWORD_BANK = { close:['心动错频','情绪翻译','嘴硬心软','靠近感','边界感','慢慢靠近','被看见','温柔对齐'], collab:['分工感','推进力','边界清楚','互相补位','低内耗','DDL救援','靠谱搭子','一起把事做成'], highRisk:['易误读','要规则','先别脑补','别冷处理','把需求说出来'], highSync:['同频','默契','低消耗','不用解释太多','懂半句','松弛感'], highComplement:['互补','反差','补位','彼此照亮','互相托底','刚好相反'] };
+const SIGNS = [
+  {id:'lingxi',quote:'心有灵犀一点通',source:'李商隐《无题》',type:'poem',ctx:['close'],fit:m=>m.similarity>=72,meaning:'有些话不用讲太满，你们也能接住半句。'},
+  {id:'jinfenyulu',quote:'金风玉露一相逢，便胜却人间无数',source:'秦观《鹊桥仙》',type:'poem',ctx:['close'],fit:m=>m.complementarity>=74,meaning:'吸引来自反差，不是复制粘贴的相似。'},
+  {id:'hainei',quote:'海内存知己，天涯若比邻',source:'王勃《送杜少府之任蜀州》',type:'poem',ctx:['close','collab'],fit:m=>m.similarity>=64&&m.risk<55,meaning:'真正同频，不需要天天绑定。'},
+  {id:'tongpao',quote:'岂曰无衣？与子同袍',source:'《诗经·秦风·无衣》',type:'poem',ctx:['collab'],fit:m=>m.dimensions.goalFit>=68,meaning:'你们适合并肩作战，但要把战术说清。'},
+  {id:'changfeng',quote:'长风破浪会有时，直挂云帆济沧海',source:'李白《行路难》',type:'poem',ctx:['collab'],fit:m=>m.dimensions.goalFit>=70&&m.risk<60,meaning:'这组搭档适合冲，但别忘了定航线。'},
+  {id:'shanchong',quote:'山重水复疑无路，柳暗花明又一村',source:'陆游《游山西村》',type:'poem',ctx:['close','collab'],fit:m=>m.risk>=55,meaning:'现在有点卡，不代表没有转圜。换一种说法，路就会出来。'},
+  {id:'xueyou',quote:'独学而无友，则孤陋而寡闻',source:'《礼记·学记》',type:'poem',ctx:['collab'],fit:m=>m.dimensions.communicationFit>=62,meaning:'这组搭档的价值，是互相补盲区。'},
+  {id:'qingtian',quote:'《晴天》',source:'周杰伦',type:'song',ctx:['close'],fit:m=>m.risk>=54,meaning:'像一场有点遗憾的心动：明明靠近，却总差一句好好说。'},
+  {id:'yu-jian',quote:'《遇见》',source:'孙燕姿',type:'song',ctx:['close'],fit:m=>m.complementarity>=65,meaning:'像一次刚好撞上的交集，未必完美，但很难忽略。'},
+  {id:'hao-jiu',quote:'《好久不见》',source:'陈奕迅',type:'song',ctx:['close'],fit:m=>m.risk>=62,meaning:'拉扯感强，像有话没说完。'},
+  {id:'guanghui',quote:'《光辉岁月》',source:'Beyond',type:'song',ctx:['collab'],fit:m=>m.dimensions.goalFit>=70,meaning:'适合一起扛目标，但别把热血用成互相压迫。'},
+  {id:'pingfan',quote:'《平凡之路》',source:'朴树',type:'song',ctx:['collab'],fit:m=>m.risk<58,meaning:'不一定轰动，但能把路一步步走出来。'}
 ];
-
-const MODERN_SONG_SIGNS = [
-  { id: 'qing-tian', quote: '《晴天》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 54, meaning: '像一场有点遗憾的心动：明明靠近，却总差一句好好说。' },
-  { id: 'qi-li-xiang', quote: '《七里香》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 68, meaning: '舒服感不靠大场面，靠那些细小但有画面的瞬间。' },
-  { id: 'jian-dan-ai', quote: '《简单爱》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk < 45, meaning: '适合少一点猜，多一点直接表达。简单反而更稳。' },
-  { id: 'yu-jian', quote: '《遇见》', source: '孙燕姿', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 65, meaning: '像一次刚好撞上的交集，未必完美，但很难忽略。' },
-  { id: 'hong-dou', quote: '《红豆》', source: '王菲', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 68, meaning: '有些在意不吵闹，但会反复出现。' },
-  { id: 'hao-jiu-bu-jian', quote: '《好久不见》', source: '陈奕迅', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 62, meaning: '拉扯感强，像有话没说完。' },
-  { id: 'wen-wen-de-xing-fu', quote: '《稳稳的幸福》', source: '陈奕迅', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk < 42 && metrics.similarity >= 60, meaning: '最打动人的地方，是低内耗的安心。' },
-  { id: 'zhi-zu', quote: '《知足》', source: '五月天', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 60 && metrics.risk < 58, meaning: '节奏未必一样，但能学会珍惜对方的存在。' },
-  { id: 'xiao-qing-ge', quote: '《小情歌》', source: '苏打绿', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 62, meaning: '温柔不一定大声，愿意靠近就已经很珍贵。' },
-  { id: 'xiao-jiu-wo', quote: '《小酒窝》', source: '林俊杰 / 蔡卓妍', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.similarity >= 65 && metrics.risk < 55, meaning: '甜不是轰轰烈烈，是能让人放松下来的可爱。' },
-  { id: 'tu-ran-hao-xiang-ni', quote: '《突然好想你》', source: '五月天', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 56, meaning: '越是错频，越容易在某个瞬间突然想起对方。' },
-  { id: 'duo-yuan', quote: '《多远都要在一起》', source: 'G.E.M. 邓紫棋', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.conflictRepair >= 65, meaning: '只要愿意修复，距离和节奏都不是最大问题。' },
-  { id: 'guang-hui-sui-yue', quote: '《光辉岁月》', source: 'Beyond', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 70, meaning: '适合一起扛目标，但别把热血用成互相压迫。' },
-  { id: 'ping-fan-zhi-lu', quote: '《平凡之路》', source: '朴树', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.risk < 58, meaning: '不一定轰动，但能把路一步步走出来。' },
-  { id: 'qi-feng-le', quote: '《起风了》', source: '买辣椒也用券', type: 'song', contexts: ['collab', 'close'], fit: ({ metrics }) => metrics.complementarity >= 60, meaning: '像风向不同的人，刚好在某个节点并肩。' },
-  { id: 'dao-xiang', quote: '《稻香》', source: '周杰伦', type: 'song', contexts: ['close', 'collab'], fit: ({ metrics }) => metrics.risk < 52, meaning: '适合把复杂关系过简单一点，别忘了最初舒服的感觉。' },
-  { id: 'fu-kuai', quote: '《富士山下》', source: '陈奕迅', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 64, meaning: '适合提醒你们：有些拉扯要温柔放下，不要互相消耗。' },
-  { id: 'ai-hen-jian-dan', quote: '《爱很简单》', source: '陶喆', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.dimensions.emotionalSync >= 68 && metrics.risk < 50, meaning: '别把喜欢弄得太复杂，真诚回应就够有力量。' },
-  { id: 'hou-lai', quote: '《后来》', source: '刘若英', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 66, meaning: '如果不想变成遗憾，就别把重要的话一直往后放。' },
-  { id: 'dang-ni', quote: '《当你》', source: '王心凌', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.intimacyNeed >= 0 || metrics.similarity >= 0, meaning: '有些在意藏不住，越轻描淡写越明显。' },
-  { id: 'zui-chang', quote: '《最长的电影》', source: '周杰伦', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.risk >= 58, meaning: '这段关系不一定轻松，但很有画面，也很难一句话讲完。' },
-  { id: 'lan-lian-hua', quote: '《蓝莲花》', source: '许巍', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.dimensions.goalFit >= 64, meaning: '适合一起往前走，别在小分歧里忘了大方向。' },
-  { id: 'sheng-huo-bu-zhi', quote: '《生活不止眼前的苟且》', source: '许巍', type: 'song', contexts: ['collab'], fit: ({ metrics }) => metrics.complementarity >= 62, meaning: '你们适合互相提醒：别只盯眼前，也别只谈理想。' },
-  { id: 'guang-nian-zhi-wai', quote: '《光年之外》', source: 'G.E.M. 邓紫棋', type: 'song', contexts: ['close'], fit: ({ metrics }) => metrics.complementarity >= 72, meaning: '反差很强，像两种轨道突然靠近。好看，也需要稳定引力。' }
+const RELATION_TYPES = [
+  {id:'stable',title:'稳定同频型',keywords:['默契','低消耗','慢慢升温'],when:(m,c)=>m.similarity>78&&m.risk<34,summary:'你们的相处方式比较接近，很多事情不用解释太多就能懂。'},
+  {id:'high-friction',title:'高吸引高摩擦型',keywords:['反差吸引','容易上头','需要翻译'],when:m=>m.complementarity>74&&m.risk>54,summary:'你们容易被差异吸引，也容易被差异触发。关键不是改造对方，而是学会互相翻译。'},
+  {id:'growth',title:'互补成长型',keywords:['互补','成长','彼此补位'],when:m=>m.complementarity>72&&m.risk<50,summary:'你们不是完全相同，但差异大多落在可以互相补位的区间。'},
+  {id:'soul',title:'灵魂共振型',keywords:['同频','被理解','有回声'],when:m=>m.dimensions.emotionalSync>78&&m.similarity>70,summary:'你们容易在情绪和想法上接住彼此，像半句话也能被听懂。'},
+  {id:'contrast',title:'反差吸引型',keywords:['反差','新鲜','互相好奇'],when:m=>m.complementarity>70&&m.similarity<62,summary:'你们不是一眼同类，但差异带来的新鲜感很明显。'},
+  {id:'drag',title:'上头但容易拖延型',keywords:['心动','拖延','要推进'],when:m=>m.dimensions.emotionalSync>70&&m.dimensions.goalFit<56,summary:'氛围能起来，但事情未必能往前走；需要有人负责落地。'},
+  {id:'efficient',title:'高效搭档型',keywords:['目标感','分工清楚','能出活'],when:(m,c)=>c==='collab'&&m.dimensions.goalFit>74&&m.dimensions.communicationFit>68&&m.risk<52,summary:'你们适合一起完成具体任务：一个推进，一个补位。'},
+  {id:'comfort-stuck',title:'舒适但停滞型',keywords:['舒服','同类感','需要新鲜'],when:m=>m.similarity>67&&m.complementarity<58,summary:'相处不太费劲，但也容易因为太舒服而少了主动表达。'},
+  {id:'consume',title:'拉扯消耗型',keywords:['节奏不同','容易误会','需要边界'],when:m=>m.risk>66||m.total<54,summary:'你们的差异不小，尤其要小心把表达方式误读成态度问题。'},
+  {id:'charge-backup',title:'一个冲锋一个兜底型',keywords:['冲锋','兜底','节奏分工'],when:(m,c,d)=>m.complementarity>68&&m.dimensions.goalFit>62,summary:'一个适合打开局面，一个适合稳住后方；角色说清会很强。'},
+  {id:'mind-sync-life-miss',title:'精神同频生活错频型',keywords:['精神同频','节奏错拍','要规则'],when:m=>m.dimensions.emotionalSync>70&&m.dimensions.lifestyleFit<58,summary:'想法能对上，但日常节奏未必同拍；小事需要约法三章。'},
+  {id:'hard-soft',title:'嘴硬但离不开型',keywords:['嘴硬心软','有牵挂','别冷处理'],when:m=>m.risk>50&&m.dimensions.conflictRepair>58,summary:'容易嘴上不饶人，但关系并不浅；别让冷处理消耗在意。'},
+  {id:'slow-warm',title:'慢热稳定型',keywords:['慢热','稳定','低内耗'],when:m=>m.similarity>62&&m.risk<45,summary:'这不是一眼炸开的火花，而是慢慢变稳的关系。'},
+  {id:'spark',title:'火花碰撞型',keywords:['火花','碰撞','有张力'],when:m=>m.complementarity>76&&m.risk>=45&&m.risk<=65,summary:'你们之间有火花，也有棱角；说清楚就会亮，憋着就会刺。'},
+  {id:'emotion-translate',title:'情绪翻译困难型',keywords:['情绪翻译','容易错频','先接住'],when:m=>m.dimensions.emotionalSync<58,summary:'很多卡点不是没感情，而是情绪没有被正确接住。'},
+  {id:'heal',title:'互相治愈型',keywords:['被看见','托底','慢慢变好'],when:m=>m.dimensions.emotionalSync>68&&m.dimensions.longTermComfort>68&&m.risk<55,summary:'这段关系的价值在于能给彼此一点松弛和底气。'},
+  {id:'fight-return',title:'吵归吵能回来型',keywords:['会修复','能回来','别上头'],when:m=>m.risk>48&&m.dimensions.conflictRepair>62,summary:'你们未必不吵，但只要愿意回到对话里，就还有修复空间。'},
+  {id:'crazy',title:'适合一起发疯型',keywords:['有梗','高能','别失控'],when:m=>m.dimensions.lifestyleFit>64&&m.complementarity>62,summary:'适合制造快乐和新鲜感，但重大决定别只靠上头。'},
+  {id:'chat-not-live',title:'适合聊天不适合同住型',keywords:['聊天舒服','生活要规则','边界感'],when:(m,c)=>c==='close'&&m.dimensions.communicationFit>68&&m.dimensions.lifestyleFit<56,summary:'聊天能对上，但生活节奏要提前说清，不然容易被小事磨掉耐心。'},
+  {id:'project-not-trip',title:'适合做项目不适合旅行型',keywords:['能做事','旅行易错频','分工先行'],when:(m,c)=>c==='collab'&&m.dimensions.goalFit>70&&m.dimensions.lifestyleFit<58,summary:'一起做事有价值，但轻松相处要多一点弹性和照顾。'},
+  {id:'default',title:'差异吸引型',keywords:['有反差','能互补','要磨合'],when:()=>true,summary:'你们不是一眼同频的组合，但差异也不是坏事。理解了是互补，不理解就会变成内耗。'}
 ];
-
-const RELATION_SIGNS = [...POETRY_SIGNS, ...MODERN_SONG_SIGNS];
-
-
-function expandKeywords(classification, metrics, differences, context) {
-  const base = [...classification.keywords];
-  const ctx = normalizeContext(context);
-  const top = differences[0]?.key;
-  const pool = [
-    ...(RELATION_KEYWORD_BANK[ctx] || []),
-    ...(metrics.risk > 56 ? RELATION_KEYWORD_BANK.highRisk : []),
-    ...(metrics.similarity > 70 ? RELATION_KEYWORD_BANK.highSync : []),
-    ...(metrics.complementarity > 70 ? RELATION_KEYWORD_BANK.highComplement : [])
-  ];
-  const traitWords = {
-    emotionalExpression: ['情绪错频', '需要回应'],
-    intimacyNeed: ['靠近/留白', '陪伴频率'],
-    planningNeed: ['计划差', '节奏要对齐'],
-    conflictDirectness: ['吵架时差', '修复规则'],
-    logicEmotion: ['答案/态度', '先哄再讲理'],
-    independenceNeed: ['边界感', '空间需求'],
-    noveltyNeed: ['新鲜感', '稳定区']
-  }[top] || [];
-  return [...new Set([...base, ...traitWords, ...pool])].slice(0, 6);
-}
-
-function pickPoetrySign(metrics, context, differences) {
-  const ctx = normalizeContext(context);
-  const pool = RELATION_SIGNS.filter(item => item.contexts.includes(ctx));
-  const top = differences[0]?.key || '';
-  const songKeys = ['emotionalExpression', 'intimacyNeed', 'securityNeed', 'conflictDirectness', 'noveltyNeed', 'extraversion', 'logicEmotion'];
-  const preferSong = ctx === 'close' && (songKeys.includes(top) || metrics.complementarity >= 62 || metrics.risk >= 46);
-  const preferred = pool.filter(item => preferSong ? item.type === 'song' : item.type === 'poem');
-  return preferred.find(item => item.fit({ metrics, differences, context: ctx }))
-    || (preferSong ? preferred[0] : null)
-    || pool.find(item => item.fit({ metrics, differences, context: ctx }))
-    || RELATION_SIGNS.find(item => item.id === 'zhiji');
-}
-
-function buildFinalRemark(metrics, classification, differences, context, tone) {
-  const main = differences[0];
-  const reality = normalizeTone(tone) === 'reality';
-  const ctx = normalizeContext(context);
-  if (reality) {
-    if (metrics.risk >= 62) return `最终评语：你们不是不合，是太容易把「${main?.label || '差异'}」听成态度。把需要讲清楚，很多误伤就不会绕远路。`;
-    if (ctx === 'collab') return '最终评语：你们不用变得一样。把边界、分工和反馈方式说清楚，默契就会慢慢长出来。';
-    return '最终评语：这段关系最需要的不是证明谁在乎，而是少一点猜测，多一点坦白、也多一点温柔。';
-  }
-  if (classification.title.includes('高吸引')) return '最终评语：你们像两种很亮的颜色靠近，漂亮是真的，刺眼也可能是真的。愿意彼此调色，就会很好看。';
-  if (classification.title.includes('稳定')) return '最终评语：你们的好不是轰轰烈烈，是日常里那些不用解释太多、却有人愿意懂的瞬间。';
-  if (metrics.complementarity >= 70) return '最终评语：你们的差异不是问题本身，真正重要的是愿不愿意把差异变成照顾，而不是变成指责。';
-  return '最终评语：你们不必完全同频。错频的时候，还愿意停下来听一听，就已经很珍贵。';
-}
-
-
-function gapBand(value) {
-  if (value < 18) return 'micro';
-  if (value < 38) return 'visible';
-  return 'strong';
-}
-
-function traitCopy(key, band) {
-  const fallback = {
-    micro: '你们在这个维度上只是轻微不同，更像习惯差异，不必上升成性格不合。',
-    visible: '这个差异已经会影响你们的日常互动，越早说清规则，越不容易误会。',
-    strong: '这个差异是关系里很明显的触发点，需要用规则和翻译来保护彼此。',
-    bridge: '先把差异说成需求，再一起讨论怎么配合。'
-  };
-  return TRAIT_COPY[key] || fallback;
-}
-
-const WEIGHTS_BY_CONTEXT = {
-  close: {
-    emotionalSync: 0.24,
-    communicationFit: 0.20,
-    lifestyleFit: 0.12,
-    goalFit: 0.08,
-    conflictRepair: 0.22,
-    growthComplementarity: 0.14
-  },
-  collab: {
-    emotionalSync: 0.10,
-    communicationFit: 0.22,
-    lifestyleFit: 0.15,
-    goalFit: 0.23,
-    conflictRepair: 0.16,
-    growthComplementarity: 0.14
-  }
-};
-
-let state = {
-  context: 'close',
-  tone: 'warm_roast',
-  lastReport: null,
-  lastAnalyticsPayload: null,
-  posterPromise: null
-};
-
-const clamp = (n, min = 0, max = 100) => Math.max(min, Math.min(max, n));
-const round = (n) => Math.round(clamp(n));
-const avg = (arr) => arr.reduce((sum, x) => sum + x, 0) / Math.max(arr.length, 1);
-const gap = (a, b, key) => Math.abs((a[key] ?? 50) - (b[key] ?? 50));
-const scoreFromGap = (g, scale = 1.18) => clamp(100 - g * scale);
-const idealGapScore = (g, ideal, scale = 1.65) => clamp(100 - Math.abs(g - ideal) * scale);
-const signedLabel = (v, key) => v >= 50 ? TRAIT_META[key].high : TRAIT_META[key].low;
-
-function getSessionId() {
-  try {
-    const key = 'pairAuraSessionId';
-    let id = localStorage.getItem(key);
-    if (!id) {
-      id = `pa_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
-      localStorage.setItem(key, id);
-    }
-    return id;
-  } catch {
-    return `pa_${Date.now().toString(36)}`;
-  }
-}
-
-function usageConsentEnabled() {
-  const el = document.getElementById('usageConsent');
-  return !el || Boolean(el.checked);
-}
-
-function anonymizeInputs(inputs = {}) {
-  return {
-    context: normalizeContext(inputs.context),
-    tone: normalizeTone(inputs.tone),
-    mbtiA: inputs.mbtiA || '',
-    mbtiB: inputs.mbtiB || '',
-    identityA: inputs.identityA || '',
-    identityB: inputs.identityB || '',
-    sbtiA: inputs.sbtiA || '',
-    sbtiB: inputs.sbtiB || '',
-    hasNicknameA: Boolean(inputs.nameA && inputs.nameA !== 'A'),
-    hasNicknameB: Boolean(inputs.nameB && inputs.nameB !== 'B')
-  };
-}
-
-function buildAnalyticsPayload(eventName, report = state.lastReport, extra = {}) {
-  const metrics = report?.metrics || {};
-  const classification = report?.classification || {};
-  const differences = report?.differences || [];
-  return {
-    version: APP_VERSION,
-    event: eventName,
-    sessionId: getSessionId(),
-    timestamp: new Date().toISOString(),
-    urlPath: location.pathname,
-    viewport: { width: window.innerWidth, height: window.innerHeight },
-    input: anonymizeInputs(report?.inputs || collectInputsSafe()),
-    result: report ? {
-      title: classification.title || '',
-      score: round(metrics.total || 0),
-      similarity: round(metrics.similarity || 0),
-      complementarity: round(metrics.complementarity || 0),
-      risk: round(metrics.risk || 0),
-      keywords: (classification.keywords || []).slice(0, 5),
-      signType: report.poetry?.type || '',
-      signId: report.poetry?.id || '',
-      topDifferences: differences.slice(0, 3).map(item => ({ key: item.key, label: item.label, gap: item.gap, band: item.band }))
-    } : null,
-    extra
-  };
-}
-
-function collectInputsSafe() {
-  try { return collectInputs(); }
-  catch { return { context: state.context, tone: state.tone }; }
-}
-
-async function recordUsageEvent(eventName, report = state.lastReport, extra = {}) {
-  const payload = buildAnalyticsPayload(eventName, report, extra);
-  state.lastAnalyticsPayload = payload;
-  try {
-    const localLog = JSON.parse(localStorage.getItem('pairAuraLocalEvents') || '[]');
-    localLog.push(payload);
-    localStorage.setItem('pairAuraLocalEvents', JSON.stringify(localLog.slice(-30)));
-  } catch {}
-  if (!ANALYTICS_ENDPOINT || !usageConsentEnabled()) return;
-  try {
-    const body = JSON.stringify(payload);
-    if (navigator.sendBeacon) {
-      const ok = navigator.sendBeacon(ANALYTICS_ENDPOINT, new Blob([body], { type: 'application/json' }));
-      if (ok) return;
-    }
-    await fetch(ANALYTICS_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, mode: 'no-cors', keepalive: true });
-  } catch (err) {
-    console.warn('匿名数据回传失败', err);
-  }
-}
-
-function getBaseVector() {
-  return {
-    extraversion: 50,
-    openness: 50,
-    agreeableness: 50,
-    conscientiousness: 50,
-    neuroticism: 50,
-    logicEmotion: 50,
-    emotionalExpression: 50,
-    planningNeed: 50,
-    noveltyNeed: 50,
-    intimacyNeed: 50,
-    independenceNeed: 50,
-    conflictDirectness: 50,
-    decisionSpeed: 50,
-    securityNeed: 50,
-    controlNeed: 50,
-    authenticityNeed: 50,
-    selfStability: 50
-  };
-}
-
-function addToVector(vector, patch) {
-  Object.entries(patch).forEach(([key, value]) => {
-    vector[key] = clamp((vector[key] ?? 50) + value);
-  });
-  return vector;
-}
-
-function buildMbtiVector(type, identity = 'unknown') {
-  const v = getBaseVector();
-  const letters = String(type || '').toUpperCase().split('');
-  const [ei, sn, tf, jp] = letters;
-
-  if (ei === 'E') addToVector(v, { extraversion: 30, conflictDirectness: 7, intimacyNeed: 8, independenceNeed: -8 });
-  if (ei === 'I') addToVector(v, { extraversion: -28, conflictDirectness: -4, intimacyNeed: -6, independenceNeed: 12 });
-
-  if (sn === 'N') addToVector(v, { openness: 30, noveltyNeed: 24, conscientiousness: -4, authenticityNeed: 7 });
-  if (sn === 'S') addToVector(v, { openness: -22, noveltyNeed: -16, conscientiousness: 8, securityNeed: 6 });
-
-  if (tf === 'F') addToVector(v, { agreeableness: 24, logicEmotion: 25, emotionalExpression: 18, neuroticism: 8, securityNeed: 6, authenticityNeed: 8 });
-  if (tf === 'T') addToVector(v, { agreeableness: -14, logicEmotion: -24, conflictDirectness: 8, decisionSpeed: 8, emotionalExpression: -10 });
-
-  if (jp === 'J') addToVector(v, { conscientiousness: 26, planningNeed: 28, decisionSpeed: 12, controlNeed: 12, noveltyNeed: -8 });
-  if (jp === 'P') addToVector(v, { conscientiousness: -20, planningNeed: -24, decisionSpeed: -5, controlNeed: -8, noveltyNeed: 12 });
-
-  const role = type.slice(1, 3);
-  if (role === 'NT') addToVector(v, { controlNeed: 6, independenceNeed: 8, intimacyNeed: -4 });
-  if (role === 'NF') addToVector(v, { authenticityNeed: 10, emotionalExpression: 8, intimacyNeed: 8 });
-  if (role === 'SJ') addToVector(v, { securityNeed: 10, selfStability: 8, noveltyNeed: -6 });
-  if (role === 'SP') addToVector(v, { noveltyNeed: 10, decisionSpeed: 6, planningNeed: -5 });
-
-  if (identity === 'A') addToVector(v, { neuroticism: -18, selfStability: 20, securityNeed: -10, conflictDirectness: 4 });
-  if (identity === 'T') addToVector(v, { neuroticism: 18, selfStability: -16, securityNeed: 12, authenticityNeed: 4 });
-
-  return v;
-}
-
-const SBTI_VECTOR_PATCHES = {
-  'CTRL': { controlNeed: 24, planningNeed: 18, decisionSpeed: 12, conflictDirectness: 18, agreeableness: -8, securityNeed: 10 },
-  'LOVE-R': { intimacyNeed: 32, emotionalExpression: 24, neuroticism: 18, logicEmotion: 22, securityNeed: 20, independenceNeed: -16 },
-  'MONK': { independenceNeed: 30, intimacyNeed: -16, emotionalExpression: -18, selfStability: 16, extraversion: -18, conflictDirectness: -10 },
-  'SOLO': { independenceNeed: 28, extraversion: -14, intimacyNeed: -12, noveltyNeed: 8, selfStability: 6 },
-  'HHHH': { extraversion: 28, noveltyNeed: 18, emotionalExpression: 18, decisionSpeed: 12, conscientiousness: -8 },
-  'DEAD': { emotionalExpression: -22, neuroticism: 8, decisionSpeed: -18, extraversion: -18, selfStability: -6 },
-  'ZZZZ': { decisionSpeed: -22, planningNeed: -12, conflictDirectness: -16, independenceNeed: 10, emotionalExpression: -12 },
-  'OJBK': { planningNeed: -18, controlNeed: -16, agreeableness: 10, selfStability: 12, noveltyNeed: 10 },
-  'IMSB': { neuroticism: 26, securityNeed: 22, authenticityNeed: 14, emotionalExpression: 12, conflictDirectness: -8 },
-  'ATM-ER': { agreeableness: 26, intimacyNeed: 18, securityNeed: 8, independenceNeed: -18, selfStability: -8 },
-  'SHIT': { agreeableness: -22, conflictDirectness: 22, authenticityNeed: 18, controlNeed: 10, emotionalExpression: 6 },
-  'FIRE': { extraversion: 18, decisionSpeed: 24, conflictDirectness: 18, noveltyNeed: 14, neuroticism: 6 },
-  'ICE': { emotionalExpression: -24, logicEmotion: -18, selfStability: 22, conflictDirectness: -6, agreeableness: -6 },
-  'MOON': { neuroticism: 22, emotionalExpression: 20, openness: 18, intimacyNeed: 18, decisionSpeed: -8 },
-  'SUN': { extraversion: 30, agreeableness: 14, emotionalExpression: 20, selfStability: 10, intimacyNeed: 8 },
-  'CUBE': { planningNeed: 26, conscientiousness: 24, controlNeed: 14, noveltyNeed: -18, selfStability: 12 },
-  'FLOW': { planningNeed: -24, noveltyNeed: 20, controlNeed: -20, decisionSpeed: -4, openness: 14 },
-  'CAT': { independenceNeed: 28, intimacyNeed: -4, conflictDirectness: -8, authenticityNeed: 12, extraversion: -10 },
-  'DOG': { intimacyNeed: 26, agreeableness: 22, extraversion: 12, securityNeed: 10, independenceNeed: -18 },
-  'NPC': { agreeableness: 12, conflictDirectness: -16, extraversion: -10, selfStability: 8, controlNeed: -8 },
-  'BOSS': { controlNeed: 26, decisionSpeed: 24, conflictDirectness: 20, conscientiousness: 14, agreeableness: -8 },
-  'CLOWN': { extraversion: 24, emotionalExpression: 22, noveltyNeed: 18, neuroticism: -4, planningNeed: -12 },
-  'DIVA': { emotionalExpression: 28, authenticityNeed: 22, intimacyNeed: 18, conflictDirectness: 12, neuroticism: 14 },
-  'TANK': { selfStability: 24, conflictDirectness: 12, neuroticism: -16, planningNeed: 8, emotionalExpression: -6 },
-  'BUBBLE': { openness: 24, noveltyNeed: 20, intimacyNeed: 14, planningNeed: -18, selfStability: -8 },
-  'STONE': { selfStability: 26, emotionalExpression: -22, planningNeed: 10, extraversion: -12, conflictDirectness: -12 },
-  'WAVE': { neuroticism: 26, emotionalExpression: 24, logicEmotion: 18, intimacyNeed: 16, selfStability: -12 }
-};
-
-function buildSbtiVector(code) {
-  const v = getBaseVector();
-  const patch = SBTI_VECTOR_PATCHES[code] || {};
-  addToVector(v, patch);
-  return v;
-}
-
-function blendVectors(primary, secondary, primaryWeight, secondaryWeight) {
-  const out = getBaseVector();
-  Object.keys(out).forEach(key => {
-    out[key] = clamp((primary[key] ?? 50) * primaryWeight + (secondary[key] ?? 50) * secondaryWeight);
-  });
-  return out;
-}
-
-function buildPersona({ mbti, identity, sbti }) {
-  const hasMbti = Boolean(mbti);
-  const hasSbti = Boolean(sbti);
-  if (hasMbti && hasSbti) {
-    return {
-      vector: blendVectors(buildMbtiVector(mbti, identity), buildSbtiVector(sbti), 0.68, 0.32),
-      sourceCount: 2
-    };
-  }
-  if (hasMbti) return { vector: buildMbtiVector(mbti, identity), sourceCount: 1 };
-  if (hasSbti) return { vector: buildSbtiVector(sbti), sourceCount: 1 };
-  return { vector: getBaseVector(), sourceCount: 0 };
-}
-
-function calculateMetrics(vecA, vecB, context) {
-  const g = (key) => gap(vecA, vecB, key);
-  const primaryGaps = [
-    g('extraversion'), g('openness'), g('agreeableness'), g('conscientiousness'),
-    g('neuroticism'), g('planningNeed'), g('intimacyNeed'), g('independenceNeed'),
-    g('conflictDirectness'), g('decisionSpeed'), g('controlNeed'), g('selfStability')
-  ];
-  const averageGap = avg(primaryGaps);
-  const largeGapPenalty = primaryGaps.filter(x => x > 45).length * 4.5;
-  const similarity = clamp(100 - averageGap * 1.25 - largeGapPenalty);
-
-  const complementTargets = normalizeContext(context) === 'collab'
-    ? { extraversion: 22, logicEmotion: 28, planningNeed: 24, noveltyNeed: 24, decisionSpeed: 18, controlNeed: 18 }
-    : { extraversion: 18, logicEmotion: 24, planningNeed: 18, noveltyNeed: 20, independenceNeed: 18, emotionalExpression: 16 };
-  const compScores = Object.entries(complementTargets).map(([key, ideal]) => idealGapScore(g(key), ideal, 1.72));
-  const complementarity = clamp(avg(compScores));
-
-  const risk = clamp(
-    g('neuroticism') * 0.18 +
-    g('intimacyNeed') * 0.20 +
-    g('independenceNeed') * 0.14 +
-    g('planningNeed') * 0.16 +
-    g('conflictDirectness') * 0.16 +
-    g('logicEmotion') * 0.14 +
-    g('controlNeed') * 0.12 +
-    primaryGaps.filter(x => x > 52).length * 7
-  );
-  const conflictScore = clamp(100 - risk * 1.18);
-
-  const dimensions = {
-    emotionalSync: clamp(avg([
-      scoreFromGap(g('neuroticism'), 1.35),
-      scoreFromGap(g('intimacyNeed'), 1.25),
-      scoreFromGap(g('logicEmotion'), 1.05),
-      scoreFromGap(g('securityNeed'), 1.15)
-    ])),
-    communicationFit: clamp(avg([
-      scoreFromGap(g('emotionalExpression'), 1.12),
-      scoreFromGap(g('conflictDirectness'), 1.2),
-      scoreFromGap(g('logicEmotion'), 1.02),
-      scoreFromGap(g('agreeableness'), 0.95)
-    ])),
-    lifestyleFit: clamp(avg([
-      scoreFromGap(g('planningNeed'), 1.28),
-      scoreFromGap(g('noveltyNeed'), 1.08),
-      scoreFromGap(g('extraversion'), 0.98),
-      scoreFromGap(g('independenceNeed'), 1.1)
-    ])),
-    goalFit: clamp(avg([
-      scoreFromGap(g('conscientiousness'), 1.12),
-      scoreFromGap(g('decisionSpeed'), 1.05),
-      scoreFromGap(g('controlNeed'), 0.98),
-      scoreFromGap(g('authenticityNeed'), 0.8)
-    ])),
-    conflictRepair: conflictScore,
-    growthComplementarity: complementarity
-  };
-
-  const weights = WEIGHTS_BY_CONTEXT[normalizeContext(context)] || WEIGHTS_BY_CONTEXT.close;
-  const weightedTotal = Object.entries(weights).reduce((sum, [key, weight]) => sum + dimensions[key] * weight, 0);
-
-  // Expanded score distribution: total reflects friction more strongly and no longer clusters near 100.
-  const spreadAdjustment = (complementarity - 65) * 0.08 - Math.max(0, risk - 38) * 0.18 - Math.max(0, averageGap - 34) * 0.2;
-  const total = clamp(weightedTotal + spreadAdjustment, 38, 96);
-
-  return {
-    total,
-    similarity,
-    complementarity,
-    risk,
-    conflictScore,
-    dimensions,
-    averageGap
-  };
-}
-
-function classifyReport(metrics, context) {
-  const { total, similarity, complementarity, risk } = metrics;
-  if (normalizeContext(context) === 'collab' && metrics.dimensions.goalFit > 76 && metrics.dimensions.communicationFit > 70 && risk < 48) {
-    return {
-      title: '高效分工型',
-      keywords: ['目标感', '分工清楚', '能出活'],
-      summary: '你们比较适合一起完成具体任务：一个负责推进，一个负责补位。只要提前说清分工和截止时间，就不容易把合作变成互相猜。'
-    };
-  }
-  if (complementarity > 74 && risk > 54) {
-    return {
-      title: '高吸引 × 高摩擦型',
-      keywords: ['反差吸引', '容易上头', '需要翻译'],
-      summary: '你们容易被对方身上自己缺少的部分吸引，但也容易在节奏、表达和安全感上互相触发。核心不是不合，而是需要学会翻译彼此。'
-    };
-  }
-  if (similarity > 78 && risk < 34) {
-    return {
-      title: '稳定同频型',
-      keywords: ['默契', '低消耗', '慢慢升温'],
-      summary: '你们的相处方式比较接近，很多事情不用解释太多就能懂。优势是舒适稳定，提醒是别因为太像而少了新鲜表达。'
-    };
-  }
-  if (complementarity > 72 && risk < 50) {
-    return {
-      title: '互补成长型',
-      keywords: ['互补', '成长', '彼此补位'],
-      summary: '你们不是完全相同，但差异大多落在可以互相补位的区间。一个提供方向，一个提供温度；一个负责打开局面，一个负责稳定节奏。'
-    };
-  }
-  if (risk > 66 || total < 54) {
-    return {
-      title: '拉扯磨合型',
-      keywords: ['节奏不同', '容易误会', '需要边界'],
-      summary: '你们的差异不小，尤其要小心把对方的表达方式误读成态度问题。相处关键是提前约定沟通规则，不要靠猜。'
-    };
-  }
-  if (similarity > 67 && complementarity < 58) {
-    return {
-      title: '舒适但易停滞型',
-      keywords: ['舒服', '同类感', '需要新鲜'],
-      summary: '你们相处起来不太费劲，但可能会因为太习惯彼此而减少主动表达。适当制造新鲜感，会让这段关系更有生命力。'
-    };
-  }
-  return {
-    title: '差异吸引型',
-    keywords: ['有反差', '能互补', '要磨合'],
-    summary: '你们不是一眼同频的组合，但也不是单纯冲突。真正的看点在于差异能不能被理解：理解了是互补，不理解就会变成内耗。'
-  };
-}
-
-function getTopDifferences(vecA, vecB, nameA, nameB, tone = 'warm_roast') {
-  const keys = [
-    'extraversion','openness','agreeableness','conscientiousness','neuroticism','logicEmotion',
-    'emotionalExpression','planningNeed','noveltyNeed','intimacyNeed','independenceNeed','conflictDirectness',
-    'decisionSpeed','securityNeed','controlNeed','authenticityNeed','selfStability'
-  ];
-  return keys
-    .map(key => {
-      const value = Math.round(gap(vecA, vecB, key));
-      const band = gapBand(value);
-      const copy = traitCopy(key, band);
-      const aSide = signedLabel(vecA[key], key);
-      const bSide = signedLabel(vecB[key], key);
-      const contrast = `${nameA}更接近“${aSide}”，${nameB}更接近“${bSide}”。`;
-      const toneTail = normalizeTone(tone) === 'reality'
-        ? copy.bridge
-        : `${copy.bridge} 你们不用争谁更对，把彼此的需要说清楚，关系就会轻一点。`;
-      return {
-        key,
-        label: TRAIT_META[key].label,
-        gap: value,
-        band,
-        bandLabel: BAND_LABELS[band],
-        aLabel: aSide,
-        bLabel: bSide,
-        aValue: Math.round(vecA[key] ?? 50),
-        bValue: Math.round(vecB[key] ?? 50),
-        text: `${contrast}${copy[band]}`,
-        bridge: toneTail
-      };
-    })
-    .sort((x, y) => y.gap - x.gap)
-    .slice(0, 4);
-}
-
-function buildSceneText(context, topDiff, tone) {
-  const bridge = topDiff?.bridge || '先把差异说成需求，再一起讨论怎么配合。';
-  if (normalizeContext(context) === 'collab') {
-    return normalizeTone(tone) === 'reality'
-      ? `搭子关系最怕边界模糊：时间、分工、临时变化都要提前说。${bridge}`
-      : `适合一起往前走，但别把默契全交给运气。谁负责什么说清楚，关系会轻很多。${bridge}`;
-  }
-  return normalizeTone(tone) === 'reality'
-    ? `朋友和情侣都一样：别把每次不同步都理解成不在乎。${bridge}`
-    : `你们最适合的模式：允许对方和自己不一样，也愿意在关键时刻多靠近一点。${bridge}`;
-}
-
-function createStoryCards(report, inputs, differences) {
-  const { metrics } = report;
-  const nameA = inputs.nameA || 'A';
-  const nameB = inputs.nameB || 'B';
-  const mainDiff = differences[0];
-  const secondDiff = differences[1];
-  const tone = normalizeTone(inputs.tone);
-  const context = normalizeContext(inputs.context);
-
-  const attraction = metrics.complementarity > metrics.similarity
-    ? `${nameA}和${nameB}会被彼此的反差吸引：一个人身上松动的地方，刚好被另一个人接住。`
-    : `${nameA}和${nameB}的靠近感来自同类感：不用解释太多，也能大概知道对方为什么会这样。`;
-
-  const friction = mainDiff
-    ? `卡点在「${mainDiff.label}」：${mainDiff.text} ${mainDiff.bridge}`
-    : '没有特别尖锐的单点差异，但别默认对方和你用同一种方式表达在乎。';
-
-  const softSpot = secondDiff
-    ? `「${secondDiff.label}」会在小事里反复出现。${secondDiff.text} ${secondDiff.bridge}`
-    : '真正影响关系的，往往是那些“不严重、但总出现”的小错位。';
-
-  const sign = report.poetry
-    ? `${report.poetry.type === 'song' ? '现代歌单签' : '关系诗词签'}：${report.poetry.quote}｜${report.poetry.source}。${report.poetry.meaning}`
-    : '关系签文：你们的故事还没写完，先别急着下结论。';
-
-  const scene = buildSceneText(context, mainDiff, tone);
-
-  const advice = tone === 'reality'
-    ? (context === 'collab'
-      ? '把边界、分工和反馈方式说清楚。真正靠谱的搭档，不靠猜，靠彼此托底。'
-      : '少一点试探，多一点明说。关系最怕的不是差异，是两个人都在等对方先懂。')
-    : (context === 'collab'
-      ? '你们不是不能合作，是需要一个清楚到不能装傻的分工表，也需要一点互相体谅。'
-      : '先接住情绪，再讨论道理。被理解过的人，才更愿意一起解决问题。');
-
-  return [
-    { tag: '吸引点', title: '为什么会靠近', content: attraction },
-    { tag: mainDiff?.bandLabel || '差异点', title: '最容易卡住', content: friction },
-    { tag: secondDiff?.bandLabel || '隐藏点', title: '那个小小的反复', content: softSpot },
-    { tag: report.poetry?.type === 'song' ? '歌单签' : '诗词签', title: '最像你们的一句', content: sign, poem: true },
-    { tag: context === 'collab' ? '搭子/项目' : '朋友/情侣', title: '放进真实关系里', content: scene },
-    { tag: tone === 'reality' ? '落地建议' : '温柔收束', title: '最后一句送给你们', content: advice }
-  ];
-}
-
-function buildReport(inputs) {
-  const personaA = buildPersona({ mbti: inputs.mbtiA, identity: inputs.identityA, sbti: inputs.sbtiA });
-  const personaB = buildPersona({ mbti: inputs.mbtiB, identity: inputs.identityB, sbti: inputs.sbtiB });
-  inputs.context = normalizeContext(inputs.context);
-  inputs.tone = normalizeTone(inputs.tone);
-  const metrics = calculateMetrics(personaA.vector, personaB.vector, inputs.context);
-
-  // Confidence and input-depth corrections keep V8 honest and prevent shallow inputs from becoming 100%.
-  const sourceCount = personaA.sourceCount + personaB.sourceCount;
-  const depthCap = sourceCount >= 4 ? 96 : sourceCount >= 3 ? 93 : sourceCount >= 2 ? 90 : 84;
-  metrics.total = Math.min(metrics.total, depthCap);
-
-  const rawClassification = classifyReport(metrics, inputs.context);
-  const differences = getTopDifferences(personaA.vector, personaB.vector, inputs.nameA || 'A', inputs.nameB || 'B', inputs.tone);
-  const classification = { ...rawClassification, keywords: expandKeywords(rawClassification, metrics, differences, inputs.context) };
-  const poetry = pickPoetrySign(metrics, inputs.context, differences);
-  const finalRemark = buildFinalRemark(metrics, classification, differences, inputs.context, inputs.tone);
-  const storyCards = createStoryCards({ metrics, personaA, personaB, poetry, finalRemark }, inputs, differences);
-  return { inputs, personaA, personaB, metrics, classification, differences, storyCards, poetry, finalRemark };
-}
-
-function initSelects() {
-  const mbtiSelects = [document.getElementById('mbtiA'), document.getElementById('mbtiB')];
-  mbtiSelects.forEach((select, idx) => {
-    select.innerHTML = MBTI_TYPES.map(type => `<option value="${type}">${type}</option>`).join('');
-    select.value = idx === 0 ? 'ENFP' : 'ISTJ';
-  });
-
-  [document.getElementById('identityA'), document.getElementById('identityB')].forEach(select => {
-    select.innerHTML = IDENTITY_OPTIONS.map(item => `<option value="${item.value}">${item.label}</option>`).join('');
-    select.value = 'unknown';
-  });
-
-  [document.getElementById('sbtiA'), document.getElementById('sbtiB')].forEach((select, idx) => {
-    select.innerHTML = SBTI_TYPES.map(item => `<option value="${item.code}">${item.label}</option>`).join('');
-    select.value = idx === 0 ? 'LOVE-R' : 'CTRL';
-  });
-}
-
-function renderChips(containerId, items, activeId, onChange) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = items.map(item => `
-    <button class="chip ${item.id === activeId ? 'active' : ''}" type="button" data-id="${item.id}">
-      <strong>${item.title}</strong>
-      <span>${item.desc}</span>
-    </button>
-  `).join('');
-  container.querySelectorAll('.chip').forEach(btn => {
-    btn.addEventListener('click', () => {
-      onChange(btn.dataset.id);
-      [...container.querySelectorAll('.chip')].forEach(el => el.classList.remove('active'));
-      btn.classList.add('active');
-    });
-  });
-}
-
-function collectInputs() {
-  return {
-    nameA: document.getElementById('nameA').value.trim() || 'A',
-    nameB: document.getElementById('nameB').value.trim() || 'B',
-    mbtiA: document.getElementById('mbtiA').value,
-    mbtiB: document.getElementById('mbtiB').value,
-    identityA: document.getElementById('identityA').value,
-    identityB: document.getElementById('identityB').value,
-    sbtiA: document.getElementById('sbtiA').value,
-    sbtiB: document.getElementById('sbtiB').value,
-    context: normalizeContext(state.context),
-    tone: normalizeTone(state.tone)
-  };
-}
-
-function dimensionLabel(key) {
-  return {
-    emotionalSync: '情绪同步度',
-    communicationFit: '沟通顺畅度',
-    lifestyleFit: '生活节奏',
-    goalFit: '目标/价值适配',
-    conflictRepair: '冲突修复力',
-    growthComplementarity: '互补成长性'
-  }[key] || key;
-}
-
-function showScreen(id) {
-  ['homeScreen', 'matchForm', 'resultSection'].forEach(screenId => {
-    const el = document.getElementById(screenId);
-    if (!el) return;
-    if (screenId === id) {
-      el.classList.remove('hidden');
-      el.classList.add('active');
-    } else {
-      el.classList.remove('active');
-      if (screenId === 'resultSection') el.classList.add('hidden');
-    }
-  });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function runSynthesis(report) {
-  const overlay = document.getElementById('synthOverlay');
-  const text = document.getElementById('synthText');
-  const steps = ['正在合成你们的关系气场...', '正在检测互补频率...', '正在挑选关系签文...', '正在生成专属关系报告...'];
-  let i = 0;
-  overlay.classList.remove('hidden');
-  text.textContent = steps[0];
-  const timer = setInterval(() => {
-    i = (i + 1) % steps.length;
-    text.textContent = steps[i];
-  }, 360);
-  setTimeout(() => {
-    clearInterval(timer);
-    overlay.classList.add('hidden');
-    renderReport(report);
-    recordUsageEvent('report_generated', report);
-  }, 1050);
-}
-
-function renderReport(report) {
-  const { classification, metrics, differences, storyCards, inputs } = report;
-  document.getElementById('resultContext').textContent = (CONTEXTS.find(x => x.id === normalizeContext(inputs.context)) || CONTEXTS[0]).title;
-  document.getElementById('resultTitle').textContent = classification.title;
-  document.getElementById('totalScore').textContent = `${round(metrics.total)}%`;
-  document.getElementById('summaryText').textContent = classification.summary;
-  document.getElementById('keywordList').innerHTML = classification.keywords.map(k => `<span>${k}</span>`).join('');
-  document.getElementById('poetrySign').innerHTML = report.poetry ? `<strong>${report.poetry.type === 'song' ? '现代歌单签' : '关系诗词签'}</strong><q>${report.poetry.quote}</q><small>${report.poetry.source} · ${report.poetry.meaning}</small>` : '';
-  document.getElementById('finalRemarkText').textContent = report.finalRemark || '';
-
-  document.getElementById('dimensionBars').innerHTML = Object.entries(metrics.dimensions).map(([key, value]) => `
-    <div class="bar-row">
-      <div class="bar-top"><span>${dimensionLabel(key)}</span><span>${round(value)}</span></div>
-      <div class="bar-track"><div class="bar-fill" style="width:${round(value)}%"></div></div>
-    </div>
-  `).join('');
-
-  document.getElementById('differenceList').innerHTML = differences.slice(0, 3).map(item => `
-    <div class="diff-item">
-      <strong><span>${item.label}</span><span>${item.bandLabel} · 差距 ${item.gap}</span></strong>
-      <p>${item.text}</p>
-      <em>${item.bridge}</em>
-    </div>
-  `).join('');
-
-  document.getElementById('reportCards').innerHTML = storyCards.map(card => `
-    <article class="story-card ${card.poem ? 'poem-card' : ''}">
-      <span class="micro-tag">${card.tag || '关系细节'}</span>
-      <h3>${card.title}</h3>
-      <p>${card.content}</p>
-    </article>
-  `).join('');
-
-  showScreen('resultSection');
-  state.lastReport = report;
-  updateUrl(report.inputs);
-  updateShareControls(report);
-  state.posterPromise = drawPoster(report);
-  recordUsageEvent('report_viewed', report);
-
-}
-
-function encodeInputs(inputs) {
-  const json = encodeURIComponent(JSON.stringify(inputs));
-  return btoa(unescape(json)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function decodeInputs(payload) {
-  const normalized = String(payload || '').replace(/-/g, '+').replace(/_/g, '/');
-  const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
-  return JSON.parse(decodeURIComponent(escape(atob(padded))));
-}
-
-function buildReportUrl(inputs) {
-  const url = new URL(window.location.href);
-  url.hash = '';
-  url.searchParams.set('r', encodeInputs(inputs));
-  return url.toString();
-}
-
-function updateUrl(inputs) {
-  const url = buildReportUrl(inputs);
-  history.replaceState(null, '', url);
-  return url;
-}
-
-function updateShareControls(report = state.lastReport) {
-  if (!report) return '';
-  const link = buildReportUrl(report.inputs);
-  const input = document.getElementById('shareLinkPreview');
-  if (input) input.value = link;
-  return link;
-}
-
-function openReportLink() {
-  const link = state.lastReport ? buildReportUrl(state.lastReport.inputs) : window.location.href;
-  window.open(link, '_blank', 'noopener,noreferrer');
-  recordUsageEvent('open_report_link');
-}
-
-function restoreFromUrl() {
-  const url = new URL(window.location.href);
-  const encoded = url.searchParams.get('r');
-  if (!encoded) return;
-  try {
-    let inputs;
-    try {
-      inputs = decodeInputs(encoded);
-    } catch {
-      inputs = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    }
-    document.getElementById('nameA').value = inputs.nameA || '';
-    document.getElementById('nameB').value = inputs.nameB || '';
-    document.getElementById('mbtiA').value = inputs.mbtiA || 'ENFP';
-    document.getElementById('mbtiB').value = inputs.mbtiB || 'ISTJ';
-    document.getElementById('identityA').value = inputs.identityA || 'unknown';
-    document.getElementById('identityB').value = inputs.identityB || 'unknown';
-    document.getElementById('sbtiA').value = inputs.sbtiA || '';
-    document.getElementById('sbtiB').value = inputs.sbtiB || '';
-    state.context = normalizeContext(inputs.context || 'close');
-    state.tone = normalizeTone(inputs.tone || 'warm_roast');
-    renderChips('contextChoices', CONTEXTS, state.context, id => state.context = id);
-    renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
-    const restoredReport = buildReport(collectInputs());
-    renderReport(restoredReport);
-    recordUsageEvent('report_restored_from_link', restoredReport);
-  } catch (err) {
-    console.warn('无法解析报告链接', err);
-  }
-}
-
-function reportShareText(report) {
-  if (!report) return '我生成了一份 Pair Aura 关系气场报告，想发给你看看。';
-  const title = report.classification?.title || '关系气场报告';
-  const score = round(report.metrics?.total || 0);
-  const keywords = (report.classification?.keywords || []).slice(0, 3).join(' / ');
-  const sign = report.poetry ? `\n关系签：${report.poetry.quote}｜${report.poetry.source}` : '';
-  return `我测了我们的关系气场：${title}，合拍指数 ${score}%。\n关键词：${keywords}${sign}\n这份报告不替我们下结论，只是把相似、差异和容易误会的地方说清楚。你看看像不像我们？`;
-}
-
-async function copyText(text, ok = '已复制') {
-  try {
-    await navigator.clipboard.writeText(text);
-    alert(ok);
-  } catch {
-    prompt('复制这段内容', text);
-  }
-}
-
-async function ensureQrLib() {
-  if (window.QRCode && window.QRCode.toCanvas) return window.QRCode;
-  const sources = [
-    'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm',
-    'https://esm.sh/qrcode@1.5.4'
-  ];
-  for (const src of sources) {
-    try {
-      const mod = await import(src);
-      const qr = mod.default || mod;
-      if (qr && typeof qr.toCanvas === 'function') {
-        window.QRCode = qr;
-        return qr;
-      }
-    } catch {}
-  }
-  return null;
-}
-
-async function drawQr(ctx, url, x, y, size) {
-  ctx.fillStyle = 'rgba(255,255,255,0.96)';
-  roundedRect(ctx, x - 14, y - 14, size + 28, size + 28, 26);
-  ctx.fill();
-  const qr = await ensureQrLib();
-  if (qr) {
-    const qrCanvas = document.createElement('canvas');
-    await qr.toCanvas(qrCanvas, url, { width: size, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#120B2E', light: '#FFFFFF' } });
-    ctx.drawImage(qrCanvas, x, y, size, size);
-    const hint = document.getElementById('shareHint');
-    if (hint) hint.textContent = '二维码已生成。微信里可保存海报，也可以直接复制报告链接发给 TA。';
-    recordUsageEvent('qr_generated_success', state.lastReport, { urlLength: String(url || '').length });
-  } else {
-    ctx.fillStyle = '#120B2E';
-    ctx.font = '800 22px Arial';
-    ctx.fillText('复制链接', x + 26, y + 68);
-    ctx.font = '600 16px Arial';
-    ctx.fillText('二维码加载失败', x + 18, y + 102);
-    const hint = document.getElementById('shareHint');
-    if (hint) hint.textContent = '二维码库加载失败，但报告链接仍可复制分享到微信。';
-    recordUsageEvent('qr_generated_fail', state.lastReport, { urlLength: String(url || '').length });
-  }
-}
-
-function roundedRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
-
-function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 5) {
-  const chars = String(text).split('');
-  let line = '';
-  let lines = 0;
-  for (let i = 0; i < chars.length; i += 1) {
-    const testLine = line + chars[i];
-    if (ctx.measureText(testLine).width > maxWidth && line) {
-      ctx.fillText(line, x, y);
-      line = chars[i];
-      y += lineHeight;
-      lines += 1;
-      if (lines >= maxLines - 1) break;
-    } else {
-      line = testLine;
-    }
-  }
-  if (line && lines < maxLines) ctx.fillText(line, x, y);
-  return y + lineHeight;
-}
-
-async function drawPoster(report) {
-  const canvas = document.getElementById('posterCanvas');
-  const ctx = canvas.getContext('2d');
-  const { classification, metrics, inputs } = report;
-  const w = canvas.width;
-  const h = canvas.height;
-
-  const bg = ctx.createLinearGradient(0, 0, w, h);
-  bg.addColorStop(0, '#120B2E');
-  bg.addColorStop(0.48, '#201051');
-  bg.addColorStop(1, '#07111F');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-
-  const drawGlow = (x, y, radius, color) => {
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  };
-  drawGlow(140, 140, 320, 'rgba(255,92,168,0.55)');
-  drawGlow(780, 230, 360, 'rgba(70,217,255,0.40)');
-  drawGlow(530, 1120, 380, 'rgba(120,242,194,0.22)');
-
-  ctx.fillStyle = 'rgba(255,255,255,0.14)';
-  roundedRect(ctx, 58, 68, 784, 1214, 42);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  ctx.fillStyle = '#78F2C2';
-  ctx.font = '800 24px Arial';
-  ctx.fillText('PAIR AURA V14', 96, 128);
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = '900 62px Arial, sans-serif';
-  wrapText(ctx, `你们是：${classification.title}`, 96, 236, 708, 76, 2);
-
-  ctx.font = '1000 150px Arial, sans-serif';
-  const scoreGradient = ctx.createLinearGradient(96, 320, 480, 455);
-  scoreGradient.addColorStop(0, '#FFE66D');
-  scoreGradient.addColorStop(0.5, '#FF5CA8');
-  scoreGradient.addColorStop(1, '#46D9FF');
-  ctx.fillStyle = scoreGradient;
-  ctx.fillText(`${round(metrics.total)}%`, 96, 438);
-  ctx.fillStyle = 'rgba(255,255,255,0.75)';
-  ctx.font = '800 28px Arial';
-  ctx.fillText('合拍指数', 96, 482);
-
-  ctx.font = '800 27px Arial';
-  let tagX = 96;
-  const tagY = 542;
-  classification.keywords.forEach(tag => {
-    const tagW = ctx.measureText(tag).width + 42;
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    roundedRect(ctx, tagX, tagY, tagW, 54, 27);
-    ctx.fill();
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(tag, tagX + 21, tagY + 36);
-    tagX += tagW + 14;
-  });
-
-  ctx.fillStyle = '#CFC7FF';
-  ctx.font = '34px Arial, sans-serif';
-  wrapText(ctx, classification.summary, 96, 680, 704, 54, 3);
-
-  if (report.poetry) {
-    ctx.fillStyle = 'rgba(255,230,109,0.12)';
-    roundedRect(ctx, 96, 840, 708, 96, 28);
-    ctx.fill();
-    ctx.fillStyle = '#FFE66D';
-    ctx.font = '800 24px Arial';
-    ctx.fillText(report.poetry && report.poetry.type === 'song' ? '现代歌单签' : '关系诗词签', 128, 880);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = '900 30px Arial, sans-serif';
-    wrapText(ctx, report.poetry.quote, 128, 920, 650, 38, 1);
-  }
-
-  ctx.fillStyle = 'rgba(255,255,255,0.14)';
-  roundedRect(ctx, 96, 960, 708, 170, 32);
-  ctx.fill();
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = '900 30px Arial';
-  ctx.fillText('测测你和 TA 的关系气场', 128, 1018);
-  ctx.fillStyle = '#CFC7FF';
-  ctx.font = '26px Arial';
-  ctx.fillText('不只看你是谁，也看你们如何相处。', 128, 1072);
-
-  const reportUrl = buildReportUrl(report.inputs);
-  await drawQr(ctx, reportUrl, 622, 1148, 148);
-
-  ctx.fillStyle = '#CFC7FF';
-  ctx.font = '24px Arial';
-  ctx.fillText('扫码打开报告，也可以测朋友、情侣、搭子和项目关系', 96, 1228);
-}
-
-function copyReportLink() {
-  const link = state.lastReport ? updateShareControls(state.lastReport) : window.location.href;
-  copyText(link, '报告链接已复制，可以直接发到微信。');
-  recordUsageEvent('copy_report_link');
-}
-
-function copyShareText() {
-  if (!state.lastReport) return;
-  const link = updateShareControls(state.lastReport);
-  copyText(`${reportShareText(state.lastReport)}
-
-打开报告：${link}`, '分享文案已复制');
-  recordUsageEvent('copy_share_text');
-}
-
-async function nativeShareReport() {
-  if (!state.lastReport) return;
-  const url = updateShareControls(state.lastReport);
-  const text = reportShareText(state.lastReport);
-  if (navigator.share) {
-    try {
-      await navigator.share({ title: 'Pair Aura 关系气场报告', text, url });
-      recordUsageEvent('native_share_success');
-      return;
-    } catch (err) {
-      if (err && err.name === 'AbortError') return;
-    }
-  }
-  copyShareText();
-}
-
-async function downloadPoster() {
-  if (!state.lastReport) return;
-  const hint = document.getElementById('shareHint');
-  if (hint) hint.textContent = '正在整理可扫码海报，请稍等一秒...';
-  try { if (state.posterPromise) await state.posterPromise; } catch {}
-  const canvas = document.getElementById('posterCanvas');
-  const link = document.createElement('a');
-  link.download = 'pair-aura-v14-poster.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-  if (hint) hint.textContent = '海报已生成：可以保存图片，二维码会打开这份报告。';
-  recordUsageEvent('download_poster');
-}
-
-function runQualitySelfCheck() {
-  const checks = [];
-  const pairs = [
-    { a: 'ENFP', b: 'ISTJ', sA: 'LOVE-R', sB: 'CTRL', context: 'close' },
-    { a: 'INTJ', b: 'ENFP', sA: 'MONK', sB: 'HHHH', context: 'close' },
-    { a: 'ISFJ', b: 'ESTP', sA: 'STONE', sB: 'FIRE', context: 'collab' },
-    { a: 'ENTJ', b: 'INFP', sA: 'BOSS', sB: 'MOON', context: 'collab' },
-    { a: 'ENFP', b: 'ENFP', sA: 'LOVE-R', sB: 'LOVE-R', context: 'close' }
-  ];
-  pairs.forEach(pair => {
-    const report = buildReport({
-      nameA: 'A', nameB: 'B', mbtiA: pair.a, mbtiB: pair.b,
-      identityA: 'unknown', identityB: 'unknown', sbtiA: pair.sA, sbtiB: pair.sB,
-      context: pair.context, tone: 'warm_roast'
-    });
-    checks.push({ pair: `${pair.a}+${pair.sA} vs ${pair.b}+${pair.sB}`, score: round(report.metrics.total), title: report.classification.title });
-  });
-  console.table(checks);
-  return checks;
-}
-
-function generateDemoReport() {
-  document.getElementById('nameA').value = '我';
-  document.getElementById('nameB').value = 'TA';
-  document.getElementById('mbtiA').value = 'ENFP';
-  document.getElementById('mbtiB').value = 'ISTJ';
-  document.getElementById('identityA').value = 'T';
-  document.getElementById('identityB').value = 'A';
-  document.getElementById('sbtiA').value = 'LOVE-R';
-  document.getElementById('sbtiB').value = 'CTRL';
-  state.context = 'close';
-  state.tone = 'warm_roast';
-  renderChips('contextChoices', CONTEXTS, state.context, id => state.context = id);
-  renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
-  const report = buildReport(collectInputs());
-  runSynthesis(report);
-}
-
-function init() {
-  initSelects();
-  renderChips('contextChoices', CONTEXTS, state.context, id => state.context = id);
-  renderChips('toneChoices', TONES, state.tone, id => state.tone = id);
-
-  document.getElementById('heroDemoBtn')?.addEventListener('click', generateDemoReport);
-  document.getElementById('heroStartBtn')?.addEventListener('click', () => showScreen('matchForm'));
-  document.getElementById('topStartBtn')?.addEventListener('click', () => showScreen('matchForm'));
-
-  document.getElementById('matchForm').addEventListener('submit', event => {
-    event.preventDefault();
-    const inputs = collectInputs();
-    const report = buildReport(inputs);
-    runSynthesis(report);
-  });
-  document.getElementById('copyLinkBtn').addEventListener('click', copyReportLink);
-  document.getElementById('copyShareTextBtn').addEventListener('click', copyShareText);
-  document.getElementById('nativeShareBtn').addEventListener('click', nativeShareReport);
-  document.getElementById('downloadPosterBtn').addEventListener('click', downloadPoster);
-  document.getElementById('openReportLinkBtn').addEventListener('click', openReportLink);
-  restoreFromUrl();
-  window.PairAuraV14 = { buildReport, runQualitySelfCheck, buildMbtiVector, buildSbtiVector, getLocalEvents: () => JSON.parse(localStorage.getItem('pairAuraLocalEvents') || '[]'), lastAnalyticsPayload: () => state.lastAnalyticsPayload };
-}
-
-document.addEventListener('DOMContentLoaded', init);
-
+let state = { context:'close', tone:'warm_roast', posterTemplate:'standard', lastReport:null, posterPromise:null, lastAnalyticsPayload:null };
+const $ = (id) => document.getElementById(id);
+const clamp = (n,min=0,max=100)=>Math.max(min,Math.min(max,n));
+const round = (n)=>Math.round(clamp(n));
+const avg = arr => arr.reduce((s,x)=>s+x,0)/Math.max(arr.length,1);
+const gap = (a,b,k)=>Math.abs((a[k]??50)-(b[k]??50));
+const scoreFromGap = (g,scale=1.18)=>clamp(100-g*scale);
+const idealGapScore=(g,ideal,scale=1.65)=>clamp(100-Math.abs(g-ideal)*scale);
+const signedLabel=(v,k)=>v>=50?TRAIT_META[k].high:TRAIT_META[k].low;
+function normalizeContext(id){ if(['romantic','friendship','roommate'].includes(id)) return 'close'; if(['teamwork','collaboration'].includes(id)) return 'collab'; return id||'close'; }
+function normalizeTone(id){ if(['warm','roast','meme'].includes(id)) return 'warm_roast'; if(['realistic','reality','sharp'].includes(id)) return 'reality'; return id||'warm_roast'; }
+function toast(msg){ const el=$('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1800); }
+function getBaseVector(){ return { extraversion:50, openness:50, agreeableness:50, conscientiousness:50, neuroticism:50, logicEmotion:50, emotionalExpression:50, planningNeed:50, noveltyNeed:50, intimacyNeed:50, independenceNeed:50, conflictDirectness:50, decisionSpeed:50, securityNeed:50, controlNeed:50, authenticityNeed:50, selfStability:50 }; }
+function addToVector(v,patch){ Object.entries(patch).forEach(([k,val])=>v[k]=clamp((v[k]??50)+val)); return v; }
+function buildMbtiVector(type,identity='unknown'){ const v=getBaseVector(); const [ei,sn,tf,jp]=String(type||'').toUpperCase().split(''); if(ei==='E')addToVector(v,{extraversion:30,conflictDirectness:7,intimacyNeed:8,independenceNeed:-8}); if(ei==='I')addToVector(v,{extraversion:-28,conflictDirectness:-4,intimacyNeed:-6,independenceNeed:12}); if(sn==='N')addToVector(v,{openness:30,noveltyNeed:24,conscientiousness:-4,authenticityNeed:7}); if(sn==='S')addToVector(v,{openness:-22,noveltyNeed:-16,conscientiousness:8,securityNeed:6}); if(tf==='F')addToVector(v,{agreeableness:24,logicEmotion:25,emotionalExpression:18,neuroticism:8,securityNeed:6,authenticityNeed:8}); if(tf==='T')addToVector(v,{agreeableness:-14,logicEmotion:-24,conflictDirectness:8,decisionSpeed:8,emotionalExpression:-10}); if(jp==='J')addToVector(v,{conscientiousness:26,planningNeed:28,decisionSpeed:12,controlNeed:12,noveltyNeed:-8}); if(jp==='P')addToVector(v,{conscientiousness:-20,planningNeed:-24,decisionSpeed:-5,controlNeed:-8,noveltyNeed:12}); const role=String(type||'').slice(1,3); if(role==='NT')addToVector(v,{controlNeed:6,independenceNeed:8,intimacyNeed:-4}); if(role==='NF')addToVector(v,{authenticityNeed:10,emotionalExpression:8,intimacyNeed:8}); if(role==='SJ')addToVector(v,{securityNeed:10,selfStability:8,noveltyNeed:-6}); if(role==='SP')addToVector(v,{noveltyNeed:10,decisionSpeed:6,planningNeed:-5}); if(identity==='A')addToVector(v,{neuroticism:-18,selfStability:20,securityNeed:-10,conflictDirectness:4}); if(identity==='T')addToVector(v,{neuroticism:18,selfStability:-16,securityNeed:12,authenticityNeed:4}); return v; }
+const SBTI_PATCHES = { CTRL:{controlNeed:24,planningNeed:18,decisionSpeed:12,conflictDirectness:18,agreeableness:-8,securityNeed:10}, 'LOVE-R':{intimacyNeed:32,emotionalExpression:24,neuroticism:18,logicEmotion:22,securityNeed:20,independenceNeed:-16}, MONK:{independenceNeed:30,intimacyNeed:-16,emotionalExpression:-18,selfStability:16,extraversion:-18}, SOLO:{independenceNeed:28,extraversion:-14,intimacyNeed:-12,noveltyNeed:8}, HHHH:{extraversion:28,noveltyNeed:18,emotionalExpression:18,decisionSpeed:12}, DEAD:{emotionalExpression:-22,neuroticism:8,decisionSpeed:-18,extraversion:-18}, ZZZZ:{decisionSpeed:-22,planningNeed:-12,conflictDirectness:-16,independenceNeed:10}, OJBK:{planningNeed:-18,controlNeed:-16,agreeableness:10,selfStability:12,noveltyNeed:10}, IMSB:{neuroticism:26,securityNeed:22,authenticityNeed:14,emotionalExpression:12}, 'ATM-ER':{agreeableness:26,intimacyNeed:18,independenceNeed:-18,selfStability:-8}, SHIT:{agreeableness:-22,conflictDirectness:22,authenticityNeed:18,controlNeed:10}, FIRE:{extraversion:18,decisionSpeed:24,conflictDirectness:18,noveltyNeed:14}, ICE:{emotionalExpression:-24,logicEmotion:-18,selfStability:22}, MOON:{neuroticism:22,emotionalExpression:20,openness:18,intimacyNeed:18}, SUN:{extraversion:30,agreeableness:14,emotionalExpression:20,selfStability:10}, CUBE:{planningNeed:26,conscientiousness:24,controlNeed:14,noveltyNeed:-18}, FLOW:{planningNeed:-24,noveltyNeed:20,controlNeed:-20,openness:14}, CAT:{independenceNeed:28,intimacyNeed:-4,conflictDirectness:-8,authenticityNeed:12}, DOG:{intimacyNeed:26,agreeableness:22,extraversion:12,independenceNeed:-18}, NPC:{agreeableness:12,conflictDirectness:-16,extraversion:-10,selfStability:8}, BOSS:{controlNeed:26,decisionSpeed:24,conflictDirectness:18,planningNeed:16}, CLOWN:{extraversion:24,noveltyNeed:20,emotionalExpression:18,conscientiousness:-14}, DIVA:{emotionalExpression:28,securityNeed:18,authenticityNeed:18,neuroticism:10}, TANK:{selfStability:28,neuroticism:-16,conflictDirectness:12,controlNeed:10}, BUBBLE:{openness:24,noveltyNeed:18,logicEmotion:14,planningNeed:-10}, STONE:{selfStability:24,emotionalExpression:-20,planningNeed:10,extraversion:-12}, WAVE:{neuroticism:24,emotionalExpression:22,logicEmotion:16,decisionSpeed:-8} };
+const ENNEA_PATCHES = { '1':{conscientiousness:24,planningNeed:18,controlNeed:14,neuroticism:8}, '2':{agreeableness:24,intimacyNeed:18,securityNeed:10,independenceNeed:-10}, '3':{decisionSpeed:22,conscientiousness:18,controlNeed:12,emotionalExpression:-4}, '4':{openness:22,authenticityNeed:22,logicEmotion:16,neuroticism:12}, '5':{independenceNeed:24,logicEmotion:-20,emotionalExpression:-16,openness:14}, '6':{securityNeed:24,neuroticism:18,selfStability:-10,planningNeed:10}, '7':{noveltyNeed:28,extraversion:16,planningNeed:-14,decisionSpeed:10}, '8':{controlNeed:26,conflictDirectness:22,decisionSpeed:16,agreeableness:-8}, '9':{agreeableness:22,conflictDirectness:-18,selfStability:14,controlNeed:-12} };
+function buildSbtiVector(code){ const v=getBaseVector(); return addToVector(v,SBTI_PATCHES[code]||{}); }
+function buildEnneagramVector(type){ const v=getBaseVector(); return addToVector(v,ENNEA_PATCHES[type]||{}); }
+function blendVectors(items){ const total=items.reduce((s,x)=>s+x.weight,0)||1; const out=getBaseVector(); Object.keys(out).forEach(k=>{ out[k]=clamp(items.reduce((s,x)=>s+(x.vector[k]??50)*x.weight,0)/total); }); return out; }
+function buildPersona({mbti,identity,sbti,enneagram,answers}){ const items=[]; if(mbti)items.push({vector:buildMbtiVector(mbti,identity),weight:.48}); if(sbti)items.push({vector:buildSbtiVector(sbti),weight:.24}); if(enneagram)items.push({vector:buildEnneagramVector(enneagram),weight:.20}); const base=items.length?blendVectors(items):getBaseVector(); let sourceCount=items.length; Object.entries(answers||{}).forEach(([qid,value])=>{ const q=QUESTIONS.find(x=>x.id===qid); if(q&&value){ addToVector(base,value==='a'?q.patchA:q.patchB); sourceCount += .12; } }); return {vector:base,sourceCount}; }
+function calculateMetrics(vecA,vecB,context){ const g=k=>gap(vecA,vecB,k); const primary=['extraversion','openness','agreeableness','conscientiousness','neuroticism','planningNeed','intimacyNeed','independenceNeed','conflictDirectness','decisionSpeed','controlNeed','selfStability'].map(g); const averageGap=avg(primary); const largeGapPenalty=primary.filter(x=>x>45).length*4.5; const similarity=clamp(100-averageGap*1.25-largeGapPenalty); const targets=normalizeContext(context)==='collab'?{extraversion:22,logicEmotion:28,planningNeed:24,noveltyNeed:24,decisionSpeed:18,controlNeed:18}:{extraversion:18,logicEmotion:24,planningNeed:18,noveltyNeed:20,independenceNeed:18,emotionalExpression:16}; const complementarity=clamp(avg(Object.entries(targets).map(([k,ideal])=>idealGapScore(g(k),ideal,1.72)))); const risk=clamp(g('neuroticism')*.18+g('intimacyNeed')*.20+g('independenceNeed')*.14+g('planningNeed')*.16+g('conflictDirectness')*.16+g('logicEmotion')*.14+g('controlNeed')*.12+primary.filter(x=>x>52).length*7); const conflictScore=clamp(100-risk*1.18); const dimensions={ emotionalSync:clamp(avg([scoreFromGap(g('neuroticism'),1.35),scoreFromGap(g('intimacyNeed'),1.25),scoreFromGap(g('logicEmotion'),1.05),scoreFromGap(g('securityNeed'),1.15)])), communicationFit:clamp(avg([scoreFromGap(g('emotionalExpression'),1.12),scoreFromGap(g('conflictDirectness'),1.2),scoreFromGap(g('logicEmotion'),1.02),scoreFromGap(g('agreeableness'),.95)])), lifestyleFit:clamp(avg([scoreFromGap(g('planningNeed'),1.28),scoreFromGap(g('noveltyNeed'),1.08),scoreFromGap(g('extraversion'),.98),scoreFromGap(g('independenceNeed'),1.1)])), goalFit:clamp(avg([scoreFromGap(g('conscientiousness'),1.12),scoreFromGap(g('decisionSpeed'),1.05),scoreFromGap(g('controlNeed'),.98),scoreFromGap(g('authenticityNeed'),.8)])), conflictRepair:conflictScore, growthComplementarity:complementarity };
+  const weights=normalizeContext(context)==='collab'?{emotionalSync:.08,communicationFit:.22,lifestyleFit:.08,goalFit:.26,conflictRepair:.12,growthComplementarity:.24}:{emotionalSync:.22,communicationFit:.18,lifestyleFit:.12,goalFit:.10,conflictRepair:.20,growthComplementarity:.18}; const weighted=Object.entries(weights).reduce((s,[k,w])=>s+dimensions[k]*w,0); const spread=(complementarity-65)*.08-Math.max(0,risk-38)*.18-Math.max(0,averageGap-34)*.2; const total=clamp(weighted+spread,38,96); return {total,similarity,complementarity,risk,conflictScore,dimensions,averageGap}; }
+function gapBand(v){ return v>=48?'strong':v>=28?'visible':'micro'; }
+function traitCopy(key,band){ return TRAIT_COPY[key]||TRAIT_COPY.extraversion; }
+function getTopDifferences(vecA,vecB,nameA,nameB,tone){ return Object.keys(TRAIT_META).map(key=>{ const value=round(gap(vecA,vecB,key)); const band=gapBand(value); const copy=traitCopy(key,band); const aSide=signedLabel(vecA[key],key), bSide=signedLabel(vecB[key],key); return {key,label:TRAIT_META[key].label,gap:value,band,bandLabel:BAND_LABELS[band],aLabel:aSide,bLabel:bSide,aValue:round(vecA[key]??50),bValue:round(vecB[key]??50),text:`${nameA}更接近“${aSide}”，${nameB}更接近“${bSide}”。${copy[band]}`,bridge:normalizeTone(tone)==='reality'?copy.bridge:`${copy.bridge} 把差异说成需求，不要说成指责。`}; }).sort((a,b)=>b.gap-a.gap).slice(0,4); }
+function expandKeywords(base,metrics,diffs,context){ const list=[...(base.keywords||[])]; const add=a=>a.forEach(x=>{if(!list.includes(x))list.push(x)}); add(RELATION_KEYWORD_BANK[normalizeContext(context)]); if(metrics.risk>55)add(RELATION_KEYWORD_BANK.highRisk); if(metrics.similarity>68)add(RELATION_KEYWORD_BANK.highSync); if(metrics.complementarity>68)add(RELATION_KEYWORD_BANK.highComplement); diffs.slice(0,2).forEach(d=>list.push(d.label)); return list.slice(0,6); }
+function classifyReport(metrics,context,diffs){ const type=RELATION_TYPES.find(r=>r.when(metrics,normalizeContext(context),diffs))||RELATION_TYPES.at(-1); return {...type,keywords:expandKeywords(type,metrics,diffs,context)}; }
+function pickSign(metrics,context){ return SIGNS.find(s=>s.ctx.includes(normalizeContext(context))&&s.fit(metrics)) || SIGNS.find(s=>s.ctx.includes(normalizeContext(context))) || SIGNS[0]; }
+function finalRemark(metrics,classification,diffs,context,tone){ const main=diffs[0]; if(normalizeTone(tone)==='reality'){ if(metrics.risk>60)return `这段关系的重点不是“配不配”，而是能不能把「${main?.label||'节奏'}」说清楚。少一点猜，多一点明说，就能少很多内耗。`; if(normalizeContext(context)==='collab')return '你们适合把差异变成分工：谁开局，谁收尾，谁提醒风险。规则越清楚，关系越轻。'; return '你们已经有靠近的条件，下一步是把回应、空间和边界讲得更具体。'; }
+  if(metrics.complementarity>metrics.similarity)return '你们像两种颜色撞在一起，亮是真的，刺眼也是真的；会不会好看，取决于谁愿意先学会调色。'; return '你们不需要证明谁更正常。能被理解，也能理解对方，这就是关系里很珍贵的事。'; }
+function buildPersonaSummary(vector,name){ const sorted=Object.keys(TRAIT_META).map(k=>({key:k,value:vector[k],dist:Math.abs(vector[k]-50)})).sort((a,b)=>b.dist-a.dist).slice(0,4); const tags=sorted.map(x=>signedLabel(x.value,x.key)); const lead=tags[0]||'关系参与者'; return {name,lead,tags}; }
+function createStoryCards(report,inputs,diffs){ const {metrics}=report, nameA=inputs.nameA||'A', nameB=inputs.nameB||'B'; const main=diffs[0], second=diffs[1], ctx=normalizeContext(inputs.context), tone=normalizeTone(inputs.tone); const attraction=metrics.complementarity>metrics.similarity?`${nameA}和${nameB}会被彼此的反差吸引：一个身上松动的地方，刚好被另一个人接住。`:`${nameA}和${nameB}的靠近感来自同类感：不用解释太多，也能大概知道对方为什么会这样。`; const friction=main?`卡点在「${main.label}」：${main.text} ${main.bridge}`:'没有特别尖锐的单点差异，但别默认对方和你用同一种方式表达在乎。'; const scene=ctx==='collab'?(tone==='reality'?'合作里最怕边界模糊：时间、分工、反馈方式都要提前说。':'适合一起往前走，但别把默契全交给运气。谁负责什么说清楚，关系会轻很多。'):(tone==='reality'?'朋友和情侣都一样：别把每次不同步都理解成不在乎。':'允许对方和自己不一样，也愿意在关键时刻多靠近一点。'); const advice=tone==='reality'?(ctx==='collab'?'把边界、分工和反馈方式说清楚。真正靠谱的搭档，不靠猜，靠彼此托底。':'少一点试探，多一点明说。关系最怕的不是差异，是两个人都在等对方先懂。'):(ctx==='collab'?'你们不是不能合作，是需要一个清楚到不能装傻的分工表，也需要一点互相体谅。':'先接住情绪，再讨论道理。被理解过的人，才更愿意一起解决问题。'); return [ {tag:'吸引点',title:'你们为什么会靠近',content:attraction}, {tag:main?.bandLabel||'差异点',title:'最容易卡住的地方',content:friction}, {tag:second?.bandLabel||'隐藏点',title:'一个更细的隐藏差异',content:second?`「${second.label}」会在小事里反复出现。${second.text} ${second.bridge}`:'真正影响关系的，往往是那些“不严重、但总出现”的小错位。'}, {tag:report.sign?.type==='song'?'歌单签':'诗词签',title:'最适合描述你们的一句',content:`${report.sign.quote}｜${report.sign.source}。${report.sign.meaning}`}, {tag:ctx==='collab'?'搭子/项目':'朋友/情侣',title:'放到真实关系里',content:scene}, {tag:tone==='reality'?'行动建议':'温柔收束',title:'最后一句送给你们',content:advice} ]; }
+function buildReport(inputs){ inputs.context=normalizeContext(inputs.context); inputs.tone=normalizeTone(inputs.tone); const pa=buildPersona({mbti:inputs.mbtiA,identity:inputs.identityA,sbti:inputs.sbtiA,enneagram:inputs.enneagramA,answers:inputs.answersA}); const pb=buildPersona({mbti:inputs.mbtiB,identity:inputs.identityB,sbti:inputs.sbtiB,enneagram:inputs.enneagramB,answers:inputs.answersB}); const metrics=calculateMetrics(pa.vector,pb.vector,inputs.context); const depth=pa.sourceCount+pb.sourceCount; metrics.total=Math.min(metrics.total, depth>=4?96:depth>=3?93:depth>=2?90:84); const diffs=getTopDifferences(pa.vector,pb.vector,inputs.nameA||'A',inputs.nameB||'B',inputs.tone); const classification=classifyReport(metrics,inputs.context,diffs); const sign=pickSign(metrics,inputs.context); const final=finalRemark(metrics,classification,diffs,inputs.context,inputs.tone); const storyCards=createStoryCards({metrics,personaA:pa,personaB:pb,sign,finalRemark:final},inputs,diffs); return {inputs,personaA:pa,personaB:pb,metrics,classification,differences:diffs,sign,finalRemark:final,storyCards,personaSummaryA:buildPersonaSummary(pa.vector,inputs.nameA||'A'),personaSummaryB:buildPersonaSummary(pb.vector,inputs.nameB||'B')}; }
+function dimLabel(k){ return {emotionalSync:'情绪同步',communicationFit:'沟通顺畅',lifestyleFit:'生活节奏',goalFit:'目标/分工',conflictRepair:'冲突修复',growthComplementarity:'互补吸引'}[k]||k; }
+function renderChips(id,items,active,onChange){ const el=$(id); el.innerHTML=items.map(x=>`<button class="chip ${x.id===active?'active':''}" type="button" data-id="${x.id}"><strong>${x.title}</strong><span>${x.desc}</span></button>`).join(''); el.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{onChange(btn.dataset.id); renderChips(id,items,btn.dataset.id,onChange); if(id==='contextChoices')recordEvent('scenario_selected',null,{context:btn.dataset.id});})); }
+function personFields(side){ return `<label class="field" for="mbti${side}">MBTI / 16 型人格</label><div class="select-row"><select id="mbti${side}"></select><a class="small-link" href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">去测</a></div><label class="field" for="identity${side}">A/T 稳定度</label><select id="identity${side}"></select><label class="field" for="sbti${side}">SBTI 娱乐人格</label><div class="select-row"><select id="sbti${side}"></select><a class="small-link" href="https://fancc.de5.net/projects/sbti/" target="_blank" rel="noopener">核对</a></div><label class="field" for="enneagram${side}">九型人格，可选</label><select id="enneagram${side}"></select><details class="qbox"><summary>想更准？补 6 个小问题（可选）</summary><div class="q-list">${QUESTIONS.map(q=>`<div><label for="q${side}_${q.id}">${q.text}</label><select id="q${side}_${q.id}"><option value="">不填写</option><option value="a">${q.a}</option><option value="b">${q.b}</option></select></div>`).join('')}</div></details>`; }
+function initSelects(){ ['A','B'].forEach((side,i)=>{ $(`personFields${side}`).innerHTML=personFields(side); $(`mbti${side}`).innerHTML=MBTI_TYPES.map(t=>`<option value="${t}">${t||'不填写 MBTI'}</option>`).join(''); $(`mbti${side}`).value=i===0?'ENFP':'ISTJ'; $(`identity${side}`).innerHTML=IDENTITY_OPTIONS.map(x=>`<option value="${x.value}">${x.label}</option>`).join(''); $(`sbti${side}`).innerHTML=SBTI_TYPES.map(x=>`<option value="${x.code}">${x.label}</option>`).join(''); $(`sbti${side}`).value=i===0?'LOVE-R':'CTRL'; $(`enneagram${side}`).innerHTML=ENNEAGRAM_TYPES.map(x=>`<option value="${x.value}">${x.label}</option>`).join(''); }); }
+function collectAnswers(side){ const obj={}; QUESTIONS.forEach(q=>obj[q.id]=$(`q${side}_${q.id}`).value); return obj; }
+function collectInputs(){ const inputs={ nameA:$('nameA').value.trim()||'A', nameB:$('nameB').value.trim()||'B', mbtiA:$('mbtiA').value, mbtiB:$('mbtiB').value, identityA:$('identityA').value, identityB:$('identityB').value, sbtiA:$('sbtiA').value, sbtiB:$('sbtiB').value, enneagramA:$('enneagramA').value, enneagramB:$('enneagramB').value, answersA:collectAnswers('A'), answersB:collectAnswers('B'), context:normalizeContext(state.context), tone:normalizeTone(state.tone)}; if(!inputs.mbtiA&&!inputs.sbtiA&&!inputs.enneagramA)throw new Error('A 至少填写一个人格结果'); if(!inputs.mbtiB&&!inputs.sbtiB&&!inputs.enneagramB)throw new Error('B 至少填写一个人格结果'); return inputs; }
+function showScreen(id){ ['homeScreen','matchForm','resultSection'].forEach(s=>$(s).classList.toggle('active',s===id)); window.scrollTo({top:0,behavior:'smooth'}); }
+function renderReport(report){ state.lastReport=report; const ctx=CONTEXTS.find(x=>x.id===report.inputs.context)||CONTEXTS[0]; $('resultContext').textContent=ctx.title; $('resultTitle').textContent=report.classification.title; $('totalScore').textContent=`${round(report.metrics.total)}%`; $('keywordList').innerHTML=report.classification.keywords.map(k=>`<span>${k}</span>`).join(''); $('summaryText').textContent=report.classification.summary; $('relationSign').innerHTML=`<strong>${report.sign.type==='song'?'现代歌单签':'关系诗词签'}</strong><q>${report.sign.quote}</q><small>${report.sign.source} · ${report.sign.meaning}</small>`; $('finalRemarkText').textContent=report.finalRemark; $('compareCard').innerHTML=[report.personaSummaryA,report.personaSummaryB].map((p,i)=>`<div class="compare-person"><h4>${i?'B':'A'} · ${p.name}</h4><p class="hint">更像：${p.lead}</p><div class="compare-tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div></div>`).join(''); $('dimensionBars').innerHTML=Object.entries(report.metrics.dimensions).map(([k,v])=>`<div><div class="bar-top"><span>${dimLabel(k)}</span><span>${round(v)}</span></div><div class="track"><div class="fill" style="width:${round(v)}%"></div></div></div>`).join(''); $('differenceList').innerHTML=report.differences.slice(0,3).map(d=>`<div class="diff"><strong><span>${d.label}</span><span>${d.bandLabel} · 差距 ${d.gap}</span></strong><p>${d.text}</p><p>${d.bridge}</p></div>`).join(''); $('storyCards').innerHTML=report.storyCards.map(c=>`<article class="story"><span class="tag">${c.tag}</span><h3>${c.title}</h3><p>${c.content}</p></article>`).join(''); renderPosterTemplates(); showScreen('resultSection'); updateUrl(report.inputs); updateShareControls(report); state.posterPromise=drawPoster(report); recordEvent('report_viewed',report); }
+function runSynthesis(report){ const el=$('loading'), text=$('loadText'); const steps=['正在合成你们的关系气场...','正在检测互补频率...','正在补全九型动机...','正在挑选关系签文...','正在生成分享海报...']; let i=0; el.classList.add('show'); const timer=setInterval(()=>{i=(i+1)%steps.length;text.textContent=steps[i];},330); setTimeout(()=>{clearInterval(timer);el.classList.remove('show');renderReport(report);recordEvent('report_generated',report);},1200); }
+function encodeInputs(inputs){ return btoa(unescape(encodeURIComponent(JSON.stringify(inputs)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function decodeInputs(payload){ const n=String(payload||'').replace(/-/g,'+').replace(/_/g,'/'); return JSON.parse(decodeURIComponent(escape(atob(n+'='.repeat((4-n.length%4)%4))))); }
+function buildReportUrl(inputs){ const url=new URL(window.location.href); url.hash=''; url.searchParams.set('r',encodeInputs(inputs)); return url.toString(); }
+function updateUrl(inputs){ const url=buildReportUrl(inputs); history.replaceState(null,'',url); return url; }
+function updateShareControls(report=state.lastReport){ if(!report)return ''; const link=buildReportUrl(report.inputs); $('shareLinkPreview').value=link; return link; }
+function restoreFromUrl(){ const encoded=new URL(window.location.href).searchParams.get('r'); if(!encoded)return; try{ const inputs=decodeInputs(encoded); Object.entries(inputs).forEach(([k,v])=>{ const el=$(k); if(el&&typeof v==='string')el.value=v; }); ['A','B'].forEach(side=>{ if(inputs[`answers${side}`])QUESTIONS.forEach(q=>{const el=$(`q${side}_${q.id}`); if(el)el.value=inputs[`answers${side}`][q.id]||'';}); }); state.context=normalizeContext(inputs.context); state.tone=normalizeTone(inputs.tone); renderChips('contextChoices',CONTEXTS,state.context,id=>state.context=id); renderChips('toneChoices',TONES,state.tone,id=>state.tone=id); const report=buildReport(collectInputs()); renderReport(report); recordEvent('report_restored_from_link',report);}catch(err){console.warn('无法解析报告链接',err);} }
+function reportShareText(report){ const kw=report.classification.keywords.slice(0,3).join(' / '); return `我测了我们的关系气场：${report.classification.title}，合拍指数 ${round(report.metrics.total)}%。\n关键词：${kw}\n关系签：${report.sign.quote}｜${report.sign.source}\n你看看像不像我们？`; }
+async function copyText(text,msg){ try{ await navigator.clipboard.writeText(text); toast(msg||'已复制'); }catch{ prompt('复制这段内容',text); } }
+function copyReportLink(){ const link=updateShareControls(); copyText(link,'报告链接已复制'); recordEvent('copy_link'); }
+function copyShareText(){ const link=updateShareControls(); copyText(`${reportShareText(state.lastReport)}\n\n打开报告：${link}`,'分享文案已复制'); recordEvent('copy_share_text'); }
+async function nativeShareReport(){ const url=updateShareControls(); const text=reportShareText(state.lastReport); if(navigator.share){ try{ await navigator.share({title:'Pair Aura 关系气场报告',text,url}); recordEvent('share_click'); return; }catch(e){ if(e&&e.name==='AbortError')return; }} copyShareText(); }
+function openReportLink(){ const link=updateShareControls(); window.open(link,'_blank','noopener,noreferrer'); recordEvent('open_report_link'); }
+async function ensureQrLib(){ if(window.QRCode&&window.QRCode.toCanvas)return true; for(const src of ['https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm','https://esm.sh/qrcode@1.5.4']){ try{ const mod=await import(src); const qr=mod.default||mod; if(qr&&typeof qr.toCanvas==='function'){ window.QRCode=qr; return true; } }catch{} } return false; }
+function rounded(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function wrap(ctx,text,x,y,maxWidth,lineHeight,maxLines=5){ const chars=String(text).split(''); let line='',lines=[]; chars.forEach(ch=>{ const t=line+ch; if(ctx.measureText(t).width>maxWidth&&line){lines.push(line);line=ch;}else line=t;}); if(line)lines.push(line); lines.slice(0,maxLines).forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight)); }
+async function drawQr(ctx,url,x,y,size){ ctx.fillStyle='#fff'; rounded(ctx,x-8,y-8,size+16,size+16,18); ctx.fill(); if(await ensureQrLib()){ const c=document.createElement('canvas'); await window.QRCode.toCanvas(c,url,{width:size,margin:1,errorCorrectionLevel:'M',color:{dark:'#120B2E',light:'#FFFFFF'}}); ctx.drawImage(c,x,y,size,size); $('shareHint').textContent='二维码已写入海报，扫码可打开这份报告。'; } else { ctx.fillStyle='#120B2E'; ctx.font='800 18px Arial'; wrap(ctx,'二维码加载失败，请复制链接分享',x+12,y+55,size-24,26,3); $('shareHint').textContent='二维码库加载失败，复制链接仍可正常分享。'; } }
+async function drawPoster(report){ const canvas=$('posterCanvas'),ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height; const template=state.posterTemplate; ctx.clearRect(0,0,w,h); const bg=ctx.createLinearGradient(0,0,w,h); bg.addColorStop(0, template==='xhs'?'#271544':'#120B2E'); bg.addColorStop(.55, template==='roast'?'#261034':'#201051'); bg.addColorStop(1, template==='invite'?'#062033':'#07111F'); ctx.fillStyle=bg; ctx.fillRect(0,0,w,h); const glow=(x,y,r,c)=>{const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}; glow(130,150,330,'rgba(255,92,168,.48)'); glow(780,250,360,'rgba(85,215,255,.36)'); glow(560,1150,390,'rgba(120,242,194,.18)'); ctx.fillStyle='rgba(255,255,255,.14)'; rounded(ctx,58,70,784,1210,42); ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.stroke(); ctx.fillStyle='#78F2C2'; ctx.font='800 24px Arial'; ctx.fillText('PAIR AURA V15',96,130); ctx.fillStyle='#fff'; if(template==='invite'){ ctx.font='900 62px Arial'; wrap(ctx,'我测了我们的关系报告',96,240,704,74,2); ctx.font='700 34px Arial'; ctx.fillStyle='#CFC7FF'; wrap(ctx,'系统说还差你的确认。点开看看：你同不同意？',96,405,704,54,3); } else if(template==='xhs'){ ctx.font='900 58px Arial'; wrap(ctx,`我们是：${report.classification.title}`,96,260,704,72,2); ctx.font='700 36px Arial'; ctx.fillStyle='#FFE66D'; wrap(ctx,`“${report.finalRemark}”`,96,520,704,58,4); } else if(template==='roast'){ ctx.font='900 54px Arial'; wrap(ctx,'系统检测到：',96,235,704,70,1); ctx.font='900 84px Arial'; ctx.fillStyle='#FFE66D'; ctx.fillText(`${round(report.metrics.similarity)}% 默契`,96,360); ctx.fillStyle='#FF5CA8'; ctx.fillText(`${round(report.metrics.risk)}% 嘴硬`,96,470); ctx.font='700 34px Arial'; ctx.fillStyle='#fff'; wrap(ctx,report.storyCards[1].content,96,600,704,52,4); } else { ctx.font='900 62px Arial'; wrap(ctx,`你们是：${report.classification.title}`,96,238,704,76,2); const sg=ctx.createLinearGradient(96,320,500,455); sg.addColorStop(0,'#FFE66D'); sg.addColorStop(.5,'#FF5CA8'); sg.addColorStop(1,'#46D9FF'); ctx.fillStyle=sg; ctx.font='1000 148px Arial'; ctx.fillText(`${round(report.metrics.total)}%`,96,438); ctx.font='800 28px Arial'; ctx.fillStyle='rgba(255,255,255,.72)'; ctx.fillText('合拍指数',96,482); }
+  ctx.font='800 27px Arial'; let tagX=96, tagY=template==='standard'?545:735; report.classification.keywords.slice(0,4).forEach(tag=>{const tw=ctx.measureText(tag).width+42;if(tagX+tw>790){tagX=96;tagY+=66;}ctx.fillStyle='rgba(255,255,255,.15)';rounded(ctx,tagX,tagY,tw,54,27);ctx.fill();ctx.fillStyle='#fff';ctx.fillText(tag,tagX+21,tagY+36);tagX+=tw+14;}); ctx.fillStyle='#CFC7FF'; ctx.font='32px Arial'; wrap(ctx,report.classification.summary,96,template==='standard'?690:870,704,52,3); if(report.sign){ ctx.fillStyle='rgba(255,230,109,.12)'; rounded(ctx,96,980,708,116,28); ctx.fill(); ctx.fillStyle='#FFE66D'; ctx.font='800 24px Arial'; ctx.fillText(report.sign.type==='song'?'现代歌单签':'关系诗词签',128,1020); ctx.fillStyle='#fff'; ctx.font='700 31px Arial'; wrap(ctx,`${report.sign.quote}｜${report.sign.source}`,128,1062,650,42,2); } await drawQr(ctx,buildReportUrl(report.inputs),630,1142,146); ctx.fillStyle='#CFC7FF'; ctx.font='24px Arial'; ctx.fillText('扫码打开报告，也可以测朋友、情侣、搭子和项目关系',96,1228); recordEvent('poster_generated',report,{template}); }
+function renderPosterTemplates(){ $('posterTemplates').innerHTML=POSTER_TEMPLATES.map(t=>`<button type="button" class="${state.posterTemplate===t.id?'active':''}" data-id="${t.id}">${t.title}</button>`).join(''); $('posterTemplates').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{ state.posterTemplate=btn.dataset.id; renderPosterTemplates(); if(state.lastReport)state.posterPromise=drawPoster(state.lastReport); })); }
+async function downloadPoster(){ if(!state.lastReport)return; if(state.posterPromise)await state.posterPromise; const a=document.createElement('a'); a.download=`pair-aura-v15-${state.posterTemplate}.png`; a.href=$('posterCanvas').toDataURL('image/png'); a.click(); recordEvent('download_poster',state.lastReport,{template:state.posterTemplate}); }
+function getSessionId(){ try{let id=localStorage.getItem('pairAuraSessionId'); if(!id){id=`pa_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,9)}`;localStorage.setItem('pairAuraSessionId',id);} return id;}catch{return `pa_${Date.now().toString(36)}`;} }
+function usageConsentEnabled(){ return !$('usageConsent') || $('usageConsent').checked; }
+function anonymizeInputs(inputs={}){ return {context:normalizeContext(inputs.context),tone:normalizeTone(inputs.tone),mbtiA:inputs.mbtiA||'',mbtiB:inputs.mbtiB||'',identityA:inputs.identityA||'',identityB:inputs.identityB||'',sbtiA:inputs.sbtiA||'',sbtiB:inputs.sbtiB||'',enneagramA:inputs.enneagramA||'',enneagramB:inputs.enneagramB||'',answerCountA:Object.values(inputs.answersA||{}).filter(Boolean).length,answerCountB:Object.values(inputs.answersB||{}).filter(Boolean).length,hasNicknameA:Boolean(inputs.nameA&&inputs.nameA!=='A'),hasNicknameB:Boolean(inputs.nameB&&inputs.nameB!=='B')}; }
+function buildPayload(event,report=state.lastReport,extra={}){ return {version:APP_VERSION,event,sessionId:getSessionId(),timestamp:new Date().toISOString(),urlPath:location.pathname,viewport:{width:innerWidth,height:innerHeight},input:anonymizeInputs(report?.inputs||{}),result:report?{title:report.classification.title,score:round(report.metrics.total),scoreRange:`${Math.floor(round(report.metrics.total)/10)*10}-${Math.floor(round(report.metrics.total)/10)*10+9}`,similarity:round(report.metrics.similarity),complementarity:round(report.metrics.complementarity),risk:round(report.metrics.risk),keywords:report.classification.keywords.slice(0,5),topDifferences:report.differences.slice(0,3).map(d=>({key:d.key,label:d.label,gap:d.gap,band:d.band}))}:null,extra}; }
+async function recordEvent(event,report=state.lastReport,extra={}){ const payload=buildPayload(event,report,extra); state.lastAnalyticsPayload=payload; try{const arr=JSON.parse(localStorage.getItem('pairAuraLocalEvents')||'[]'); arr.push(payload); localStorage.setItem('pairAuraLocalEvents',JSON.stringify(arr.slice(-60)));}catch{} if(!ANALYTICS_ENDPOINT||!usageConsentEnabled())return; try{const body=JSON.stringify(payload); if(navigator.sendBeacon&&navigator.sendBeacon(ANALYTICS_ENDPOINT,new Blob([body],{type:'application/json'})))return; await fetch(ANALYTICS_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body,mode:'no-cors',keepalive:true});}catch(e){console.warn('匿名数据回传失败',e);} }
+function generateDemo(){ const inputs={nameA:'我',nameB:'TA',mbtiA:'ENFP',mbtiB:'ISTJ',identityA:'T',identityB:'A',sbtiA:'LOVE-R',sbtiB:'CTRL',enneagramA:'4',enneagramB:'1',answersA:{reply:'a',conflict:'a',comfort:'a',pace:'a',plan:'b',complaint:'a'},answersB:{reply:'b',conflict:'b',comfort:'b',pace:'b',plan:'a',complaint:'b'},context:'close',tone:'warm_roast'}; const report=buildReport(inputs); runSynthesis(report); recordEvent('demo_report_generated',report); }
+function init(){ initSelects(); renderChips('contextChoices',CONTEXTS,state.context,id=>state.context=id); renderChips('toneChoices',TONES,state.tone,id=>state.tone=id); renderPosterTemplates(); $('heroStartBtn').addEventListener('click',()=>{showScreen('matchForm');recordEvent('start_click',null,{source:'hero'});}); $('topStartBtn').addEventListener('click',()=>{showScreen('matchForm');recordEvent('start_click',null,{source:'topbar'});}); $('heroDemoBtn').addEventListener('click',generateDemo); $('matchForm').addEventListener('submit',e=>{e.preventDefault(); try{const inputs=collectInputs(); recordEvent('input_completed',null,{input:anonymizeInputs(inputs)}); runSynthesis(buildReport(inputs));}catch(err){toast(err.message||'请至少填写两个人各一项人格结果');}}); $('copyLinkBtn').addEventListener('click',copyReportLink); $('copyShareTextBtn').addEventListener('click',copyShareText); $('nativeShareBtn').addEventListener('click',nativeShareReport); $('downloadPosterBtn').addEventListener('click',downloadPoster); $('openReportLinkBtn').addEventListener('click',openReportLink); $('restartBtn').addEventListener('click',()=>{showScreen('matchForm');recordEvent('restart_click');}); restoreFromUrl(); recordEvent('page_view'); window.PairAuraV15={buildReport,calculateMetrics,runQualitySelfCheck,getLocalEvents:()=>JSON.parse(localStorage.getItem('pairAuraLocalEvents')||'[]'),lastAnalyticsPayload:()=>state.lastAnalyticsPayload}; }
+function runQualitySelfCheck(){ const cases=[{a:'ENFP',b:'ISTJ',ea:'4',eb:'1',sa:'LOVE-R',sb:'CTRL',c:'close'},{a:'INTJ',b:'ENFP',ea:'5',eb:'7',sa:'MONK',sb:'HHHH',c:'close'},{a:'ISFJ',b:'ESTP',ea:'2',eb:'8',sa:'STONE',sb:'FIRE',c:'collab'},{a:'ENTJ',b:'INFP',ea:'8',eb:'4',sa:'BOSS',sb:'MOON',c:'collab'},{a:'ENFP',b:'ENFP',ea:'7',eb:'7',sa:'LOVE-R',sb:'LOVE-R',c:'close'}]; return cases.map(x=>{ const r=buildReport({nameA:'A',nameB:'B',mbtiA:x.a,mbtiB:x.b,identityA:'unknown',identityB:'unknown',sbtiA:x.sa,sbtiB:x.sb,enneagramA:x.ea,enneagramB:x.eb,answersA:{},answersB:{},context:x.c,tone:'warm_roast'}); return {title:r.classification.title,score:round(r.metrics.total),cards:r.storyCards.length,keywords:r.classification.keywords.length}; }); }
+document.addEventListener('DOMContentLoaded',init);
   </script>
 </body>
 </html>
